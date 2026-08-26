@@ -27,11 +27,7 @@ export default function App() {
       <button onClick={onCheck} disabled={loading} data-testid="check-health">
         {loading ? 'Đang kiểm tra...' : 'Kiểm tra backend /health'}
       </button>
-      {health && (
-        <pre data-testid="health-result">
-          {JSON.stringify(health, null, 2)}
-        </pre>
-      )}
+      {health && <pre data-testid="health-result">{JSON.stringify(health, null, 2)}</pre>}
       {error && <p style={{ color: 'crimson' }}>Lỗi: {error}</p>}
     </main>
   );

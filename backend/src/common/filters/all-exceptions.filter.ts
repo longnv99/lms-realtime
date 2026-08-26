@@ -18,19 +18,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+      exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
 
     const code =
-      exception instanceof HttpException
-        ? this.mapHttpStatusToCode(status)
-        : 'INTERNAL_ERROR';
+      exception instanceof HttpException ? this.mapHttpStatusToCode(status) : 'INTERNAL_ERROR';
 
-    const message =
-      exception instanceof HttpException
-        ? exception.message
-        : 'Lỗi máy chủ nội bộ';
+    const message = exception instanceof HttpException ? exception.message : 'Lỗi máy chủ nội bộ';
 
     if (status >= 500) {
       this.logger.error(

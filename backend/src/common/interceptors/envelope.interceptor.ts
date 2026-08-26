@@ -1,9 +1,4 @@
-import {
-  CallHandler,
-  ExecutionContext,
-  Injectable,
-  NestInterceptor,
-} from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -16,10 +11,7 @@ export interface Envelope<T> {
 
 @Injectable()
 export class EnvelopeInterceptor<T> implements NestInterceptor<T, Envelope<T>> {
-  intercept(
-    _context: ExecutionContext,
-    next: CallHandler<T>,
-  ): Observable<Envelope<T>> {
+  intercept(_context: ExecutionContext, next: CallHandler<T>): Observable<Envelope<T>> {
     return next.handle().pipe(
       map((data) => ({
         success: true,
