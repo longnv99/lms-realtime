@@ -9,7 +9,6 @@ export default defineConfig({
             '/api': {
                 target: 'http://localhost:4000',
                 changeOrigin: true,
-                rewrite: function (path) { return path.replace(/^\/api/, ''); },
             },
             '/socket.io': {
                 target: 'http://localhost:4000',
