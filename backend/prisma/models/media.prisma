@@ -1,0 +1,17 @@
+enum MediaAssetStatus {
+  PENDING
+  UPLOADED
+}
+
+model MediaAsset {
+  id          String           @id @default(uuid())
+  key         String           @unique
+  fileName    String
+  contentType String
+  sizeBytes   BigInt
+  status      MediaAssetStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  lesson Lesson?
+}

@@ -1,0 +1,72 @@
+enum QuizRunStatus {
+  PENDING
+  OPEN
+  CLOSED
+  REVEALED
+  FINISHED
+}
+
+model Quiz {
+  id        String   @id @default(uuid())
+  lessonId  String
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lesson    Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  questions Question[]
+  quizRuns  QuizRun[]
+
+  @@index([lessonId])
+}
+
+model Question {
+  id              String @id @default(uuid())
+  quizId          String
+  text            String
+  options         Json
+  correctOptionId String
+  order           Int
+
+  quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quizAnswers QuizAnswer[]
+
+  @@unique([quizId, order])
+}
+
+model QuizRun {
+  id                   String        @id @default(uuid())
+  quizId               String
+  sessionId            String
+  currentQuestionIndex Int?
+  status               QuizRunStatus @default(PENDING)
+  questionOpenedAt     DateTime?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  quiz    Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  session Session      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  answers QuizAnswer[]
+
+  @@index([sessionId])
+  @@index([status])
+}
+
+model QuizAnswer {
+  id               String   @id @default(uuid())
+  runId            String
+  questionId       String
+  userId           String
+  selectedOptionId String
+  isCorrect        Boolean
+  score            Int
+  answeredAt       DateTime @default(now())
+
+  run      QuizRun  @relation(fields: [runId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([runId, questionId, userId])
+  @@index([runId])
+  @@index([userId])
+}

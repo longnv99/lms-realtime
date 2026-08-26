@@ -1,0 +1,37 @@
+enum UserRole {
+  ADMIN
+  INSTRUCTOR
+  STUDENT
+}
+
+model User {
+  id              String           @id @default(uuid())
+  email           String           @unique
+  passwordHash    String
+  name            String
+  role            UserRole         @default(STUDENT)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  refreshTokens   RefreshToken[]
+  courses         Course[]         @relation("CourseInstructor")
+  enrollments     Enrollment[]
+  lessonProgress  LessonProgress[]
+  chatMessages    ChatMessage[]
+  quizAnswers     QuizAnswer[]
+  notifications   Notification[]
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}

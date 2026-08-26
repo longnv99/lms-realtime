@@ -1,0 +1,16 @@
+model LessonProgress {
+  id              String    @id @default(uuid())
+  userId          String
+  lessonId        String
+  positionSeconds Int       @default(0)
+  lastWatchedAt   DateTime  @default(now())
+  completedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@index([lessonId])
+}

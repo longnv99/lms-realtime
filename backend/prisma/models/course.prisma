@@ -1,0 +1,58 @@
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Course {
+  id           String       @id @default(uuid())
+  title        String
+  slug         String       @unique
+  description  String?
+  status       CourseStatus @default(DRAFT)
+  instructorId String
+  publishedAt  DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  instructor  User         @relation("CourseInstructor", fields: [instructorId], references: [id])
+  lessons     Lesson[]
+  enrollments Enrollment[]
+  sessions    Session[]
+
+  @@index([status])
+  @@index([instructorId])
+}
+
+model Enrollment {
+  id        String   @id @default(uuid())
+  userId    String
+  courseId  String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@index([courseId])
+}
+
+model Lesson {
+  id              String   @id @default(uuid())
+  courseId        String
+  title           String
+  description     String?
+  order           Int
+  durationSeconds Int      @default(0)
+  mediaAssetId    String?  @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  course         Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  mediaAsset     MediaAsset?      @relation(fields: [mediaAssetId], references: [id])
+  quizzes        Quiz[]
+  lessonProgress LessonProgress[]
+
+  @@unique([courseId, order])
+  @@index([courseId])
+}
