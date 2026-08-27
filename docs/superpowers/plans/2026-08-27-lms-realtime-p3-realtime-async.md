@@ -1688,7 +1688,7 @@ git commit -m "feat(quizzes): add quiz run control flow"
 - Persists `QuizAnswer` with unique `(runId, questionId, userId)`.
 - Consumes `QuizScoringService`, `RedisService`, `QuizzesRealtimeService`.
 
-- [ ] **Step 5.1: Write failing quiz realtime tests**
+- [x] **Step 5.1: Write failing quiz realtime tests**
 
 Create `backend/test/quizzes-realtime.e2e-spec.ts`:
 
@@ -1876,7 +1876,7 @@ function once<T = any>(socket: Socket, event: string): Promise<T> {
 }
 ```
 
-- [ ] **Step 5.2: Run quiz realtime tests to verify failure**
+- [x] **Step 5.2: Run quiz realtime tests to verify failure**
 
 Run:
 
@@ -1886,7 +1886,7 @@ npm.cmd run test:e2e --workspace=backend -- quizzes-realtime.e2e-spec.ts
 
 Expected: FAIL because `/quiz` namespace does not exist.
 
-- [ ] **Step 5.3: Add quiz DTOs**
+- [x] **Step 5.3: Add quiz DTOs**
 
 Create `backend/src/modules/quizzes/dto/quiz-join.dto.ts`:
 
@@ -1917,7 +1917,7 @@ export class QuizAnswerDto {
 }
 ```
 
-- [ ] **Step 5.4: Add quiz answer method**
+- [x] **Step 5.4: Add quiz answer method**
 
 Add to `backend/src/modules/quizzes/quizzes.service.ts`:
 
@@ -1971,7 +1971,7 @@ async submitAnswer(actor: AuthenticatedUser, dto: QuizAnswerDto) {
 
 Also inject `private readonly quizScoring: QuizScoringService` in the constructor.
 
-- [ ] **Step 5.5: Add leaderboard method**
+- [x] **Step 5.5: Add leaderboard method**
 
 Add to `backend/src/modules/quizzes/quizzes.service.ts`:
 
@@ -2007,7 +2007,7 @@ async getLeaderboard(quizRunId: string) {
 }
 ```
 
-- [ ] **Step 5.6: Add quiz gateway**
+- [x] **Step 5.6: Add quiz gateway**
 
 Create `backend/src/modules/quizzes/quizzes.gateway.ts`:
 
@@ -2074,7 +2074,7 @@ export class QuizzesGateway implements OnGatewayInit, OnGatewayConnection {
 }
 ```
 
-- [ ] **Step 5.7: Register quiz gateway**
+- [x] **Step 5.7: Register quiz gateway**
 
 Modify `backend/src/modules/quizzes/quizzes.module.ts`:
 
@@ -2088,7 +2088,7 @@ providers: [
 ],
 ```
 
-- [ ] **Step 5.8: Verify quiz realtime tests pass**
+- [x] **Step 5.8: Verify quiz realtime tests pass**
 
 Run:
 
@@ -2098,7 +2098,7 @@ npm.cmd run test:e2e --workspace=backend -- quizzes-realtime.e2e-spec.ts
 
 Expected: all tests pass.
 
-- [ ] **Step 5.9: Verify backend build**
+- [x] **Step 5.9: Verify backend build**
 
 Run:
 
@@ -2108,7 +2108,7 @@ npm.cmd run build:backend
 
 Expected: exit code 0.
 
-- [ ] **Step 5.10: Commit**
+- [x] **Step 5.10: Commit**
 
 ```bash
 git add backend/src backend/test

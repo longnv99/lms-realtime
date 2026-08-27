@@ -8,6 +8,8 @@ import { RedisService } from '../../redis/redis.service';
 import { CoursesService } from '../courses/courses.service';
 import { CreateQuizRunDto } from './dto/create-quiz-run.dto';
 import { CreateQuizDto, QuizQuestionDto } from './dto/create-quiz.dto';
+import { QuizAnswerDto } from './dto/quiz-answer.dto';
+import { QuizScoringService } from './quiz-scoring.service';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
 import { QuizzesRealtimeService } from './quizzes.realtime.service';
 
@@ -18,6 +20,7 @@ export class QuizzesService {
     private readonly coursesService: CoursesService,
     private readonly redis: RedisService,
     private readonly realtime: QuizzesRealtimeService,
+    private readonly quizScoring: QuizScoringService,
   ) {}
 
   async createQuiz(lessonId: string, actor: AuthenticatedUser, dto: CreateQuizDto) {
@@ -252,6 +255,92 @@ export class QuizzesService {
     this.realtime.emitFinished(id, { summaryUrl: `/api/quiz-runs/${id}/state` });
 
     return updated;
+  }
+
+  async submitAnswer(actor: AuthenticatedUser, dto: QuizAnswerDto) {
+    const run = await this.findRunWithQuizSessionOrThrow(dto.quizRunId);
+    await this.ensureCanViewSession(run.session, actor);
+
+    if (run.status !== 'OPEN' || !run.questionOpenedAt || !run.currentQuestionIndex) {
+      throw new AppError('QUIZ_NOT_OPEN', 'Quiz khong mo', HttpStatus.BAD_REQUEST);
+    }
+
+    const question = run.quiz.questions[run.currentQuestionIndex - 1];
+
+    if (question.id !== dto.questionId) {
+      throw new AppError(
+        'VALIDATION_FAILED',
+        'Cau hoi khong phai cau dang mo',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const options = question.options as Array<{ id: string; text: string }>;
+    if (!options.some((option) => option.id === dto.optionId)) {
+      throw new AppError('VALIDATION_FAILED', 'optionId khong hop le', HttpStatus.BAD_REQUEST);
+    }
+
+    const answeredAt = new Date();
+    const isCorrect = dto.optionId === question.correctOptionId;
+    const score = this.quizScoring.calculateScore(isCorrect, run.questionOpenedAt, answeredAt);
+
+    try {
+      const answer = await this.prisma.quizAnswer.create({
+        data: {
+          runId: dto.quizRunId,
+          questionId: dto.questionId,
+          userId: actor.id,
+          selectedOptionId: dto.optionId,
+          isCorrect,
+          score,
+          answeredAt,
+        },
+      });
+
+      await this.redis
+        .getClient()
+        .zincrby(`quiz-run:${dto.quizRunId}:leaderboard`, score, actor.id);
+      await this.redis
+        .getClient()
+        .incr(`quiz-run:${dto.quizRunId}:q:${run.currentQuestionIndex}:count`);
+
+      return answer;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        throw new AppError('QUIZ_ALREADY_ANSWERED', 'Da submit cau nay', HttpStatus.CONFLICT);
+      }
+      throw error;
+    }
+  }
+
+  async getLeaderboard(quizRunId: string) {
+    const redisRows = await this.redis
+      .getClient()
+      .zrevrange(`quiz-run:${quizRunId}:leaderboard`, 0, 9, 'WITHSCORES');
+    const entries: Array<{ userId: string; score: number }> = [];
+
+    for (let index = 0; index < redisRows.length; index += 2) {
+      entries.push({ userId: redisRows[index], score: Number(redisRows[index + 1]) });
+    }
+
+    if (entries.length === 0) {
+      return { entries: [] };
+    }
+
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: entries.map((entry) => entry.userId) } },
+      select: { id: true, name: true },
+    });
+    const names = new Map(users.map((user) => [user.id, user.name]));
+
+    return {
+      entries: entries.map((entry, index) => ({
+        userId: entry.userId,
+        name: names.get(entry.userId) ?? 'Unknown',
+        score: entry.score,
+        rank: index + 1,
+      })),
+    };
   }
 
   private ensureCorrectOptions(questions: QuizQuestionDto[]): void {
