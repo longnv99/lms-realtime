@@ -5,6 +5,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { CoursesModule } from './modules/courses/courses.module';
 import { EnrollmentsModule } from './modules/enrollments/enrollments.module';
 import { LessonsModule } from './modules/lessons/lessons.module';
+import { QuizzesModule } from './modules/quizzes/quizzes.module';
 import { SessionsModule } from './modules/sessions/sessions.module';
 import { UsersModule } from './modules/users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -20,6 +21,7 @@ import { PrismaModule } from './prisma/prisma.module';
     EnrollmentsModule,
     LessonsModule,
     SessionsModule,
+    QuizzesModule,
   ],
 })
 export class AppModule {}

@@ -96,6 +96,84 @@ describe('Sessions and quizzes (e2e)', () => {
     });
   });
 
+  it('allows instructor to create a quiz with questions', async () => {
+    const instructor = await registerAndLogin(app, 'INSTRUCTOR');
+    const course = await createCourse(instructor.accessToken);
+    const lesson = await createLesson(instructor.accessToken, course.id);
+
+    const res = await request(app.getHttpServer())
+      .post(`/api/lessons/${lesson.id}/quizzes`)
+      .set('Authorization', `Bearer ${instructor.accessToken}`)
+      .send(sampleQuizPayload())
+      .expect(201);
+
+    expect(res.body.success).toBe(true);
+    expect(res.body.data).toMatchObject({
+      lessonId: lesson.id,
+      title: 'Intro quiz',
+    });
+    expect(res.body.data.questions).toHaveLength(1);
+    expect(res.body.data.questions[0]).toMatchObject({
+      text: 'Which service stores relational LMS data?',
+      correctOptionId: 'a',
+      order: 1,
+    });
+  });
+
+  it('creates a quiz run for a session in PENDING status', async () => {
+    const instructor = await registerAndLogin(app, 'INSTRUCTOR');
+    const course = await createCourse(instructor.accessToken);
+    const lesson = await createLesson(instructor.accessToken, course.id);
+    const session = await createSession(instructor.accessToken, course.id);
+    const quiz = await createQuiz(instructor.accessToken, lesson.id);
+
+    const res = await request(app.getHttpServer())
+      .post(`/api/sessions/${session.id}/quiz-runs`)
+      .set('Authorization', `Bearer ${instructor.accessToken}`)
+      .send({ quizId: quiz.id })
+      .expect(201);
+
+    expect(res.body.data).toMatchObject({
+      quizId: quiz.id,
+      sessionId: session.id,
+      status: 'PENDING',
+      currentQuestionIndex: null,
+    });
+  });
+
+  it('returns quiz run state without correctOptionId', async () => {
+    const instructor = await registerAndLogin(app, 'INSTRUCTOR');
+    const course = await createCourse(instructor.accessToken);
+    const lesson = await createLesson(instructor.accessToken, course.id);
+    const session = await createSession(instructor.accessToken, course.id);
+    const quiz = await createQuiz(instructor.accessToken, lesson.id);
+    const run = await createQuizRun(instructor.accessToken, session.id, quiz.id);
+
+    await prisma.quizRun.update({
+      where: { id: run.id },
+      data: { status: 'OPEN', currentQuestionIndex: 1, questionOpenedAt: new Date() },
+    });
+
+    const res = await request(app.getHttpServer())
+      .get(`/api/quiz-runs/${run.id}/state`)
+      .set('Authorization', `Bearer ${instructor.accessToken}`)
+      .expect(200);
+
+    expect(res.body.data).toMatchObject({
+      id: run.id,
+      status: 'OPEN',
+      currentQuestionIndex: 1,
+      question: {
+        text: 'Which service stores relational LMS data?',
+        options: [
+          { id: 'a', text: 'PostgreSQL' },
+          { id: 'b', text: 'Redis' },
+        ],
+      },
+    });
+    expect(JSON.stringify(res.body.data)).not.toContain('correctOptionId');
+  });
+
   async function createCourse(accessToken: string) {
     const res = await request(app.getHttpServer())
       .post('/api/courses')
@@ -120,7 +198,53 @@ describe('Sessions and quizzes (e2e)', () => {
     return res.body.data;
   }
 
+  async function createLesson(accessToken: string, courseId: string) {
+    const res = await request(app.getHttpServer())
+      .post(`/api/courses/${courseId}/lessons`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ title: 'Quiz lesson' })
+      .expect(201);
+
+    return res.body.data;
+  }
+
+  async function createQuiz(accessToken: string, lessonId: string) {
+    const res = await request(app.getHttpServer())
+      .post(`/api/lessons/${lessonId}/quizzes`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send(sampleQuizPayload())
+      .expect(201);
+
+    return res.body.data;
+  }
+
+  async function createQuizRun(accessToken: string, sessionId: string, quizId: string) {
+    const res = await request(app.getHttpServer())
+      .post(`/api/sessions/${sessionId}/quiz-runs`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ quizId })
+      .expect(201);
+
+    return res.body.data;
+  }
+
   function futureIsoDate(): string {
     return new Date(Date.now() + 60 * 60 * 1000).toISOString();
+  }
+
+  function sampleQuizPayload() {
+    return {
+      title: 'Intro quiz',
+      questions: [
+        {
+          text: 'Which service stores relational LMS data?',
+          options: [
+            { id: 'a', text: 'PostgreSQL' },
+            { id: 'b', text: 'Redis' },
+          ],
+          correctOptionId: 'a',
+        },
+      ],
+    };
   }
 });
