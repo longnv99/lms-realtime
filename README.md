@@ -1,23 +1,60 @@
 # LMS Realtime
 
-Learning Management System với chat/quiz realtime (portfolio project).
+Learning Management System with realtime chat and quiz features.
 
-## Quick start
+## Quick Start
 
 ```bash
 npm install
-cp .env.example .env
-npm run infra:up
-npm run dev
+npm.cmd run infra:up
+npm.cmd run db:migrate --workspace=backend
+npm.cmd run db:seed --workspace=backend
+npm.cmd run dev:backend
 ```
 
-Frontend: http://localhost:5173 — Backend: http://localhost:4000 — MinIO console: http://localhost:9001
+In another terminal:
+
+```bash
+npm.cmd run dev:frontend
+```
+
+Frontend: http://localhost:5173
+Backend: http://localhost:4000
+MinIO console: http://localhost:9001
+
+## Seed Users
+
+```text
+admin@example.com / Password123!
+instructor@example.com / Password123!
+student@example.com / Password123!
+```
+
+## Verification
+
+```bash
+npm.cmd run test:e2e --workspace=backend
+npm.cmd run build:backend
+npm.cmd run build:frontend
+npm.cmd run test:frontend
+```
+
+## Local API Smoke
+
+```bash
+curl -s http://localhost:4000/api/health
+curl -s -X POST http://localhost:4000/api/auth/login ^
+  -H "Content-Type: application/json" ^
+  -d "{\"email\":\"student@example.com\",\"password\":\"Password123!\"}"
+```
+
+Both responses should include `"success":true`.
 
 ## Structure
 
-- `backend/` — NestJS monolith
-- `frontend/` — Vite + React
-- `shared/` — TypeScript types dùng chung BE-FE
-- `docker-compose.infra.yml` — postgres + redis + minio
+- `backend/` - NestJS modular monolith
+- `frontend/` - Vite + React
+- `shared/` - shared TypeScript contracts
+- `docker-compose.infra.yml` - Postgres, Redis, and MinIO
 
-Xem chi tiết ở `docs/superpowers/specs/2026-08-26-lms-realtime-design.md`.
+See `docs/superpowers/specs/2026-08-26-lms-realtime-design.md` for the project design.
