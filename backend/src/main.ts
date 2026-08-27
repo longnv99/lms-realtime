@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { EnvelopeInterceptor } from './common/interceptors/envelope.interceptor';
 import { env } from './config/env';
+import { setupSwagger } from './swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -24,6 +25,7 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalInterceptors(new EnvelopeInterceptor());
   app.setGlobalPrefix('api');
+  setupSwagger(app);
 
   await app.listen(port);
   Logger.log(`Backend listening on http://localhost:${port}`, 'Bootstrap');

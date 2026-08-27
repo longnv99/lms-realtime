@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -9,6 +10,7 @@ import { CreateCourseDto } from './dto/create-course.dto';
 import { ListCoursesQueryDto } from './dto/list-courses-query.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 
+@ApiTags('Courses')
 @Controller('courses')
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
@@ -19,6 +21,7 @@ export class CoursesController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
   @Roles('ADMIN', 'INSTRUCTOR')
   @Post()
   create(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateCourseDto) {
@@ -31,6 +34,7 @@ export class CoursesController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
   @Roles('ADMIN', 'INSTRUCTOR')
   @Patch(':id')
   update(
@@ -42,6 +46,7 @@ export class CoursesController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
   @Roles('ADMIN', 'INSTRUCTOR')
   @Delete(':id')
   remove(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
@@ -49,6 +54,7 @@ export class CoursesController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
   @Roles('ADMIN', 'INSTRUCTOR')
   @Post(':id/publish')
   publish(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
@@ -56,6 +62,7 @@ export class CoursesController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
   @Roles('ADMIN', 'INSTRUCTOR')
   @Post(':id/unpublish')
   unpublish(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {

@@ -4,7 +4,9 @@ import { AppModule } from '../../src/app.module';
 import { AllExceptionsFilter } from '../../src/common/filters/all-exceptions.filter';
 import { EnvelopeInterceptor } from '../../src/common/interceptors/envelope.interceptor';
 
-export async function createTestApp(): Promise<INestApplication> {
+export async function createTestApp(
+  configure?: (app: INestApplication) => void | Promise<void>,
+): Promise<INestApplication> {
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
   }).compile();
@@ -20,6 +22,7 @@ export async function createTestApp(): Promise<INestApplication> {
   );
   app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalInterceptors(new EnvelopeInterceptor());
+  await configure?.(app);
   await app.init();
   return app;
 }
