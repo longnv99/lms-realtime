@@ -362,18 +362,18 @@ git commit -m "feat(backend): add swagger api docs"
 - Produces env `REDIS_URL`, `BREVO_API_KEY`, `EMAIL_FROM`, `NOTIFICATIONS_MOCK_MODE`.
 - Consumes existing `ApiEnvelope`, `UserRole`, `QuizRunStatus`, and P2 Prisma models.
 
-- [ ] **Step 1.1: Install realtime and async dependencies**
+- [x] **Step 1.1: Install realtime and async dependencies**
 
 Run from repo root:
 
 ```bash
-npm.cmd install --workspace=backend @nestjs/websockets @nestjs/platform-socket.io socket.io @socket.io/redis-adapter ioredis @nestjs/bullmq bullmq
+npm.cmd install --workspace=backend "@nestjs/websockets@^10" "@nestjs/platform-socket.io@^10" socket.io "@socket.io/redis-adapter" ioredis "@nestjs/bullmq@^10" bullmq
 npm.cmd install --workspace=backend --save-dev socket.io-client
 ```
 
 Expected: `backend/package.json` and root `package-lock.json` update.
 
-- [ ] **Step 1.2: Add backend env values**
+- [x] **Step 1.2: Add backend env values**
 
 Modify `backend/.env.example`:
 
@@ -386,7 +386,7 @@ NOTIFICATIONS_MOCK_MODE=true
 
 Modify local `backend/.env` with the same values. Keep `backend/.env` ignored.
 
-- [ ] **Step 1.3: Validate new env values**
+- [x] **Step 1.3: Validate new env values**
 
 Modify `backend/src/config/env.ts`:
 
@@ -408,7 +408,7 @@ const envSchema = z.object({
 });
 ```
 
-- [ ] **Step 1.4: Add shared realtime contracts**
+- [x] **Step 1.4: Add shared realtime contracts**
 
 Create `shared/src/realtime.ts`:
 
@@ -499,7 +499,7 @@ export interface NotificationResponse extends NotificationPayload {
 }
 ```
 
-- [ ] **Step 1.5: Export contracts and add type smoke**
+- [x] **Step 1.5: Export contracts and add type smoke**
 
 Modify `shared/src/index.ts`:
 
@@ -556,7 +556,7 @@ void quizQuestion;
 void notification;
 ```
 
-- [ ] **Step 1.6: Verify shared build**
+- [x] **Step 1.6: Verify shared build**
 
 Run:
 
@@ -566,7 +566,7 @@ npm.cmd run build:shared
 
 Expected: exit code 0.
 
-- [ ] **Step 1.7: Commit**
+- [x] **Step 1.7: Commit**
 
 ```bash
 git add backend/package.json backend/.env.example backend/src/config/env.ts shared/src package-lock.json

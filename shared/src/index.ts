@@ -4,5 +4,7 @@ export * from './courses';
 export * from './errors';
 export * from './health';
 export * from './lessons';
+export * from './notifications';
 export * from './quizzes';
+export * from './realtime';
 export * from './sessions';
