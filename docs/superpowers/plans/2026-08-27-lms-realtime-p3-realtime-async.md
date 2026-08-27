@@ -1332,7 +1332,7 @@ git commit -m "feat(sessions): add realtime chat and presence"
 - Emits quiz events through `QuizzesRealtimeService`.
 - Consumes existing `QuizzesService.getQuizRunState`, `QuizRun`, `Question`, `QuizAnswer`.
 
-- [ ] **Step 4.1: Add REST control e2e tests**
+- [x] **Step 4.1: Add REST control e2e tests**
 
 Append to `backend/test/sessions-quizzes.e2e-spec.ts`:
 
@@ -1385,7 +1385,7 @@ it('closes, reveals, and finishes a quiz run', async () => {
 
 Add helper `createSessionQuizFixture()` in the same file by composing existing session, lesson, quiz, and quiz run helpers.
 
-- [ ] **Step 4.2: Run REST control tests to verify failure**
+- [x] **Step 4.2: Run REST control tests to verify failure**
 
 Run:
 
@@ -1395,7 +1395,7 @@ npm.cmd run test:e2e --workspace=backend -- sessions-quizzes.e2e-spec.ts
 
 Expected: FAIL because quiz run control routes do not exist.
 
-- [ ] **Step 4.3: Add scoring service**
+- [x] **Step 4.3: Add scoring service**
 
 Create `backend/src/modules/quizzes/quiz-scoring.service.ts`:
 
@@ -1419,7 +1419,7 @@ export class QuizScoringService {
 }
 ```
 
-- [ ] **Step 4.4: Add quiz realtime service**
+- [x] **Step 4.4: Add quiz realtime service**
 
 Create `backend/src/modules/quizzes/quizzes.realtime.service.ts`:
 
@@ -1464,7 +1464,7 @@ export class QuizzesRealtimeService {
 }
 ```
 
-- [ ] **Step 4.5: Implement quiz control service methods**
+- [x] **Step 4.5: Implement quiz control service methods**
 
 Modify `backend/src/modules/quizzes/quizzes.service.ts` constructor:
 
@@ -1594,7 +1594,7 @@ private async findRunWithQuizSessionOrThrow(id: string) {
 }
 ```
 
-- [ ] **Step 4.6: Add REST control routes**
+- [x] **Step 4.6: Add REST control routes**
 
 Modify `backend/src/modules/quizzes/quizzes.controller.ts`:
 
@@ -1628,7 +1628,7 @@ finishRun(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
 }
 ```
 
-- [ ] **Step 4.7: Register providers**
+- [x] **Step 4.7: Register providers**
 
 Modify `backend/src/modules/quizzes/quizzes.module.ts`:
 
@@ -1641,7 +1641,7 @@ Modify `backend/src/modules/quizzes/quizzes.module.ts`:
 export class QuizzesModule {}
 ```
 
-- [ ] **Step 4.8: Verify REST control tests pass**
+- [x] **Step 4.8: Verify REST control tests pass**
 
 Run:
 
@@ -1651,7 +1651,7 @@ npm.cmd run test:e2e --workspace=backend -- sessions-quizzes.e2e-spec.ts
 
 Expected: all sessions and quizzes tests pass.
 
-- [ ] **Step 4.9: Verify backend build**
+- [x] **Step 4.9: Verify backend build**
 
 Run:
 
@@ -1661,7 +1661,7 @@ npm.cmd run build:backend
 
 Expected: exit code 0.
 
-- [ ] **Step 4.10: Commit**
+- [x] **Step 4.10: Commit**
 
 ```bash
 git add backend/src backend/test

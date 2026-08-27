@@ -61,4 +61,32 @@ export class QuizzesController {
   getQuizRunState(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.quizzesService.getQuizRunState(id, user);
   }
+
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN', 'INSTRUCTOR')
+  @Post('quiz-runs/:id/questions/next')
+  openNextQuestion(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.quizzesService.openNextQuestion(id, user);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN', 'INSTRUCTOR')
+  @Post('quiz-runs/:id/questions/close')
+  closeQuestion(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.quizzesService.closeQuestion(id, user);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN', 'INSTRUCTOR')
+  @Post('quiz-runs/:id/reveal')
+  revealQuestion(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.quizzesService.revealQuestion(id, user);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN', 'INSTRUCTOR')
+  @Post('quiz-runs/:id/finish')
+  finishRun(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.quizzesService.finishRun(id, user);
+  }
 }

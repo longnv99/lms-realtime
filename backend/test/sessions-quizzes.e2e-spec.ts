@@ -174,6 +174,62 @@ describe('Sessions and quizzes (e2e)', () => {
     expect(JSON.stringify(res.body.data)).not.toContain('correctOptionId');
   });
 
+  it('opens the next quiz question without exposing correctOptionId', async () => {
+    const fixture = await createSessionQuizFixture();
+
+    const res = await request(app.getHttpServer())
+      .post(`/api/quiz-runs/${fixture.run.id}/questions/next`)
+      .set('Authorization', `Bearer ${fixture.instructor.accessToken}`)
+      .expect(201);
+
+    expect(res.body.data).toMatchObject({
+      status: 'OPEN',
+      currentQuestionIndex: 1,
+      question: {
+        text: 'Which service stores relational LMS data?',
+        options: [
+          { id: 'a', text: 'PostgreSQL' },
+          { id: 'b', text: 'Redis' },
+        ],
+      },
+    });
+    expect(JSON.stringify(res.body.data)).not.toContain('correctOptionId');
+  });
+
+  it('closes, reveals, and finishes a quiz run', async () => {
+    const fixture = await createSessionQuizFixture();
+
+    await request(app.getHttpServer())
+      .post(`/api/quiz-runs/${fixture.run.id}/questions/next`)
+      .set('Authorization', `Bearer ${fixture.instructor.accessToken}`)
+      .expect(201);
+
+    const closeRes = await request(app.getHttpServer())
+      .post(`/api/quiz-runs/${fixture.run.id}/questions/close`)
+      .set('Authorization', `Bearer ${fixture.instructor.accessToken}`)
+      .expect(201);
+    expect(closeRes.body.data).toMatchObject({
+      status: 'CLOSED',
+      answerCount: 0,
+    });
+
+    const revealRes = await request(app.getHttpServer())
+      .post(`/api/quiz-runs/${fixture.run.id}/reveal`)
+      .set('Authorization', `Bearer ${fixture.instructor.accessToken}`)
+      .expect(201);
+    expect(revealRes.body.data).toMatchObject({
+      status: 'REVEALED',
+      correctOptionId: 'a',
+      correctCount: 0,
+    });
+
+    const finishRes = await request(app.getHttpServer())
+      .post(`/api/quiz-runs/${fixture.run.id}/finish`)
+      .set('Authorization', `Bearer ${fixture.instructor.accessToken}`)
+      .expect(201);
+    expect(finishRes.body.data).toMatchObject({ status: 'FINISHED' });
+  });
+
   async function createCourse(accessToken: string) {
     const res = await request(app.getHttpServer())
       .post('/api/courses')
@@ -226,6 +282,17 @@ describe('Sessions and quizzes (e2e)', () => {
       .expect(201);
 
     return res.body.data;
+  }
+
+  async function createSessionQuizFixture() {
+    const instructor = await registerAndLogin(app, 'INSTRUCTOR');
+    const course = await createCourse(instructor.accessToken);
+    const lesson = await createLesson(instructor.accessToken, course.id);
+    const session = await createSession(instructor.accessToken, course.id);
+    const quiz = await createQuiz(instructor.accessToken, lesson.id);
+    const run = await createQuizRun(instructor.accessToken, session.id, quiz.id);
+
+    return { instructor, course, lesson, session, quiz, run };
   }
 
   function futureIsoDate(): string {
