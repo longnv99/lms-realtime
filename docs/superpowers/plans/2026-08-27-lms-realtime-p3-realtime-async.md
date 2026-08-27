@@ -2143,7 +2143,7 @@ git commit -m "feat(quizzes): add realtime answers and leaderboard"
 - Emits `notification:new` to room `user:<userId>`.
 - Consumes existing `Notification` Prisma model and `CoursesService.publish()`.
 
-- [ ] **Step 6.1: Write failing notification tests**
+- [x] **Step 6.1: Write failing notification tests**
 
 Create `backend/test/notifications.e2e-spec.ts`:
 
@@ -2226,7 +2226,7 @@ function once<T = any>(socket: Socket, event: string): Promise<T> {
 }
 ```
 
-- [ ] **Step 6.2: Run notification tests to verify failure**
+- [x] **Step 6.2: Run notification tests to verify failure**
 
 Run:
 
@@ -2236,7 +2236,7 @@ npm.cmd run test:e2e --workspace=backend -- notifications.e2e-spec.ts
 
 Expected: FAIL because notification routes and namespace do not exist.
 
-- [ ] **Step 6.3: Add queue module**
+- [x] **Step 6.3: Add queue module**
 
 Create `backend/src/queue/queue.constants.ts`:
 
@@ -2274,7 +2274,7 @@ import { NOTIFICATIONS_QUEUE } from './queue.constants';
 export class QueueModule {}
 ```
 
-- [ ] **Step 6.4: Add notifications service**
+- [x] **Step 6.4: Add notifications service**
 
 Create `backend/src/modules/notifications/notifications.service.ts`:
 
@@ -2335,7 +2335,7 @@ export class NotificationsService {
 }
 ```
 
-- [ ] **Step 6.5: Add notifications gateway**
+- [x] **Step 6.5: Add notifications gateway**
 
 Create `backend/src/modules/notifications/notifications.gateway.ts`:
 
@@ -2372,7 +2372,7 @@ export class NotificationsGateway implements OnGatewayConnection {
 }
 ```
 
-- [ ] **Step 6.6: Add notifications REST controller**
+- [x] **Step 6.6: Add notifications REST controller**
 
 Create `backend/src/modules/notifications/notifications.controller.ts`:
 
@@ -2400,7 +2400,7 @@ export class NotificationsController {
 }
 ```
 
-- [ ] **Step 6.7: Add notifications producer and processor**
+- [x] **Step 6.7: Add notifications producer and processor**
 
 Create `backend/src/modules/notifications/notifications.producer.ts`:
 
@@ -2473,7 +2473,7 @@ export class NotificationsProcessor extends WorkerHost {
 }
 ```
 
-- [ ] **Step 6.8: Register notifications module**
+- [x] **Step 6.8: Register notifications module**
 
 Create `backend/src/modules/notifications/notifications.module.ts`:
 
@@ -2519,7 +2519,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 export class AppModule {}
 ```
 
-- [ ] **Step 6.9: Enqueue course-published jobs**
+- [x] **Step 6.9: Enqueue course-published jobs**
 
 Modify `backend/src/modules/courses/courses.module.ts`:
 
@@ -2559,7 +2559,7 @@ return updated;
 
 Expected: `CoursesModule` imports `NotificationsModule`; `NotificationsModule` does not import `CoursesModule`, so no `forwardRef` is needed.
 
-- [ ] **Step 6.10: Verify notification tests pass**
+- [x] **Step 6.10: Verify notification tests pass**
 
 Run:
 
@@ -2569,7 +2569,7 @@ npm.cmd run test:e2e --workspace=backend -- notifications.e2e-spec.ts
 
 Expected: all tests pass.
 
-- [ ] **Step 6.11: Verify affected course tests pass**
+- [x] **Step 6.11: Verify affected course tests pass**
 
 Run:
 
@@ -2579,7 +2579,7 @@ npm.cmd run test:e2e --workspace=backend -- courses.e2e-spec.ts
 
 Expected: all course tests pass. If queue jobs create async timing noise, mock `NotificationsProducer` in course tests or wait for notification job completion only in notification-specific tests.
 
-- [ ] **Step 6.12: Verify backend build**
+- [x] **Step 6.12: Verify backend build**
 
 Run:
 
@@ -2589,7 +2589,7 @@ npm.cmd run build:backend
 
 Expected: exit code 0.
 
-- [ ] **Step 6.13: Commit**
+- [x] **Step 6.13: Commit**
 
 ```bash
 git add backend/src backend/test backend/package.json backend/.env.example package-lock.json
