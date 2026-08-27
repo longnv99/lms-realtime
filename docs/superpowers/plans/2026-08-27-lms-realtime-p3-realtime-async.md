@@ -886,7 +886,7 @@ git commit -m "feat(realtime): add redis socket infrastructure"
 - Emits `chat:message` to room `session:<sessionId>`.
 - Consumes `WsAuthService`, `RedisService`, `PrismaService`, and existing session/course/enrollment data.
 
-- [ ] **Step 3.1: Write failing sessions realtime tests**
+- [x] **Step 3.1: Write failing sessions realtime tests**
 
 Create `backend/test/sessions-realtime.e2e-spec.ts`:
 
@@ -1032,7 +1032,7 @@ function once<T = any>(socket: Socket, event: string): Promise<T> {
 }
 ```
 
-- [ ] **Step 3.2: Run sessions realtime tests to verify failure**
+- [x] **Step 3.2: Run sessions realtime tests to verify failure**
 
 Run:
 
@@ -1042,7 +1042,7 @@ npm.cmd run test:e2e --workspace=backend -- sessions-realtime.e2e-spec.ts
 
 Expected: FAIL because `/sessions` namespace does not exist.
 
-- [ ] **Step 3.3: Add DTOs**
+- [x] **Step 3.3: Add DTOs**
 
 Create `backend/src/modules/sessions/dto/session-join.dto.ts`:
 
@@ -1071,7 +1071,7 @@ export class ChatSendDto {
 }
 ```
 
-- [ ] **Step 3.4: Add sessions realtime service**
+- [x] **Step 3.4: Add sessions realtime service**
 
 Create `backend/src/modules/sessions/sessions.realtime.service.ts`:
 
@@ -1098,7 +1098,7 @@ export class SessionsRealtimeService {
 }
 ```
 
-- [ ] **Step 3.5: Add sessions gateway**
+- [x] **Step 3.5: Add sessions gateway**
 
 Create `backend/src/modules/sessions/sessions.gateway.ts`:
 
@@ -1231,7 +1231,7 @@ export class SessionsGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 }
 ```
 
-- [ ] **Step 3.6: Broadcast REST start/end state**
+- [x] **Step 3.6: Broadcast REST start/end state**
 
 Modify `backend/src/modules/sessions/sessions.service.ts` constructor:
 
@@ -1267,7 +1267,7 @@ this.sessionsRealtime.emitSessionState(updated.id, {
 return updated;
 ```
 
-- [ ] **Step 3.7: Register gateway and service**
+- [x] **Step 3.7: Register gateway and service**
 
 Modify `backend/src/modules/sessions/sessions.module.ts`:
 
@@ -1283,7 +1283,7 @@ export class SessionsModule {}
 
 If `WsAuthService` is needed by multiple gateways, move it to a small `RealtimeModule` and export it instead of registering it in every feature module.
 
-- [ ] **Step 3.8: Verify sessions realtime tests pass**
+- [x] **Step 3.8: Verify sessions realtime tests pass**
 
 Run:
 
@@ -1293,7 +1293,7 @@ npm.cmd run test:e2e --workspace=backend -- sessions-realtime.e2e-spec.ts
 
 Expected: all tests pass.
 
-- [ ] **Step 3.9: Verify backend build**
+- [x] **Step 3.9: Verify backend build**
 
 Run:
 
@@ -1303,7 +1303,7 @@ npm.cmd run build:backend
 
 Expected: exit code 0.
 
-- [ ] **Step 3.10: Commit**
+- [x] **Step 3.10: Commit**
 
 ```bash
 git add backend/src backend/test

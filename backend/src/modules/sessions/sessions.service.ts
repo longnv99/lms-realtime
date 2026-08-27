@@ -6,6 +6,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CoursesService } from '../courses/courses.service';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { UpdateSessionDto } from './dto/update-session.dto';
+import { SessionsRealtimeService } from './sessions.realtime.service';
 
 const sessionSelect = {
   id: true,
@@ -40,6 +41,7 @@ export class SessionsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly coursesService: CoursesService,
+    private readonly sessionsRealtime: SessionsRealtimeService,
   ) {}
 
   async create(
@@ -99,11 +101,18 @@ export class SessionsService {
       this.throwInvalidTransition();
     }
 
-    return this.prisma.session.update({
+    const updated = await this.prisma.session.update({
       where: { id },
       data: { status: 'LIVE' },
       select: sessionSelect,
     });
+    this.sessionsRealtime.emitSessionState(updated.id, {
+      id: updated.id,
+      status: updated.status,
+      participantCount: 0,
+    });
+
+    return updated;
   }
 
   async end(id: string, actor: AuthenticatedUser): Promise<PublicSession> {
@@ -114,11 +123,18 @@ export class SessionsService {
       this.throwInvalidTransition();
     }
 
-    return this.prisma.session.update({
+    const updated = await this.prisma.session.update({
       where: { id },
       data: { status: 'ENDED', endsAt: new Date() },
       select: sessionSelect,
     });
+    this.sessionsRealtime.emitSessionState(updated.id, {
+      id: updated.id,
+      status: updated.status,
+      participantCount: 0,
+    });
+
+    return updated;
   }
 
   async getState(

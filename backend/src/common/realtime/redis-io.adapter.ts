@@ -44,14 +44,15 @@ export class RedisIoAdapter extends IoAdapter {
     if (server) {
       await super.close(server);
     }
-    await Promise.all([this.quitClient(this.pubClient), this.quitClient(this.subClient)]);
+    this.disconnectClient(this.pubClient);
+    this.disconnectClient(this.subClient);
   }
 
-  private async quitClient(client?: Redis): Promise<void> {
+  private disconnectClient(client?: Redis): void {
     if (!client || client.status === 'end') {
       return;
     }
 
-    await client.quit();
+    client.disconnect(false);
   }
 }
