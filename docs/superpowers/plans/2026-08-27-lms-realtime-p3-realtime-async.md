@@ -596,7 +596,7 @@ git commit -m "feat(shared): add realtime event contracts"
 - Produces: `createWsTestApp(): Promise<{ app, url }>` and `connectSocket(url, namespace, token)`.
 - Consumes: env `REDIS_URL`, existing JWT strategy secrets, existing `AuthenticatedUser`.
 
-- [ ] **Step 2.1: Add Redis service**
+- [x] **Step 2.1: Add Redis service**
 
 Create `backend/src/redis/redis.service.ts`:
 
@@ -640,7 +640,7 @@ import { RedisService } from './redis.service';
 export class RedisModule {}
 ```
 
-- [ ] **Step 2.2: Add Redis-backed Socket.IO adapter**
+- [x] **Step 2.2: Add Redis-backed Socket.IO adapter**
 
 Create `backend/src/common/realtime/redis-io.adapter.ts`:
 
@@ -693,7 +693,7 @@ await redisIoAdapter.connectToRedis();
 app.useWebSocketAdapter(redisIoAdapter);
 ```
 
-- [ ] **Step 2.3: Add WebSocket auth service**
+- [x] **Step 2.3: Add WebSocket auth service**
 
 Create `backend/src/common/realtime/ws-auth.service.ts`:
 
@@ -734,7 +734,7 @@ export class WsAuthService {
 }
 ```
 
-- [ ] **Step 2.4: Add WS exception filter and validation pipe**
+- [x] **Step 2.4: Add WS exception filter and validation pipe**
 
 Create `backend/src/common/realtime/ws-exception.filter.ts`:
 
@@ -764,7 +764,7 @@ export const wsValidationPipe = new ValidationPipe({
 });
 ```
 
-- [ ] **Step 2.5: Register Redis module**
+- [x] **Step 2.5: Register Redis module**
 
 Modify `backend/src/app.module.ts`:
 
@@ -782,7 +782,7 @@ import { RedisModule } from './redis/redis.module';
 export class AppModule {}
 ```
 
-- [ ] **Step 2.6: Add WS test app helper**
+- [x] **Step 2.6: Add WS test app helper**
 
 Create `backend/test/helpers/ws-app.ts`:
 
@@ -848,7 +848,7 @@ export async function connectSocket(
 }
 ```
 
-- [ ] **Step 2.7: Verify build**
+- [x] **Step 2.7: Verify build**
 
 Run:
 
@@ -858,7 +858,7 @@ npm.cmd run build:backend
 
 Expected: exit code 0.
 
-- [ ] **Step 2.8: Commit**
+- [x] **Step 2.8: Commit**
 
 ```bash
 git add backend/src backend/test backend/package.json backend/.env.example package-lock.json

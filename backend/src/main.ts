@@ -3,6 +3,7 @@ import { ValidationPipe, Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { EnvelopeInterceptor } from './common/interceptors/envelope.interceptor';
+import { RedisIoAdapter } from './common/realtime/redis-io.adapter';
 import { env } from './config/env';
 import { setupSwagger } from './swagger';
 
@@ -26,6 +27,10 @@ async function bootstrap() {
   app.useGlobalInterceptors(new EnvelopeInterceptor());
   app.setGlobalPrefix('api');
   setupSwagger(app);
+
+  const redisIoAdapter = new RedisIoAdapter(app);
+  await redisIoAdapter.connectToRedis();
+  app.useWebSocketAdapter(redisIoAdapter);
 
   await app.listen(port);
   Logger.log(`Backend listening on http://localhost:${port}`, 'Bootstrap');

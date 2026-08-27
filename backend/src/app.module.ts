@@ -9,10 +9,12 @@ import { QuizzesModule } from './modules/quizzes/quizzes.module';
 import { SessionsModule } from './modules/sessions/sessions.module';
 import { UsersModule } from './modules/users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
     EnvModule,
+    RedisModule,
     PrismaModule,
     HealthModule,
     AuthModule,
