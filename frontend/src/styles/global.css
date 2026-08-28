@@ -300,8 +300,113 @@ a {
   line-height: 1.2;
 }
 
+.panel-subtitle {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .panel-body {
   padding: 16px;
+}
+
+.panel-stack {
+  display: grid;
+  gap: 14px;
+}
+
+.compact-form {
+  display: grid;
+  gap: 12px;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+
+.lesson-list,
+.session-list,
+.session-groups {
+  display: grid;
+  gap: 10px;
+}
+
+.lesson-row,
+.session-row {
+  display: grid;
+  min-height: 64px;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface) 86%, var(--surface-strong));
+  padding: 12px;
+}
+
+.lesson-row {
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+}
+
+.lesson-order {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  background: var(--surface-strong);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.lesson-main,
+.session-main {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.lesson-main strong,
+.session-main strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lesson-main span,
+.lesson-duration,
+.session-main span,
+.session-group-header {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.lesson-duration,
+.session-main span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.session-group {
+  display: grid;
+  gap: 8px;
+}
+
+.session-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.session-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.session-actions {
+  display: flex;
+  min-width: max-content;
+  align-items: center;
+  gap: 8px;
 }
 
 .button {
@@ -511,6 +616,16 @@ a {
   .course-layout,
   .course-row {
     grid-template-columns: 1fr;
+  }
+
+  .lesson-row,
+  .session-row {
+    grid-template-columns: 1fr;
+  }
+
+  .lesson-duration,
+  .session-actions {
+    justify-self: start;
   }
 
   .course-row-head {

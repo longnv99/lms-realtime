@@ -584,19 +584,19 @@ git commit -m "feat(api): add frontend read endpoints"
 - Produces: lesson list, create lesson form, session list, create/start/end session controls.
 - Consumes: lesson endpoints, session endpoints, `GET /sessions/:id/state`.
 
-- [ ] **Step 5.1: Write panel tests**
+- [x] **Step 5.1: Write panel tests**
 
 Verify lesson rows sort by `order`, live sessions show `Vao live`, instructor can click `Start`, and ended sessions no longer show live entry.
 
-- [ ] **Step 5.2: Implement lessons panel**
+- [x] **Step 5.2: Implement lessons panel**
 
 Render compact lesson rows with duration, description, and an instructor create form. Add disabled media area labeled `Video upload planned in P3b` only in code comments, not visible UI copy.
 
-- [ ] **Step 5.3: Implement sessions panel**
+- [x] **Step 5.3: Implement sessions panel**
 
 Render sessions grouped by `LIVE`, `SCHEDULED`, `ENDED`. Student and instructor can navigate to `/sessions/:sessionId/live` when status is `LIVE`.
 
-- [ ] **Step 5.4: Run verification and commit**
+- [x] **Step 5.4: Run verification and commit**
 
 Run:
 

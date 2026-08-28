@@ -2,23 +2,20 @@ import { ArrowLeft } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from 'react-router-dom';
 import { getCourse } from '../../api/courses';
-import { listLessons } from '../../api/lessons';
-import { EmptyState } from '../../components/EmptyState';
 import { LoadingBlock } from '../../components/LoadingBlock';
 import { StatusBadge } from '../../components/StatusBadge';
 import { getErrorMessage } from '../../lib/errors';
+import { useAuthStore } from '../auth/auth.store';
+import { LessonsPanel } from '../lessons/LessonsPanel';
+import { SessionsPanel } from '../sessions/SessionsPanel';
 
 export function CourseDetailPage() {
   const { courseId } = useParams<{ courseId: string }>();
+  const user = useAuthStore((state) => state.user);
   const courseQuery = useQuery({
     enabled: Boolean(courseId),
     queryKey: ['course', courseId],
     queryFn: () => getCourse(courseId ?? ''),
-  });
-  const lessonsQuery = useQuery({
-    enabled: Boolean(courseId),
-    queryKey: ['lessons', courseId],
-    queryFn: () => listLessons(courseId ?? ''),
   });
 
   if (courseQuery.isLoading) {
@@ -40,6 +37,7 @@ export function CourseDetailPage() {
   }
 
   const course = courseQuery.data;
+  const canManage = user?.role === 'ADMIN' || course.instructorId === user?.id;
 
   return (
     <div className="page">
@@ -55,33 +53,8 @@ export function CourseDetailPage() {
         <p className="page-description">{course.description ?? course.slug}</p>
       </section>
       <section className="dashboard-grid">
-        <div className="panel">
-          <div className="panel-header">
-            <h3 className="panel-title">Lessons</h3>
-            <StatusBadge>{lessonsQuery.data?.length ?? 0}</StatusBadge>
-          </div>
-          <div className="panel-body">
-            {lessonsQuery.isLoading ? (
-              <LoadingBlock height={180} label="Loading lessons" />
-            ) : (
-              <EmptyState
-                description="Lesson authoring and session controls are implemented in the next P4a task."
-                title="Lesson workspace"
-              />
-            )}
-          </div>
-        </div>
-        <div className="panel">
-          <div className="panel-header">
-            <h3 className="panel-title">Live sessions</h3>
-          </div>
-          <div className="panel-body">
-            <EmptyState
-              description="Live session entry appears here after the sessions panel lands."
-              title="No live room selected"
-            />
-          </div>
-        </div>
+        <LessonsPanel canManage={canManage} courseId={course.id} />
+        <SessionsPanel canManage={canManage} courseId={course.id} />
       </section>
     </div>
   );
