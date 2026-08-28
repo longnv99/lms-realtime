@@ -1,17 +1,11 @@
-import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 import App from './App';
 
-describe('App', () => {
-  it('renders heading and check button', () => {
+describe('App shell', () => {
+  it('renders the product shell and auth entry route', () => {
     render(<App />);
     expect(screen.getByRole('heading', { name: /LMS Realtime/i })).toBeInTheDocument();
-    expect(screen.getByTestId('check-health')).toBeInTheDocument();
-    expect(screen.getByTestId('check-health')).toHaveTextContent(/Kiểm tra backend/i);
-  });
-
-  it('does not show health result before clicking', () => {
-    render(<App />);
-    expect(screen.queryByTestId('health-result')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /dang nhap/i })).toBeInTheDocument();
   });
 });

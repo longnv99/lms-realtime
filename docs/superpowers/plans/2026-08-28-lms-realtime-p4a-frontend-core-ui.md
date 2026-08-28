@@ -130,18 +130,18 @@ frontend/
 - Produces: `AppProviders`, `AppRoutes`, `Button`, `Field`, `StatusBadge`, `LoadingBlock`, `EmptyState`, `useToast`.
 - Consumes: existing `checkHealth()` temporarily only for a backend status chip.
 
-- [ ] **Step 1.1: Install UI routing dependencies**
+- [x] **Step 1.1: Install UI routing dependencies**
 
 Run:
 
 ```bash
-npm.cmd install --workspace=frontend react-router-dom lucide-react @fontsource-variable/satoshi @fontsource/jetbrains-mono
+npm.cmd install --workspace=frontend react-router-dom lucide-react @fontsource-variable/outfit @fontsource/jetbrains-mono
 npm.cmd install --workspace=frontend --save-dev @testing-library/user-event
 ```
 
 Expected: `frontend/package.json` and root `package-lock.json` update.
 
-- [ ] **Step 1.2: Write foundation smoke tests**
+- [x] **Step 1.2: Write foundation smoke tests**
 
 Replace `frontend/src/App.test.tsx` with:
 
@@ -159,7 +159,7 @@ describe('App shell', () => {
 });
 ```
 
-- [ ] **Step 1.3: Run test to verify current app fails**
+- [x] **Step 1.3: Run test to verify current app fails**
 
 Run:
 
@@ -169,14 +169,14 @@ npm.cmd run test:frontend
 
 Expected: FAIL because the current app still renders the old health-check scaffold and no app shell button.
 
-- [ ] **Step 1.4: Add CSS tokens and global app styling**
+- [x] **Step 1.4: Add CSS tokens and global app styling**
 
 Create `frontend/src/styles/tokens.css`:
 
 ```css
 :root {
   color-scheme: light;
-  --font-sans: "Satoshi Variable", "Segoe UI", sans-serif;
+  --font-sans: "Outfit Variable", "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", "SFMono-Regular", monospace;
   --bg: #f7f8f5;
   --surface: #ffffff;
@@ -211,7 +211,7 @@ Create `frontend/src/styles/tokens.css`:
 
 Create `frontend/src/styles/global.css` with layout classes for `.app-shell`, `.sidebar`, `.topbar`, `.page`, `.panel`, `.toolbar`, `.button`, `.field`, `.badge`, `.toast-region`, responsive collapse at `768px`, and visible `:focus-visible` outlines. Import fonts and CSS in `frontend/src/main.tsx`.
 
-- [ ] **Step 1.5: Add providers and route shell**
+- [x] **Step 1.5: Add providers and route shell**
 
 Create `frontend/src/lib/queryClient.ts`:
 
@@ -246,7 +246,7 @@ export default function App() {
 }
 ```
 
-- [ ] **Step 1.6: Run verification**
+- [x] **Step 1.6: Run verification**
 
 Run:
 
@@ -257,7 +257,7 @@ npm.cmd run build:frontend
 
 Expected: frontend test and build pass.
 
-- [ ] **Step 1.7: Commit**
+- [x] **Step 1.7: Commit**
 
 ```bash
 git add frontend/package.json frontend/src package-lock.json
