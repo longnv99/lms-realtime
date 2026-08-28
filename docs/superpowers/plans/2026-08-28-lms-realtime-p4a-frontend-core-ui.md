@@ -285,7 +285,7 @@ git commit -m "feat(frontend): add app shell foundation"
 - Produces: `useAuthStore` with `accessToken`, `refreshToken`, `user`, `loginSuccess()`, `logoutLocal()`.
 - Consumes: `ApiEnvelope`, `AuthTokensResponse`, `CourseResponse`, `LessonResponse`, `SessionResponse`, `QuizRunResponse`, `NotificationResponse`.
 
-- [ ] **Step 2.1: Write API client tests**
+- [x] **Step 2.1: Write API client tests**
 
 Create `frontend/src/api/client.test.ts`:
 
@@ -313,7 +313,7 @@ describe('unwrapEnvelope', () => {
 });
 ```
 
-- [ ] **Step 2.2: Implement typed envelope handling**
+- [x] **Step 2.2: Implement typed envelope handling**
 
 Modify `frontend/src/api/client.ts`:
 
@@ -355,7 +355,7 @@ export async function checkHealth(): Promise<HealthResponse> {
 }
 ```
 
-- [ ] **Step 2.3: Add endpoint modules**
+- [x] **Step 2.3: Add endpoint modules**
 
 Implement typed functions:
 
@@ -369,7 +369,7 @@ export async function logout(refreshToken: string): Promise<void>;
 
 Create similar modules for courses, lessons, sessions, quizzes, and notifications using the REST paths listed in the P3 plan and backend controllers.
 
-- [ ] **Step 2.4: Add Zustand auth store**
+- [x] **Step 2.4: Add Zustand auth store**
 
 Create `frontend/src/features/auth/auth.store.ts`:
 
@@ -408,7 +408,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
 });
 ```
 
-- [ ] **Step 2.5: Run verification and commit**
+- [x] **Step 2.5: Run verification and commit**
 
 Run:
 
