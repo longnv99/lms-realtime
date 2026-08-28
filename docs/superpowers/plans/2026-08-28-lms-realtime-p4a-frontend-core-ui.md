@@ -12,7 +12,7 @@
 
 ## Taste Skill Read
 
-Taste Skill was referenced from https://www.tasteskill.dev/ and its `design-taste-frontend` docs. The skill itself says it is for landing pages, portfolios, and redesigns, not dashboards or multi-step product UI, so use it as an anti-generic design checklist rather than as a dashboard recipe.
+Taste Skill was referenced from https://www.tasteskill.dev/ and https://github.com/Leonxlnx/taste-skill. Its main install name is `design-taste-frontend`; the repo also lists `gpt-taste`, `redesign-existing-projects`, `minimalist-ui`, and `high-end-visual-design` as related variants. The core `design-taste-frontend` skill itself says it is for landing pages, portfolios, and redesigns, not dashboards or multi-step product UI, so use it as an anti-generic design checklist rather than as a dashboard recipe.
 
 - Reading this as: product dashboard for LMS instructors and students, with a serious educational SaaS language, leaning toward native CSS tokens plus accessible React components.
 - `DESIGN_VARIANCE=4`: clear structure and predictable app navigation beat decorative experimentation.
@@ -21,6 +21,10 @@ Taste Skill was referenced from https://www.tasteskill.dev/ and its `design-tast
 - Avoid AI-purple gradients, centered landing heroes, generic card grids, placeholder screenshots, emoji UI, and visible instructional copy.
 - Use light/dark mode parity, label-above-input forms, real loading/empty/error states, keyboard focus rings, and WCAG AA contrast.
 - Use `lucide-react` for icons because the project-level frontend instruction requires lucide icons in buttons when available.
+- Apply Taste Skill's "brief inference first" rule before each page group: audience, workflow pressure, role context, and quiet constraints decide layout.
+- Apply its "three dials" as page-specific variables in implementation notes when a page differs from the plan default.
+- Apply its dashboard-relevant rules: no generic card sprawl, no placeholder-as-label forms, no circular spinner-only loading states, no unreadable ghost buttons, no duplicated CTA intent, and no desktop nav wrapping.
+- Treat the existing P1 health-check screen as an audit target: preserve only the useful backend health concept as a small status chip, then replace the scaffold visual language entirely.
 
 ## Global Constraints
 
