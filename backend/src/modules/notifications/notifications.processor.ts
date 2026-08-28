@@ -1,4 +1,4 @@
-import { Processor, WorkerHost } from '@nestjs/bullmq';
+import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { Injectable, Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { env } from '../../config/env';
@@ -40,5 +40,14 @@ export class NotificationsProcessor extends WorkerHost {
         body: `${course.title} is now available`,
       });
     }
+  }
+
+  @OnWorkerEvent('error')
+  onError(error: Error): void {
+    if (error.message === 'Connection is closed.') {
+      return;
+    }
+
+    this.logger.error(error.message, error.stack);
   }
 }

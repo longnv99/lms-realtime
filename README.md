@@ -20,6 +20,7 @@ npm.cmd run dev:frontend
 
 Frontend: http://localhost:5173
 Backend: http://localhost:4000
+Swagger API docs: http://localhost:4000/api/docs
 MinIO console: http://localhost:9001
 
 ## Seed Users
@@ -28,6 +29,15 @@ MinIO console: http://localhost:9001
 admin@example.com / Password123!
 instructor@example.com / Password123!
 student@example.com / Password123!
+student2@example.com / Password123!
+```
+
+## Realtime Namespaces
+
+```text
+/sessions        auth.handshake.token, events: session:join, chat:send
+/quiz            auth.handshake.token, events: quiz:join, quiz:answer
+/notifications   auth.handshake.token, event: notification:new
 ```
 
 ## Verification

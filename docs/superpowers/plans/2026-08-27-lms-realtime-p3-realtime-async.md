@@ -2610,7 +2610,7 @@ git commit -m "feat(notifications): add realtime queue notifications"
 - Produces README instructions for local realtime smoke.
 - Consumes all P3 modules and P2 seed credentials.
 
-- [ ] **Step 7.1: Upgrade seed data for P3 manual demo**
+- [x] **Step 7.1: Upgrade seed data for P3 manual demo**
 
 Modify `backend/prisma/seed.ts` to create:
 
@@ -2670,7 +2670,7 @@ questions: {
 }
 ```
 
-- [ ] **Step 7.2: Update README P3 smoke instructions**
+- [x] **Step 7.2: Update README P3 smoke instructions**
 
 Add:
 
@@ -2695,7 +2695,7 @@ Document additional seed credential:
 student2@example.com / Password123!
 ```
 
-- [ ] **Step 7.3: Run all backend e2e tests**
+- [x] **Step 7.3: Run all backend e2e tests**
 
 Run:
 
@@ -2705,7 +2705,7 @@ npm.cmd run test:e2e --workspace=backend
 
 Expected: all P2 and P3 e2e suites pass.
 
-- [ ] **Step 7.4: Run backend and frontend builds**
+- [x] **Step 7.4: Run backend and frontend builds**
 
 Run:
 
@@ -2715,7 +2715,7 @@ npm.cmd run build
 
 Expected: backend, shared, and frontend builds pass.
 
-- [ ] **Step 7.5: Run frontend tests**
+- [x] **Step 7.5: Run frontend tests**
 
 Run:
 
@@ -2725,7 +2725,7 @@ npm.cmd run test:frontend
 
 Expected: all frontend tests pass. P3 does not add frontend UI, but this guards shared contract changes.
 
-- [ ] **Step 7.6: Seed DB after e2e reset**
+- [x] **Step 7.6: Seed DB after e2e reset**
 
 Run:
 
@@ -2742,11 +2742,11 @@ student@example.com
 student2@example.com
 ```
 
-- [ ] **Step 7.7: Mark this plan complete**
+- [x] **Step 7.7: Mark this plan complete**
 
-Replace every remaining `- [ ]` in this file with `- [x]` only after Steps 7.3-7.6 pass.
+All remaining plan checkboxes were marked complete after Steps 7.3-7.6 passed.
 
-- [ ] **Step 7.8: Commit**
+- [x] **Step 7.8: Commit**
 
 ```bash
 git add backend/prisma/seed.ts README.md docs/superpowers/plans/2026-08-27-lms-realtime-p3-realtime-async.md
@@ -2757,33 +2757,33 @@ git commit -m "docs(plan): complete p3 realtime async"
 
 ## P3 Acceptance Checklist
 
-- [ ] `/api/docs` serves Swagger UI for backend REST APIs.
-- [ ] `/api/docs-json` includes `Auth`, `Courses`, `Users`, `Lessons`, `Sessions`, and `Quizzes` REST paths.
-- [ ] Swagger includes JWT bearer auth scheme named `access-token`.
-- [ ] `@lms/shared` exports realtime and notification payload contracts.
-- [ ] Backend validates `REDIS_URL`, `BREVO_API_KEY`, `EMAIL_FROM`, and `NOTIFICATIONS_MOCK_MODE`.
-- [ ] NestJS uses Redis-backed Socket.IO adapter.
-- [ ] WebSocket connection rejects missing/invalid JWT.
-- [ ] `/sessions` namespace allows only instructors/admins or enrolled students into live sessions.
-- [ ] `session:join` joins room `session:<id>` and emits `session:state`.
-- [ ] `chat:send` validates content, persists `ChatMessage`, and broadcasts `chat:message`.
-- [ ] REST `sessions/:id/start` and `sessions/:id/end` broadcast `session:state`.
-- [ ] Quiz run REST control endpoints open/close/reveal/finish questions.
-- [ ] `quiz:question` never exposes `correctOptionId`.
-- [ ] `/quiz` namespace allows only users who can view the session.
-- [ ] `quiz:answer` persists one answer per `(runId, questionId, userId)`.
-- [ ] Duplicate quiz answers return `QUIZ_ALREADY_ANSWERED`.
-- [ ] Quiz score follows the spec formula.
-- [ ] Redis leaderboard emits top 10 entries with rank.
-- [ ] `/notifications` namespace joins `user:<id>`.
-- [ ] `GET /api/me/notifications` lists current user's notifications.
-- [ ] `PATCH /api/me/notifications/:id/read` marks only current user's notification as read.
-- [ ] Course publish enqueues BullMQ `course-published`.
-- [ ] Notification worker runs in mock mode without Brevo API key.
-- [ ] Notification worker inserts in-app notifications and emits `notification:new`.
-- [ ] All backend e2e tests pass.
-- [ ] Backend and frontend builds pass.
-- [ ] Frontend smoke tests pass.
+- [x] `/api/docs` serves Swagger UI for backend REST APIs.
+- [x] `/api/docs-json` includes `Auth`, `Courses`, `Users`, `Lessons`, `Sessions`, and `Quizzes` REST paths.
+- [x] Swagger includes JWT bearer auth scheme named `access-token`.
+- [x] `@lms/shared` exports realtime and notification payload contracts.
+- [x] Backend validates `REDIS_URL`, `BREVO_API_KEY`, `EMAIL_FROM`, and `NOTIFICATIONS_MOCK_MODE`.
+- [x] NestJS uses Redis-backed Socket.IO adapter.
+- [x] WebSocket connection rejects missing/invalid JWT.
+- [x] `/sessions` namespace allows only instructors/admins or enrolled students into live sessions.
+- [x] `session:join` joins room `session:<id>` and emits `session:state`.
+- [x] `chat:send` validates content, persists `ChatMessage`, and broadcasts `chat:message`.
+- [x] REST `sessions/:id/start` and `sessions/:id/end` broadcast `session:state`.
+- [x] Quiz run REST control endpoints open/close/reveal/finish questions.
+- [x] `quiz:question` never exposes `correctOptionId`.
+- [x] `/quiz` namespace allows only users who can view the session.
+- [x] `quiz:answer` persists one answer per `(runId, questionId, userId)`.
+- [x] Duplicate quiz answers return `QUIZ_ALREADY_ANSWERED`.
+- [x] Quiz score follows the spec formula.
+- [x] Redis leaderboard emits top 10 entries with rank.
+- [x] `/notifications` namespace joins `user:<id>`.
+- [x] `GET /api/me/notifications` lists current user's notifications.
+- [x] `PATCH /api/me/notifications/:id/read` marks only current user's notification as read.
+- [x] Course publish enqueues BullMQ `course-published`.
+- [x] Notification worker runs in mock mode without Brevo API key.
+- [x] Notification worker inserts in-app notifications and emits `notification:new`.
+- [x] All backend e2e tests pass.
+- [x] Backend and frontend builds pass.
+- [x] Frontend smoke tests pass.
 
 ## Out of Scope for P3
 

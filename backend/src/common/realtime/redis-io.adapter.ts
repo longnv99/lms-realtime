@@ -1,4 +1,4 @@
-import { INestApplicationContext } from '@nestjs/common';
+import { INestApplicationContext, Logger } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import Redis from 'ioredis';
@@ -6,9 +6,11 @@ import { env } from '../../config/env';
 import { RedisService } from '../../redis/redis.service';
 
 export class RedisIoAdapter extends IoAdapter {
+  private readonly logger = new Logger(RedisIoAdapter.name);
   private adapterConstructor?: ReturnType<typeof createAdapter>;
   private pubClient?: Redis;
   private subClient?: Redis;
+  private readonly servers = new Set<any>();
 
   constructor(private readonly app: INestApplicationContext) {
     super(app);
@@ -37,22 +39,56 @@ export class RedisIoAdapter extends IoAdapter {
       server.adapter(this.adapterConstructor);
     }
 
+    this.servers.add(server);
     return server;
   }
 
   async close(server?: Parameters<IoAdapter['close']>[0]): Promise<void> {
     if (server) {
+      if (!this.servers.has(server)) {
+        return;
+      }
+
       await super.close(server);
+      this.servers.delete(server);
+    } else {
+      await Promise.all(
+        [...this.servers].map(async (createdServer) => {
+          await super.close(createdServer);
+          this.servers.delete(createdServer);
+        }),
+      );
     }
-    this.disconnectClient(this.pubClient);
-    this.disconnectClient(this.subClient);
+
+    if (this.servers.size > 0) {
+      return;
+    }
+
+    await Promise.all([this.closeClient(this.pubClient), this.closeClient(this.subClient)]);
   }
 
-  private disconnectClient(client?: Redis): void {
+  private async closeClient(client?: Redis): Promise<void> {
     if (!client || client.status === 'end') {
       return;
     }
 
-    client.disconnect(false);
+    client.on('error', (error) => {
+      if (error.message === 'Connection is closed.') {
+        return;
+      }
+
+      this.logger.warn(error.message);
+    });
+
+    if (client.status === 'wait') {
+      client.disconnect(false);
+      return;
+    }
+
+    try {
+      await client.quit();
+    } catch {
+      client.disconnect(false);
+    }
   }
 }

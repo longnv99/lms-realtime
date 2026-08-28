@@ -12,12 +12,13 @@ import { UsersModule } from './modules/users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { QueueModule } from './queue/queue.module';
 import { RedisModule } from './redis/redis.module';
+import { env } from './config/env';
 
 @Module({
   imports: [
     EnvModule,
     RedisModule,
-    QueueModule,
+    ...(env.NODE_ENV === 'test' ? [] : [QueueModule]),
     PrismaModule,
     HealthModule,
     AuthModule,

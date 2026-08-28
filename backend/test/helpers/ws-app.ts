@@ -29,8 +29,8 @@ export async function createWsTestApp(): Promise<{ app: INestApplication; url: s
 
   const closeApp = app.close.bind(app);
   app.close = async () => {
-    await closeApp();
     await redisIoAdapter.close();
+    await closeApp();
   };
 
   await app.listen(0);

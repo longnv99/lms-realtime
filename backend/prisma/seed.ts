@@ -38,12 +38,20 @@ async function main(): Promise<void> {
   const student = await prisma.user.create({
     data: { email: 'student@example.com', name: 'Student', passwordHash, role: 'STUDENT' },
   });
+  const studentTwo = await prisma.user.create({
+    data: {
+      email: 'student2@example.com',
+      name: 'Student Two',
+      passwordHash,
+      role: 'STUDENT',
+    },
+  });
 
   const course = await prisma.course.create({
     data: {
       title: 'Realtime LMS Foundations',
       slug: 'realtime-lms-foundations',
-      description: 'Seed course for local P2 testing',
+      description: 'Seed course for local P3 realtime testing',
       status: 'PUBLISHED',
       instructorId: instructor.id,
       publishedAt: new Date(),
@@ -65,11 +73,16 @@ async function main(): Promise<void> {
       courseId: course.id,
       title: 'Live intro session',
       startsAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-      status: 'SCHEDULED',
+      status: 'LIVE',
     },
   });
 
-  await prisma.enrollment.create({ data: { courseId: course.id, userId: student.id } });
+  await prisma.enrollment.createMany({
+    data: [
+      { courseId: course.id, userId: student.id },
+      { courseId: course.id, userId: studentTwo.id },
+    ],
+  });
 
   const quiz = await prisma.quiz.create({
     data: {
@@ -86,6 +99,42 @@ async function main(): Promise<void> {
             correctOptionId: 'a',
             order: 1,
           },
+          {
+            text: 'Which protocol powers realtime events here?',
+            options: [
+              { id: 'a', text: 'Socket.IO' },
+              { id: 'b', text: 'SMTP' },
+            ] as Prisma.InputJsonValue,
+            correctOptionId: 'a',
+            order: 2,
+          },
+          {
+            text: 'Which service backs BullMQ?',
+            options: [
+              { id: 'a', text: 'Redis' },
+              { id: 'b', text: 'MinIO' },
+            ] as Prisma.InputJsonValue,
+            correctOptionId: 'a',
+            order: 3,
+          },
+          {
+            text: 'Which room prefix is used for quiz runs?',
+            options: [
+              { id: 'a', text: 'quiz-run:' },
+              { id: 'b', text: 'course:' },
+            ] as Prisma.InputJsonValue,
+            correctOptionId: 'a',
+            order: 4,
+          },
+          {
+            text: 'Should quiz:question expose correctOptionId?',
+            options: [
+              { id: 'a', text: 'No' },
+              { id: 'b', text: 'Yes' },
+            ] as Prisma.InputJsonValue,
+            correctOptionId: 'a',
+            order: 5,
+          },
         ],
       },
     },
@@ -93,7 +142,12 @@ async function main(): Promise<void> {
 
   await prisma.quizRun.create({ data: { quizId: quiz.id, sessionId: session.id } });
 
-  console.log({ admin: admin.email, instructor: instructor.email, student: student.email });
+  console.log({
+    admin: admin.email,
+    instructor: instructor.email,
+    student: student.email,
+    studentTwo: studentTwo.email,
+  });
 }
 
 main()
