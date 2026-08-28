@@ -761,15 +761,15 @@ git commit -m "feat(frontend): add realtime quiz ui"
 - Produces: topbar notification button, drawer list, unread badge.
 - Consumes: `GET /me/notifications`, `PATCH /me/notifications/:id/read`, `/notifications` event `notification:new`.
 
-- [ ] **Step 9.1: Write notification tests**
+- [x] **Step 9.1: Write notification tests**
 
 Mock API/socket and verify unread count increments on `notification:new`, drawer renders newest first, and clicking a row calls mark-read mutation.
 
-- [ ] **Step 9.2: Implement notifications UI**
+- [x] **Step 9.2: Implement notifications UI**
 
 Use icon-only button with tooltip/accessibility label. Drawer is a real dialog region with Escape close, focus return, loading rows, empty state, and contextual error state.
 
-- [ ] **Step 9.3: Run verification and commit**
+- [x] **Step 9.3: Run verification and commit**
 
 Run:
 

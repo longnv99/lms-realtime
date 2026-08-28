@@ -1,4 +1,4 @@
-import { Bell, LayoutDashboard, Moon, Radio, Search } from 'lucide-react';
+import { LayoutDashboard, Moon, Radio, Search } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import { checkHealth } from '../api/client';
@@ -9,6 +9,7 @@ import { ProtectedRoute } from '../features/auth/ProtectedRoute';
 import { RegisterPage } from '../features/auth/RegisterPage';
 import { CourseDetailPage } from '../features/courses/CourseDetailPage';
 import { CoursesPage } from '../features/courses/CoursesPage';
+import { NotificationsButton } from '../features/notifications/NotificationsButton';
 import { LiveSessionPage } from '../features/sessions/LiveSessionPage';
 
 export function AppRoutes() {
@@ -83,7 +84,7 @@ function ProductShell() {
           <BackendStatus />
           <div className="topbar-actions">
             <Button aria-label="Search" icon={<Search size={18} />} iconOnly variant="ghost" />
-            <Button aria-label="Notifications" icon={<Bell size={18} />} iconOnly variant="ghost" />
+            <NotificationsButton />
             <Button aria-label="Toggle theme" icon={<Moon size={18} />} iconOnly variant="ghost" />
           </div>
         </header>
