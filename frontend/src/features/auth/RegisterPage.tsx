@@ -1,7 +1,6 @@
 import { UserPlus } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import type { UserRole } from '@lms/shared';
 import { register } from '../../api/auth';
 import { Button } from '../../components/Button';
 import { Field } from '../../components/Field';
@@ -15,7 +14,6 @@ export function RegisterPage() {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<UserRole>('STUDENT');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -25,7 +23,7 @@ export function RegisterPage() {
     setSubmitting(true);
 
     try {
-      const tokens = await register({ email, name, password, role });
+      const tokens = await register({ email, name, password });
       loginSuccess(tokens);
       navigate('/courses', { replace: true });
     } catch (caught) {
@@ -81,19 +79,6 @@ export function RegisterPage() {
             type="password"
             value={password}
           />
-          <label className="field" htmlFor="role">
-            <span className="field-label">Vai tro</span>
-            <select
-              className="field-control"
-              id="role"
-              name="role"
-              onChange={(event) => setRole(event.target.value as UserRole)}
-              value={role}
-            >
-              <option value="STUDENT">Student</option>
-              <option value="INSTRUCTOR">Instructor</option>
-            </select>
-          </label>
           <div className="toolbar">
             <Button disabled={submitting} icon={<UserPlus size={18} />} type="submit">
               {submitting ? 'Dang tao' : 'Tao tai khoan'}

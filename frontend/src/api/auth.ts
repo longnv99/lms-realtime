@@ -1,4 +1,4 @@
-import type { AuthTokensResponse, UserRole } from '@lms/shared';
+import type { AuthTokensResponse } from '@lms/shared';
 import { postEnvelope, postVoidEnvelope } from './client';
 
 export type LoginInput = {
@@ -8,7 +8,6 @@ export type LoginInput = {
 
 export type RegisterInput = LoginInput & {
   name: string;
-  role?: UserRole;
 };
 
 export async function login(input: LoginInput): Promise<AuthTokensResponse> {

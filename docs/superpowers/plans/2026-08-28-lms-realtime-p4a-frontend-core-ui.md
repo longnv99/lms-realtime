@@ -482,7 +482,7 @@ git commit -m "feat(frontend): add auth routes"
 - Produces: `/courses`, `/courses/:courseId`.
 - Consumes: `GET /courses`, `POST /courses`, `GET /courses/:id`, `PATCH /courses/:id`, `POST /courses/:id/publish`, `POST /courses/:id/enroll`, `GET /courses/:courseId/lessons`.
 
-- [ ] **Step 4.1: Write course page tests**
+- [x] **Step 4.1: Write course page tests**
 
 Mock API functions and verify:
 - published courses render with status badge.
@@ -490,15 +490,15 @@ Mock API functions and verify:
 - instructor sees `Tao khoa hoc` and `Publish`.
 - empty state appears when course list is empty.
 
-- [ ] **Step 4.2: Implement course list**
+- [x] **Step 4.2: Implement course list**
 
 Build a dense table/list hybrid with columns: title, status, instructor, updated date, primary action. Use a side filter rail for `keyword` and `status`. Use `StatusBadge` for `DRAFT`, `PUBLISHED`, `ARCHIVED`.
 
-- [ ] **Step 4.3: Implement course detail**
+- [x] **Step 4.3: Implement course detail**
 
 Show course metadata, enrollment action, lessons panel mount point, sessions panel mount point, and instructor edit panel. Do not show upload/progress controls in P4a.
 
-- [ ] **Step 4.4: Run verification and commit**
+- [x] **Step 4.4: Run verification and commit**
 
 Run:
 

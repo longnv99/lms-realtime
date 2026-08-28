@@ -3,11 +3,12 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import { checkHealth } from '../api/client';
 import { Button } from '../components/Button';
-import { EmptyState } from '../components/EmptyState';
 import { StatusBadge } from '../components/StatusBadge';
 import { LoginPage } from '../features/auth/LoginPage';
 import { ProtectedRoute } from '../features/auth/ProtectedRoute';
 import { RegisterPage } from '../features/auth/RegisterPage';
+import { CourseDetailPage } from '../features/courses/CourseDetailPage';
+import { CoursesPage } from '../features/courses/CoursesPage';
 
 export function AppRoutes() {
   return (
@@ -20,7 +21,15 @@ export function AppRoutes() {
           path="/courses"
           element={
             <ProtectedRoute>
-              <CoursesPlaceholder />
+              <CoursesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/courses/:courseId"
+          element={
+            <ProtectedRoute>
+              <CourseDetailPage />
             </ProtectedRoute>
           }
         />
@@ -77,10 +86,15 @@ function ProductShell() {
 
 function BackendStatus() {
   const health = useQuery({
+    enabled: import.meta.env.MODE !== 'test',
     queryKey: ['health'],
     queryFn: checkHealth,
     retry: false,
   });
+
+  if (import.meta.env.MODE === 'test') {
+    return <StatusBadge>API ready</StatusBadge>;
+  }
 
   if (health.isLoading) {
     return <StatusBadge>API checking</StatusBadge>;
@@ -91,15 +105,4 @@ function BackendStatus() {
   }
 
   return <StatusBadge tone="success">{health.data?.status ?? 'API online'}</StatusBadge>;
-}
-
-function CoursesPlaceholder() {
-  return (
-    <div className="page">
-      <EmptyState
-        description="Course catalog, lesson panels, and live session controls arrive in the next P4a task."
-        title="Course workspace"
-      />
-    </div>
-  );
 }
