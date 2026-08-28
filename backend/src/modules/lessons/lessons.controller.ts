@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -9,11 +10,13 @@ import { ReorderLessonsDto } from './dto/reorder-lessons.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
 import { LessonsService } from './lessons.service';
 
+@ApiTags('Lessons')
 @Controller()
 export class LessonsController {
   constructor(private readonly lessonsService: LessonsService) {}
 
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
   @Roles('ADMIN', 'INSTRUCTOR')
   @Post('courses/:courseId/lessons')
   create(
@@ -30,6 +33,7 @@ export class LessonsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
   @Roles('ADMIN', 'INSTRUCTOR')
   @Patch('courses/:courseId/lessons/reorder')
   reorder(
@@ -41,6 +45,7 @@ export class LessonsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
   @Roles('ADMIN', 'INSTRUCTOR')
   @Patch('lessons/:id')
   update(
@@ -52,6 +57,7 @@ export class LessonsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
   @Roles('ADMIN', 'INSTRUCTOR')
   @Delete('lessons/:id')
   remove(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {

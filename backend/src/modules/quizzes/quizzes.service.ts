@@ -4,16 +4,23 @@ import { Prisma } from '../../generated/prisma/client';
 import { AppError } from '../../common/errors/app-error';
 import type { AuthenticatedUser } from '../../common/types/authenticated-request';
 import { PrismaService } from '../../prisma/prisma.service';
+import { RedisService } from '../../redis/redis.service';
 import { CoursesService } from '../courses/courses.service';
 import { CreateQuizRunDto } from './dto/create-quiz-run.dto';
 import { CreateQuizDto, QuizQuestionDto } from './dto/create-quiz.dto';
+import { QuizAnswerDto } from './dto/quiz-answer.dto';
+import { QuizScoringService } from './quiz-scoring.service';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
+import { QuizzesRealtimeService } from './quizzes.realtime.service';
 
 @Injectable()
 export class QuizzesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly coursesService: CoursesService,
+    private readonly redis: RedisService,
+    private readonly realtime: QuizzesRealtimeService,
+    private readonly quizScoring: QuizScoringService,
   ) {}
 
   async createQuiz(lessonId: string, actor: AuthenticatedUser, dto: CreateQuizDto) {
@@ -142,6 +149,200 @@ export class QuizzesService {
     };
   }
 
+  async openNextQuestion(id: string, actor: AuthenticatedUser) {
+    const run = await this.findRunWithQuizSessionOrThrow(id);
+    this.coursesService.ensureCanManage(run.session.course, actor);
+
+    if (run.status === 'FINISHED') {
+      throw new AppError('QUIZ_RUN_LOCKED', 'QuizRun da ket thuc', HttpStatus.BAD_REQUEST);
+    }
+
+    const nextIndex = (run.currentQuestionIndex ?? 0) + 1;
+    const question = run.quiz.questions[nextIndex - 1];
+
+    if (!question) {
+      throw new AppError('CONFLICT', 'Khong con cau hoi tiep theo', HttpStatus.CONFLICT);
+    }
+
+    const updated = await this.prisma.quizRun.update({
+      where: { id },
+      data: {
+        currentQuestionIndex: nextIndex,
+        status: 'OPEN',
+        questionOpenedAt: new Date(),
+      },
+    });
+    const payload = {
+      currentQuestionIndex: nextIndex,
+      question: {
+        id: question.id,
+        text: question.text,
+        options: question.options as Array<{ id: string; text: string }>,
+      },
+    };
+
+    this.realtime.emitQuestion(id, payload);
+
+    return { ...updated, ...payload };
+  }
+
+  async closeQuestion(id: string, actor: AuthenticatedUser) {
+    const run = await this.findRunWithQuizSessionOrThrow(id);
+    this.coursesService.ensureCanManage(run.session.course, actor);
+
+    if (run.status !== 'OPEN' || !run.currentQuestionIndex) {
+      throw new AppError('CONFLICT', 'Khong co cau hoi dang mo', HttpStatus.CONFLICT);
+    }
+
+    const question = run.quiz.questions[run.currentQuestionIndex - 1];
+    const answerCount = Number(
+      (await this.redis
+        .getClient()
+        .get(`quiz-run:${id}:q:${run.currentQuestionIndex}:count`)) ?? 0,
+    );
+    const updated = await this.prisma.quizRun.update({
+      where: { id },
+      data: { status: 'CLOSED' },
+    });
+
+    this.realtime.emitQuestionClosed(id, { questionId: question.id, answerCount });
+
+    return { ...updated, questionId: question.id, answerCount };
+  }
+
+  async revealQuestion(id: string, actor: AuthenticatedUser) {
+    const run = await this.findRunWithQuizSessionOrThrow(id);
+    this.coursesService.ensureCanManage(run.session.course, actor);
+
+    if (run.status !== 'CLOSED' || !run.currentQuestionIndex) {
+      throw new AppError('CONFLICT', 'Chi reveal sau khi dong cau hoi', HttpStatus.CONFLICT);
+    }
+
+    const question = run.quiz.questions[run.currentQuestionIndex - 1];
+    const correctCount = await this.prisma.quizAnswer.count({
+      where: { runId: id, questionId: question.id, isCorrect: true },
+    });
+    const updated = await this.prisma.quizRun.update({
+      where: { id },
+      data: { status: 'REVEALED' },
+    });
+
+    this.realtime.emitReveal(id, {
+      questionId: question.id,
+      correctOptionId: question.correctOptionId,
+      correctCount,
+    });
+
+    return {
+      ...updated,
+      questionId: question.id,
+      correctOptionId: question.correctOptionId,
+      correctCount,
+    };
+  }
+
+  async finishRun(id: string, actor: AuthenticatedUser) {
+    const run = await this.findRunWithQuizSessionOrThrow(id);
+    this.coursesService.ensureCanManage(run.session.course, actor);
+
+    const updated = await this.prisma.quizRun.update({
+      where: { id },
+      data: { status: 'FINISHED' },
+    });
+    const countKeys = await this.redis.getClient().keys(`quiz-run:${id}:q:*:count`);
+    await this.redis.getClient().del(`quiz-run:${id}:leaderboard`, ...countKeys);
+
+    this.realtime.emitFinished(id, { summaryUrl: `/api/quiz-runs/${id}/state` });
+
+    return updated;
+  }
+
+  async submitAnswer(actor: AuthenticatedUser, dto: QuizAnswerDto) {
+    const run = await this.findRunWithQuizSessionOrThrow(dto.quizRunId);
+    await this.ensureCanViewSession(run.session, actor);
+
+    if (run.status !== 'OPEN' || !run.questionOpenedAt || !run.currentQuestionIndex) {
+      throw new AppError('QUIZ_NOT_OPEN', 'Quiz khong mo', HttpStatus.BAD_REQUEST);
+    }
+
+    const question = run.quiz.questions[run.currentQuestionIndex - 1];
+
+    if (question.id !== dto.questionId) {
+      throw new AppError(
+        'VALIDATION_FAILED',
+        'Cau hoi khong phai cau dang mo',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const options = question.options as Array<{ id: string; text: string }>;
+    if (!options.some((option) => option.id === dto.optionId)) {
+      throw new AppError('VALIDATION_FAILED', 'optionId khong hop le', HttpStatus.BAD_REQUEST);
+    }
+
+    const answeredAt = new Date();
+    const isCorrect = dto.optionId === question.correctOptionId;
+    const score = this.quizScoring.calculateScore(isCorrect, run.questionOpenedAt, answeredAt);
+
+    try {
+      const answer = await this.prisma.quizAnswer.create({
+        data: {
+          runId: dto.quizRunId,
+          questionId: dto.questionId,
+          userId: actor.id,
+          selectedOptionId: dto.optionId,
+          isCorrect,
+          score,
+          answeredAt,
+        },
+      });
+
+      await this.redis
+        .getClient()
+        .zincrby(`quiz-run:${dto.quizRunId}:leaderboard`, score, actor.id);
+      await this.redis
+        .getClient()
+        .incr(`quiz-run:${dto.quizRunId}:q:${run.currentQuestionIndex}:count`);
+
+      return answer;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        throw new AppError('QUIZ_ALREADY_ANSWERED', 'Da submit cau nay', HttpStatus.CONFLICT);
+      }
+      throw error;
+    }
+  }
+
+  async getLeaderboard(quizRunId: string) {
+    const redisRows = await this.redis
+      .getClient()
+      .zrevrange(`quiz-run:${quizRunId}:leaderboard`, 0, 9, 'WITHSCORES');
+    const entries: Array<{ userId: string; score: number }> = [];
+
+    for (let index = 0; index < redisRows.length; index += 2) {
+      entries.push({ userId: redisRows[index], score: Number(redisRows[index + 1]) });
+    }
+
+    if (entries.length === 0) {
+      return { entries: [] };
+    }
+
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: entries.map((entry) => entry.userId) } },
+      select: { id: true, name: true },
+    });
+    const names = new Map(users.map((user) => [user.id, user.name]));
+
+    return {
+      entries: entries.map((entry, index) => ({
+        userId: entry.userId,
+        name: names.get(entry.userId) ?? 'Unknown',
+        score: entry.score,
+        rank: index + 1,
+      })),
+    };
+  }
+
   private ensureCorrectOptions(questions: QuizQuestionDto[]): void {
     for (const question of questions) {
       if (!question.options.some((option) => option.id === question.correctOptionId)) {
@@ -239,5 +440,21 @@ export class QuizzesService {
     }
 
     return session;
+  }
+
+  private async findRunWithQuizSessionOrThrow(id: string) {
+    const run = await this.prisma.quizRun.findUnique({
+      where: { id },
+      include: {
+        session: { include: { course: { select: { instructorId: true } } } },
+        quiz: { include: { questions: { orderBy: { order: 'asc' } } } },
+      },
+    });
+
+    if (!run) {
+      throw new AppError('NOT_FOUND', 'Khong tim thay quiz run', HttpStatus.NOT_FOUND);
+    }
+
+    return run;
   }
 }

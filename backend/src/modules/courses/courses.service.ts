@@ -5,6 +5,7 @@ import { AppError } from '../../common/errors/app-error';
 import type { AuthenticatedUser } from '../../common/types/authenticated-request';
 import type { PaginatedData } from '../../common/utils/pagination';
 import { PrismaService } from '../../prisma/prisma.service';
+import { NotificationsProducer } from '../notifications/notifications.producer';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { ListCoursesQueryDto } from './dto/list-courses-query.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
@@ -35,7 +36,10 @@ export type PublicCourse = {
 
 @Injectable()
 export class CoursesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsProducer: NotificationsProducer,
+  ) {}
 
   async create(instructorId: string, dto: CreateCourseDto): Promise<PublicCourse> {
     try {
@@ -125,11 +129,15 @@ export class CoursesService {
     const course = await this.findCourseOrThrow(id);
     this.ensureCanManage(course, actor);
 
-    return this.prisma.course.update({
+    const publishedAt = new Date();
+    const updated = await this.prisma.course.update({
       where: { id },
-      data: { status: 'PUBLISHED', publishedAt: new Date() },
+      data: { status: 'PUBLISHED', publishedAt },
       select: courseSelect,
     });
+    await this.notificationsProducer.enqueueCoursePublished(updated.id, publishedAt);
+
+    return updated;
   }
 
   async unpublish(id: string, actor: AuthenticatedUser): Promise<PublicCourse> {

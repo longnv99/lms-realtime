@@ -1,6 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import type { HealthResponse } from '@lms/shared';
 
+@ApiTags('Health')
 @Controller('health')
 export class HealthController {
   private readonly startedAt = Date.now();

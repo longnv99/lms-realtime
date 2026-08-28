@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -9,6 +10,8 @@ import { CreateQuizDto } from './dto/create-quiz.dto';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
 import { QuizzesService } from './quizzes.service';
 
+@ApiTags('Quizzes')
+@ApiBearerAuth('access-token')
 @UseGuards(JwtAuthGuard)
 @Controller()
 export class QuizzesController {
@@ -57,5 +60,33 @@ export class QuizzesController {
   @Get('quiz-runs/:id/state')
   getQuizRunState(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.quizzesService.getQuizRunState(id, user);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN', 'INSTRUCTOR')
+  @Post('quiz-runs/:id/questions/next')
+  openNextQuestion(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.quizzesService.openNextQuestion(id, user);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN', 'INSTRUCTOR')
+  @Post('quiz-runs/:id/questions/close')
+  closeQuestion(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.quizzesService.closeQuestion(id, user);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN', 'INSTRUCTOR')
+  @Post('quiz-runs/:id/reveal')
+  revealQuestion(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.quizzesService.revealQuestion(id, user);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN', 'INSTRUCTOR')
+  @Post('quiz-runs/:id/finish')
+  finishRun(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.quizzesService.finishRun(id, user);
   }
 }
