@@ -9,6 +9,7 @@ import { ProtectedRoute } from '../features/auth/ProtectedRoute';
 import { RegisterPage } from '../features/auth/RegisterPage';
 import { CourseDetailPage } from '../features/courses/CourseDetailPage';
 import { CoursesPage } from '../features/courses/CoursesPage';
+import { LiveSessionPage } from '../features/sessions/LiveSessionPage';
 
 export function AppRoutes() {
   return (
@@ -30,6 +31,14 @@ export function AppRoutes() {
           element={
             <ProtectedRoute>
               <CourseDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/sessions/:sessionId/live"
+          element={
+            <ProtectedRoute>
+              <LiveSessionPage />
             </ProtectedRoute>
           }
         />

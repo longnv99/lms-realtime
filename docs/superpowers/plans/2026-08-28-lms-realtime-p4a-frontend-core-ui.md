@@ -669,22 +669,22 @@ git commit -m "feat(frontend): add realtime socket client"
 - Consumes: `/sessions` namespace events `session:join`, `session:state`, `chat:send`, `chat:message`.
 - Consumes: `GET /sessions/:id/state`.
 
-- [ ] **Step 7.1: Write live session tests**
+- [x] **Step 7.1: Write live session tests**
 
 Mock `createNamespaceSocket()`. Verify page emits `session:join`, appends incoming `chat:message`, sends `chat:send` after form submit, and renders participant count from `session:state`.
 
-- [ ] **Step 7.2: Implement live workspace layout**
+- [x] **Step 7.2: Implement live workspace layout**
 
 Use a work-focused three-zone layout:
 - left rail: session status, participant count, course navigation.
 - center: live lesson surface with calm empty state because video is P3b.
 - right panel: chat and quiz panel mount point.
 
-- [ ] **Step 7.3: Implement chat panel**
+- [x] **Step 7.3: Implement chat panel**
 
 Use stable message rows, timestamp, sender name, and a bottom composer with max length guard matching backend `1000`.
 
-- [ ] **Step 7.4: Run verification and commit**
+- [x] **Step 7.4: Run verification and commit**
 
 Run:
 
