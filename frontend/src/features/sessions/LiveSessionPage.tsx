@@ -11,6 +11,7 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { getErrorMessage } from '../../lib/errors';
 import { createNamespaceSocket, useSocketStatus } from '../../lib/realtime';
 import { useAuthStore } from '../auth/auth.store';
+import { QuizPanel } from '../quizzes/QuizPanel';
 import { ChatPanel } from './ChatPanel';
 
 export function LiveSessionPage() {
@@ -133,16 +134,7 @@ export function LiveSessionPage() {
         </section>
         <div className="live-side">
           <ChatPanel messages={messages} onSend={handleSend} />
-          <section className="panel quiz-mount" aria-labelledby="quiz-mount-title">
-            <div className="panel-header">
-              <h3 className="panel-title" id="quiz-mount-title">
-                Quiz
-              </h3>
-            </div>
-            <div className="panel-body">
-              <EmptyState description="Waiting" title="Standby" />
-            </div>
-          </section>
+          {sessionId && <QuizPanel sessionId={sessionId} />}
         </div>
       </section>
     </div>

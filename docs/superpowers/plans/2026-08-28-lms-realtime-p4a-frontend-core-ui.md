@@ -712,7 +712,7 @@ git commit -m "feat(frontend): add live session chat ui"
 - Produces: student answer grid for `quiz:question`, locked answered state, reveal feedback, leaderboard.
 - Consumes: quiz REST control endpoints and `/quiz` namespace events.
 
-- [ ] **Step 8.1: Write quiz panel tests**
+- [x] **Step 8.1: Write quiz panel tests**
 
 Verify:
 - `quiz:question` renders answer options without `correctOptionId`.
@@ -722,11 +722,11 @@ Verify:
 - leaderboard ranks render in score order.
 - instructor role renders `Mo cau tiep`, `Dong cau`, `Reveal`, `Ket thuc`.
 
-- [ ] **Step 8.2: Implement quiz panel**
+- [x] **Step 8.2: Implement quiz panel**
 
 Connect to `/quiz` namespace once per live page when a quiz run exists. Emit `quiz:join` and keep local event state for question, reveal, closed state, finished state, and leaderboard.
 
-- [ ] **Step 8.3: Implement instructor controls**
+- [x] **Step 8.3: Implement instructor controls**
 
 Use REST mutations:
 - `POST /quiz-runs/:id/questions/next`
@@ -736,7 +736,7 @@ Use REST mutations:
 
 After each mutation, rely on socket broadcast first and invalidate `quizRunState` second.
 
-- [ ] **Step 8.4: Run verification and commit**
+- [x] **Step 8.4: Run verification and commit**
 
 Run:
 

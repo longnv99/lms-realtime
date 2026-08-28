@@ -38,6 +38,10 @@ vi.mock('../../lib/realtime', () => ({
   useSocketStatus: vi.fn(() => 'connected'),
 }));
 
+vi.mock('../quizzes/QuizPanel', () => ({
+  QuizPanel: ({ sessionId }: { sessionId: string }) => <div>Quiz panel {sessionId}</div>,
+}));
+
 const mockedCreateNamespaceSocket = vi.mocked(createNamespaceSocket);
 const mockedGetSessionState = vi.mocked(getSessionState);
 
