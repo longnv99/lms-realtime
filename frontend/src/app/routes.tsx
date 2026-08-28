@@ -1,19 +1,29 @@
-import { Bell, BookOpen, LayoutDashboard, LogIn, Moon, Radio, Search } from 'lucide-react';
+import { Bell, LayoutDashboard, Moon, Radio, Search } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import { checkHealth } from '../api/client';
 import { Button } from '../components/Button';
 import { EmptyState } from '../components/EmptyState';
-import { LoadingBlock } from '../components/LoadingBlock';
 import { StatusBadge } from '../components/StatusBadge';
+import { LoginPage } from '../features/auth/LoginPage';
+import { ProtectedRoute } from '../features/auth/ProtectedRoute';
+import { RegisterPage } from '../features/auth/RegisterPage';
 
 export function AppRoutes() {
   return (
     <Routes>
       <Route element={<ProductShell />}>
         <Route index element={<Navigate to="/login" replace />} />
-        <Route path="/login" element={<AuthEntry />} />
-        <Route path="/courses" element={<CoursesPlaceholder />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/courses"
+          element={
+            <ProtectedRoute>
+              <CoursesPlaceholder />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Route>
     </Routes>
@@ -81,44 +91,6 @@ function BackendStatus() {
   }
 
   return <StatusBadge tone="success">{health.data?.status ?? 'API online'}</StatusBadge>;
-}
-
-function AuthEntry() {
-  return (
-    <div className="page">
-      <section className="page-header">
-        <StatusBadge tone="live">Portfolio demo</StatusBadge>
-        <h2 className="page-title">Run the live classroom.</h2>
-        <p className="page-description">
-          Sign in as instructor or student to manage courses, enter live sessions, chat, and run
-          realtime quizzes.
-        </p>
-      </section>
-      <section className="dashboard-grid">
-        <div className="panel">
-          <div className="panel-header">
-            <h3 className="panel-title">Access</h3>
-            <StatusBadge>Seed ready</StatusBadge>
-          </div>
-          <div className="panel-body">
-            <div className="toolbar">
-              <Button icon={<LogIn size={18} />}>Dang nhap</Button>
-              <Button variant="secondary">Tao tai khoan</Button>
-            </div>
-          </div>
-        </div>
-        <div className="panel">
-          <div className="panel-header">
-            <h3 className="panel-title">Today</h3>
-            <BookOpen size={18} aria-hidden="true" />
-          </div>
-          <div className="panel-body">
-            <LoadingBlock height={132} label="Loading workspace preview" />
-          </div>
-        </div>
-      </section>
-    </div>
-  );
 }
 
 function CoursesPlaceholder() {

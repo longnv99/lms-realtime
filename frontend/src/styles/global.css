@@ -159,6 +159,57 @@ a {
   gap: 18px;
 }
 
+.auth-page {
+  align-content: start;
+}
+
+.auth-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 440px) minmax(280px, 1fr);
+  gap: 18px;
+}
+
+.auth-card {
+  max-width: 480px;
+}
+
+.auth-form {
+  display: grid;
+  gap: 16px;
+}
+
+.auth-notes {
+  align-self: start;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 10%, transparent), transparent 55%),
+    var(--surface);
+}
+
+.seed-list {
+  display: grid;
+  gap: 10px;
+}
+
+.seed-list code {
+  overflow-wrap: anywhere;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-strong);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 10px;
+}
+
+.error-banner {
+  margin: 0;
+  border: 1px solid color-mix(in srgb, var(--danger) 40%, var(--line));
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--danger) 10%, var(--surface));
+  color: var(--danger);
+  padding: 10px 12px;
+}
+
 .panel {
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
@@ -382,6 +433,10 @@ a {
   }
 
   .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-grid {
     grid-template-columns: 1fr;
   }
 }

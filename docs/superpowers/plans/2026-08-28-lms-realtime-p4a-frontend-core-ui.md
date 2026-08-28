@@ -434,15 +434,15 @@ git commit -m "feat(frontend): add typed api client and auth store"
 - Produces: `/login`, `/register`, protected `/courses`.
 - Consumes: `login()`, `register()`, `useAuthStore`.
 
-- [ ] **Step 3.1: Write auth UI tests**
+- [x] **Step 3.1: Write auth UI tests**
 
 Create tests that render `LoginPage`, type `instructor@example.com` and `Password123!`, mock `login()`, click `Dang nhap`, and expect `loginSuccess()` navigation to `/courses`.
 
-- [ ] **Step 3.2: Implement login/register forms**
+- [x] **Step 3.2: Implement login/register forms**
 
 Use label-above-input fields, inline error text, skeleton-free submit loading state, and no placeholder-as-label. Primary button text: `Dang nhap`; secondary route text: `Tao tai khoan`.
 
-- [ ] **Step 3.3: Add protected route**
+- [x] **Step 3.3: Add protected route**
 
 Implement:
 
@@ -456,7 +456,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 ```
 
-- [ ] **Step 3.4: Run verification and commit**
+- [x] **Step 3.4: Run verification and commit**
 
 Run:
 
