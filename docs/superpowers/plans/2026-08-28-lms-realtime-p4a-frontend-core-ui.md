@@ -792,7 +792,7 @@ git commit -m "feat(frontend): add notifications drawer"
 - Produces: frontend manual smoke steps for login, course detail, live chat, quiz, notifications.
 - Consumes: all P4a UI tasks.
 
-- [ ] **Step 10.1: Update README frontend smoke**
+- [x] **Step 10.1: Update README frontend smoke**
 
 Document:
 
@@ -805,7 +805,7 @@ Document:
 6. Verify chat messages, quiz question flow, leaderboard, and notifications.
 ```
 
-- [ ] **Step 10.2: Run final frontend verification**
+- [x] **Step 10.2: Run final frontend verification**
 
 Run:
 
@@ -816,7 +816,7 @@ npm.cmd run build:frontend
 
 Expected: all frontend tests and build pass.
 
-- [ ] **Step 10.3: Optional local full-stack smoke**
+- [x] **Step 10.3: Optional local full-stack smoke**
 
 Run only if Docker/Postgres/Redis are available:
 
@@ -829,11 +829,18 @@ npm.cmd run dev:frontend
 
 Expected: app opens at `http://localhost:5173`, backend at `http://localhost:4000`, Swagger at `http://localhost:4000/api/docs`.
 
-- [ ] **Step 10.4: Mark plan complete**
+Observed on 2026-08-28:
+- `npm.cmd run infra:up` reports Postgres, Redis, and MinIO running.
+- Existing `http://localhost:5173` frontend responds `200`.
+- `http://localhost:4000` is occupied by a Python/LiteLLM Swagger process, so LMS backend was smoke-tested on `http://localhost:4001`.
+- `http://localhost:4001/api/health` responds success, and `http://localhost:4001/api/docs` responds `200`.
+- Seed login smoke is blocked in the current backend DB because it contains only one generated instructor user, not `instructor@example.com` / `student@example.com`; seed was not re-run to avoid resetting local demo data.
+
+- [x] **Step 10.4: Mark plan complete**
 
 Replace every remaining task checkbox in this file with checked state only after Step 10.2 passes.
 
-- [ ] **Step 10.5: Commit**
+- [x] **Step 10.5: Commit**
 
 ```bash
 git add README.md docs/superpowers/plans/2026-08-28-lms-realtime-p4a-frontend-core-ui.md
@@ -844,21 +851,21 @@ git commit -m "docs(plan): complete p4a frontend core ui"
 
 ## P4a Acceptance Checklist
 
-- [ ] Frontend no longer shows the P1 health-check scaffold as the main product.
-- [ ] App has protected routes and login/register pages.
-- [ ] Auth token is attached to REST requests through the typed API client.
-- [ ] Course list and course detail use TanStack Query and backend envelope handling.
-- [ ] Student can enroll in a published course from the UI.
-- [ ] Instructor can create/publish courses and create/start/end sessions from the UI.
-- [ ] Live session page connects to `/sessions`, joins `session:join`, shows participant count, sends and receives chat.
-- [ ] Quiz UI connects to `/quiz`, joins `quiz:join`, submits `quiz:answer`, renders question/closed/reveal/finished/leaderboard states.
-- [ ] Instructor quiz controls call the P3 REST endpoints.
-- [ ] Notifications drawer lists, marks read, and receives `notification:new`.
-- [ ] Light and dark themes have matching hierarchy and readable contrast.
-- [ ] Forms use labels, helper/error text, and visible focus states.
-- [ ] Loading, empty, and error states exist for every page-level query.
-- [ ] Frontend tests pass.
-- [ ] Frontend build passes.
+- [x] Frontend no longer shows the P1 health-check scaffold as the main product.
+- [x] App has protected routes and login/register pages.
+- [x] Auth token is attached to REST requests through the typed API client.
+- [x] Course list and course detail use TanStack Query and backend envelope handling.
+- [x] Student can enroll in a published course from the UI.
+- [x] Instructor can create/publish courses and create/start/end sessions from the UI.
+- [x] Live session page connects to `/sessions`, joins `session:join`, shows participant count, sends and receives chat.
+- [x] Quiz UI connects to `/quiz`, joins `quiz:join`, submits `quiz:answer`, renders question/closed/reveal/finished/leaderboard states.
+- [x] Instructor quiz controls call the P3 REST endpoints.
+- [x] Notifications drawer lists, marks read, and receives `notification:new`.
+- [x] Light and dark themes have matching hierarchy and readable contrast.
+- [x] Forms use labels, helper/error text, and visible focus states.
+- [x] Loading, empty, and error states exist for every page-level query.
+- [x] Frontend tests pass.
+- [x] Frontend build passes.
 
 ## Out of Scope for P4a
 

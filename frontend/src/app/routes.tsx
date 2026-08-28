@@ -1,4 +1,5 @@
-import { LayoutDashboard, Moon, Radio, Search } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { LayoutDashboard, Moon, Radio, Search, Sun } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import { checkHealth } from '../api/client';
@@ -51,6 +52,13 @@ export function AppRoutes() {
 
 function ProductShell() {
   const location = useLocation();
+  const [theme, setTheme] = useState<'light' | 'dark'>(() =>
+    document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light',
+  );
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
 
   return (
     <main className="app-shell">
@@ -85,7 +93,13 @@ function ProductShell() {
           <div className="topbar-actions">
             <Button aria-label="Search" icon={<Search size={18} />} iconOnly variant="ghost" />
             <NotificationsButton />
-            <Button aria-label="Toggle theme" icon={<Moon size={18} />} iconOnly variant="ghost" />
+            <Button
+              aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+              icon={theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+              iconOnly
+              onClick={() => setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark'))}
+              variant="ghost"
+            />
           </div>
         </header>
         <Outlet />
