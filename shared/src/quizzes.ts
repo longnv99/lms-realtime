@@ -9,6 +9,7 @@ export interface QuizQuestionResponse {
   id: string;
   text: string;
   options: QuizOption[];
+  order: number;
 }
 
 export interface QuizResponse {
@@ -28,4 +29,12 @@ export interface QuizRunResponse {
   questionOpenedAt: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface QuizWithQuestionsResponse extends QuizResponse {
+  questions: QuizQuestionResponse[];
+}
+
+export interface QuizRunListItemResponse extends QuizRunResponse {
+  quiz: Pick<QuizResponse, 'id' | 'title'>;
 }

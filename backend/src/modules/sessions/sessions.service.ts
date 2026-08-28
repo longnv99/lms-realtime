@@ -62,6 +62,17 @@ export class SessionsService {
     });
   }
 
+  async findMany(courseId: string, actor: AuthenticatedUser): Promise<PublicSession[]> {
+    const course = await this.coursesService.findCourseOrThrow(courseId);
+    await this.ensureCanViewCourseSessions(course, actor);
+
+    return this.prisma.session.findMany({
+      where: { courseId },
+      orderBy: [{ startsAt: 'asc' }, { createdAt: 'asc' }],
+      select: sessionSelect,
+    });
+  }
+
   async update(
     id: string,
     actor: AuthenticatedUser,
@@ -149,6 +160,28 @@ export class SessionsService {
       status: session.status,
       participantCount: 0,
     };
+  }
+
+  private async ensureCanViewCourseSessions(
+    course: { id: string; instructorId: string },
+    actor: AuthenticatedUser,
+  ): Promise<void> {
+    if (actor.role === 'ADMIN' || course.instructorId === actor.id) {
+      return;
+    }
+
+    const enrollment = await this.prisma.enrollment.findUnique({
+      where: { userId_courseId: { userId: actor.id, courseId: course.id } },
+      select: { id: true },
+    });
+
+    if (!enrollment) {
+      throw new AppError(
+        'AUTH_FORBIDDEN',
+        'Khong co quyen xem sessions cua khoa hoc',
+        HttpStatus.FORBIDDEN,
+      );
+    }
   }
 
   private async ensureCanViewState(

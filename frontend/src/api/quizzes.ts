@@ -1,9 +1,10 @@
 import type {
   QuizOption,
   QuizQuestionPayload,
-  QuizQuestionResponse,
+  QuizRunListItemResponse,
   QuizRunResponse,
   QuizRunStatus,
+  QuizWithQuestionsResponse,
 } from '@lms/shared';
 import { deleteEnvelope, getEnvelope, patchEnvelope, postEnvelope } from './client';
 import type { DeletedResponse } from './courses';
@@ -14,21 +15,16 @@ export type QuizQuestionInput = {
   text: string;
 };
 
-export type QuizWithQuestionsResponse = {
-  createdAt: string;
-  id: string;
-  lessonId: string;
-  questions: QuizQuestionResponse[];
-  title: string;
-  updatedAt: string;
-};
-
 export type QuizRunStateResponse = {
   currentQuestionIndex: number | null;
   id: string;
   question: QuizQuestionPayload['question'] | null;
   status: QuizRunStatus;
 };
+
+export async function listQuizzes(lessonId: string): Promise<QuizWithQuestionsResponse[]> {
+  return getEnvelope<QuizWithQuestionsResponse[]>(`/lessons/${lessonId}/quizzes`);
+}
 
 export async function createQuiz(
   lessonId: string,
@@ -53,6 +49,10 @@ export async function createQuizRun(
   quizId: string,
 ): Promise<QuizRunResponse> {
   return postEnvelope<QuizRunResponse>(`/sessions/${sessionId}/quiz-runs`, { quizId });
+}
+
+export async function listQuizRuns(sessionId: string): Promise<QuizRunListItemResponse[]> {
+  return getEnvelope<QuizRunListItemResponse[]>(`/sessions/${sessionId}/quiz-runs`);
 }
 
 export async function getQuizRunState(id: string): Promise<QuizRunStateResponse> {

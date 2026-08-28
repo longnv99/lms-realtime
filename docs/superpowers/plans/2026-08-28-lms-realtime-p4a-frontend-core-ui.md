@@ -511,6 +511,67 @@ git commit -m "feat(frontend): add course catalog ui"
 
 ---
 
+### Task 4.5: Backend Read Endpoints Needed by Frontend Panels
+
+**Files:**
+- Modify: `shared/src/quizzes.ts`
+- Modify: `backend/src/modules/sessions/sessions.controller.ts`
+- Modify: `backend/src/modules/sessions/sessions.service.ts`
+- Modify: `backend/src/modules/quizzes/quizzes.controller.ts`
+- Modify: `backend/src/modules/quizzes/quizzes.service.ts`
+- Modify: `backend/test/sessions-quizzes.e2e-spec.ts`
+- Modify: `frontend/src/api/sessions.ts`
+- Modify: `frontend/src/api/quizzes.ts`
+
+**Interfaces:**
+- Produces: `GET /courses/:courseId/sessions`, `GET /lessons/:lessonId/quizzes`, `GET /sessions/:sessionId/quiz-runs`.
+- Consumes: course instructor ownership and student enrollment authorization.
+
+- [x] **Step 4.5.1: Write backend e2e tests**
+
+Verify:
+- enrolled students can list course sessions.
+- lesson quiz list includes questions/options but does not expose `correctOptionId`.
+- session quiz-run list includes the linked quiz title.
+
+- [x] **Step 4.5.2: Run test to verify endpoints fail**
+
+Run:
+
+```bash
+$env:REDIS_URL='redis://:123456@localhost:6379'; npm.cmd run test:e2e --workspace=backend -- sessions-quizzes.e2e-spec.ts
+```
+
+Expected: FAIL with missing routes before implementation.
+
+- [x] **Step 4.5.3: Add shared list response types**
+
+Add `QuizWithQuestionsResponse` and `QuizRunListItemResponse` to `@lms/shared` so frontend and backend agree on the list payload shape.
+
+- [x] **Step 4.5.4: Implement backend controllers and services**
+
+Add authorized list methods for sessions, quizzes, and quiz runs. Admin/instructor can list their managed course data; students can list data only for enrolled courses.
+
+- [x] **Step 4.5.5: Add frontend API wrappers**
+
+Add typed `listSessions(courseId)`, `listQuizzes(lessonId)`, and `listQuizRuns(sessionId)` wrappers.
+
+- [x] **Step 4.5.6: Run verification and commit**
+
+Run:
+
+```bash
+$env:REDIS_URL='redis://:123456@localhost:6379'; npm.cmd run test:e2e --workspace=backend -- sessions-quizzes.e2e-spec.ts
+npm.cmd run build:backend
+npm.cmd run build:shared
+npm.cmd run test:frontend
+npm.cmd run build:frontend
+git add shared/src backend/src backend/test frontend/src docs/superpowers/plans/2026-08-28-lms-realtime-p4a-frontend-core-ui.md
+git commit -m "feat(api): add frontend read endpoints"
+```
+
+---
+
 ### Task 5: Lessons and Sessions Panels
 
 **Files:**

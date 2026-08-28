@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import type { QuizRunStatus } from '@lms/shared';
+import type { QuizOption, QuizRunStatus } from '@lms/shared';
 import { Prisma } from '../../generated/prisma/client';
 import { AppError } from '../../common/errors/app-error';
 import type { AuthenticatedUser } from '../../common/types/authenticated-request';
@@ -43,6 +43,40 @@ export class QuizzesService {
       },
       include: { questions: { orderBy: { order: 'asc' } } },
     });
+  }
+
+  async listQuizzes(lessonId: string, actor: AuthenticatedUser) {
+    const lesson = await this.findLessonWithCourseOrThrow(lessonId);
+    await this.ensureCanViewCourse(
+      lesson.courseId,
+      lesson.course.instructorId,
+      actor,
+      'Khong co quyen xem quizzes cua lesson',
+    );
+
+    const quizzes = await this.prisma.quiz.findMany({
+      where: { lessonId },
+      orderBy: { createdAt: 'asc' },
+      include: {
+        questions: {
+          orderBy: { order: 'asc' },
+          select: {
+            id: true,
+            text: true,
+            options: true,
+            order: true,
+          },
+        },
+      },
+    });
+
+    return quizzes.map((quiz) => ({
+      ...quiz,
+      questions: quiz.questions.map((question) => ({
+        ...question,
+        options: question.options as unknown as QuizOption[],
+      })),
+    }));
   }
 
   async updateQuiz(id: string, actor: AuthenticatedUser, dto: UpdateQuizDto) {
@@ -103,6 +137,24 @@ export class QuizzesService {
 
     return this.prisma.quizRun.create({
       data: { quizId: dto.quizId, sessionId },
+    });
+  }
+
+  async listQuizRuns(sessionId: string, actor: AuthenticatedUser) {
+    const session = await this.findSessionWithCourseOrThrow(sessionId);
+    await this.ensureCanViewSession(session, actor);
+
+    return this.prisma.quizRun.findMany({
+      where: { sessionId },
+      orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+      include: {
+        quiz: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+      },
     });
   }
 
@@ -359,21 +411,31 @@ export class QuizzesService {
     session: { courseId: string; course: { instructorId: string } },
     actor: AuthenticatedUser,
   ): Promise<void> {
-    if (actor.role === 'ADMIN' || session.course.instructorId === actor.id) {
+    await this.ensureCanViewCourse(
+      session.courseId,
+      session.course.instructorId,
+      actor,
+      'Khong co quyen xem trang thai quiz run',
+    );
+  }
+
+  private async ensureCanViewCourse(
+    courseId: string,
+    instructorId: string,
+    actor: AuthenticatedUser,
+    forbiddenMessage: string,
+  ): Promise<void> {
+    if (actor.role === 'ADMIN' || instructorId === actor.id) {
       return;
     }
 
     const enrollment = await this.prisma.enrollment.findUnique({
-      where: { userId_courseId: { userId: actor.id, courseId: session.courseId } },
+      where: { userId_courseId: { userId: actor.id, courseId } },
       select: { id: true },
     });
 
     if (!enrollment) {
-      throw new AppError(
-        'AUTH_FORBIDDEN',
-        'Khong co quyen xem trang thai quiz run',
-        HttpStatus.FORBIDDEN,
-      );
+      throw new AppError('AUTH_FORBIDDEN', forbiddenMessage, HttpStatus.FORBIDDEN);
     }
   }
 

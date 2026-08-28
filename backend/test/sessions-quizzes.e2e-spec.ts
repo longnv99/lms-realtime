@@ -96,6 +96,31 @@ describe('Sessions and quizzes (e2e)', () => {
     });
   });
 
+  it('lists course sessions for enrolled students', async () => {
+    const instructor = await registerAndLogin(app, 'INSTRUCTOR');
+    const student = await registerAndLogin(app, 'STUDENT');
+    const course = await createCourse(instructor.accessToken);
+    const session = await createSession(instructor.accessToken, course.id);
+
+    await publishCourse(instructor.accessToken, course.id);
+    await enrollStudent(student.accessToken, course.id);
+
+    const res = await request(app.getHttpServer())
+      .get(`/api/courses/${course.id}/sessions`)
+      .set('Authorization', `Bearer ${student.accessToken}`)
+      .expect(200);
+
+    expect(res.body.success).toBe(true);
+    expect(res.body.data).toEqual([
+      expect.objectContaining({
+        id: session.id,
+        courseId: course.id,
+        title: session.title,
+        status: 'SCHEDULED',
+      }),
+    ]);
+  });
+
   it('allows instructor to create a quiz with questions', async () => {
     const instructor = await registerAndLogin(app, 'INSTRUCTOR');
     const course = await createCourse(instructor.accessToken);
@@ -120,6 +145,42 @@ describe('Sessions and quizzes (e2e)', () => {
     });
   });
 
+  it('lists lesson quizzes with questions without exposing correctOptionId', async () => {
+    const instructor = await registerAndLogin(app, 'INSTRUCTOR');
+    const student = await registerAndLogin(app, 'STUDENT');
+    const course = await createCourse(instructor.accessToken);
+    const lesson = await createLesson(instructor.accessToken, course.id);
+    const quiz = await createQuiz(instructor.accessToken, lesson.id);
+
+    await publishCourse(instructor.accessToken, course.id);
+    await enrollStudent(student.accessToken, course.id);
+
+    const res = await request(app.getHttpServer())
+      .get(`/api/lessons/${lesson.id}/quizzes`)
+      .set('Authorization', `Bearer ${student.accessToken}`)
+      .expect(200);
+
+    expect(res.body.success).toBe(true);
+    expect(res.body.data).toEqual([
+      expect.objectContaining({
+        id: quiz.id,
+        lessonId: lesson.id,
+        title: 'Intro quiz',
+        questions: [
+          expect.objectContaining({
+            id: expect.any(String),
+            text: 'Which service stores relational LMS data?',
+            options: [
+              { id: 'a', text: 'PostgreSQL' },
+              { id: 'b', text: 'Redis' },
+            ],
+          }),
+        ],
+      }),
+    ]);
+    expect(JSON.stringify(res.body.data)).not.toContain('correctOptionId');
+  });
+
   it('creates a quiz run for a session in PENDING status', async () => {
     const instructor = await registerAndLogin(app, 'INSTRUCTOR');
     const course = await createCourse(instructor.accessToken);
@@ -139,6 +200,34 @@ describe('Sessions and quizzes (e2e)', () => {
       status: 'PENDING',
       currentQuestionIndex: null,
     });
+  });
+
+  it('lists session quiz runs with linked quiz title', async () => {
+    const instructor = await registerAndLogin(app, 'INSTRUCTOR');
+    const course = await createCourse(instructor.accessToken);
+    const lesson = await createLesson(instructor.accessToken, course.id);
+    const session = await createSession(instructor.accessToken, course.id);
+    const quiz = await createQuiz(instructor.accessToken, lesson.id);
+    const run = await createQuizRun(instructor.accessToken, session.id, quiz.id);
+
+    const res = await request(app.getHttpServer())
+      .get(`/api/sessions/${session.id}/quiz-runs`)
+      .set('Authorization', `Bearer ${instructor.accessToken}`)
+      .expect(200);
+
+    expect(res.body.success).toBe(true);
+    expect(res.body.data).toEqual([
+      expect.objectContaining({
+        id: run.id,
+        quizId: quiz.id,
+        sessionId: session.id,
+        status: 'PENDING',
+        quiz: {
+          id: quiz.id,
+          title: 'Intro quiz',
+        },
+      }),
+    ]);
   });
 
   it('returns quiz run state without correctOptionId', async () => {
@@ -282,6 +371,20 @@ describe('Sessions and quizzes (e2e)', () => {
       .expect(201);
 
     return res.body.data;
+  }
+
+  async function publishCourse(accessToken: string, courseId: string) {
+    await request(app.getHttpServer())
+      .post(`/api/courses/${courseId}/publish`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(201);
+  }
+
+  async function enrollStudent(accessToken: string, courseId: string) {
+    await request(app.getHttpServer())
+      .post(`/api/courses/${courseId}/enroll`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(201);
   }
 
   async function createSessionQuizFixture() {

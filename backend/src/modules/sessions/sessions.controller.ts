@@ -16,6 +16,11 @@ import { SessionsService } from './sessions.service';
 export class SessionsController {
   constructor(private readonly sessionsService: SessionsService) {}
 
+  @Get('courses/:courseId/sessions')
+  findMany(@Param('courseId') courseId: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.sessionsService.findMany(courseId, user);
+  }
+
   @UseGuards(RolesGuard)
   @Roles('ADMIN', 'INSTRUCTOR')
   @Post('courses/:courseId/sessions')

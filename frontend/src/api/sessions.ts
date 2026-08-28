@@ -11,6 +11,10 @@ export type SessionUpdateInput = Partial<SessionInput> & {
   status?: SessionStatus;
 };
 
+export async function listSessions(courseId: string): Promise<SessionResponse[]> {
+  return getEnvelope<SessionResponse[]>(`/courses/${courseId}/sessions`);
+}
+
 export async function createSession(
   courseId: string,
   input: SessionInput,
