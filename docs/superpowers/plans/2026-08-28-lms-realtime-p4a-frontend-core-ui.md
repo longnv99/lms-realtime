@@ -620,11 +620,11 @@ git commit -m "feat(frontend): add lessons and sessions panels"
 - Produces: `createNamespaceSocket(namespace, token)`, `useSocketStatus(namespace)`.
 - Consumes: `socket.io-client`, `useAuthStore.accessToken`, shared realtime payload types.
 
-- [ ] **Step 6.1: Write socket factory tests**
+- [x] **Step 6.1: Write socket factory tests**
 
 Mock `socket.io-client` and verify `io('/sessions', { auth: { token }, transports: ['websocket'] })` is called, reconnection is enabled with bounded backoff, and no socket is created when token is missing.
 
-- [ ] **Step 6.2: Implement realtime socket factory**
+- [x] **Step 6.2: Implement realtime socket factory**
 
 Create:
 
@@ -643,7 +643,7 @@ export function createNamespaceSocket(namespace: RealtimeNamespace, token: strin
 }
 ```
 
-- [ ] **Step 6.3: Run verification and commit**
+- [x] **Step 6.3: Run verification and commit**
 
 Run:
 
