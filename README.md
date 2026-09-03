@@ -22,6 +22,7 @@ Frontend: http://localhost:5173
 Backend: http://localhost:4000
 Swagger API docs: http://localhost:4000/api/docs
 MinIO console: http://localhost:9001
+MinIO credentials: `lms / lms_dev_password`
 
 ## Seed Users
 
@@ -32,10 +33,32 @@ student@example.com / Password123!
 student2@example.com / Password123!
 ```
 
+The seed script also creates an uploaded demo media asset at `videos/seed-demo.mp4`
+and attaches it to the first lesson. Uploading the matching object to MinIO is
+optional for local playback smoke tests.
+
+## Local Environment
+
+Backend media uploads use a private MinIO/S3-compatible bucket:
+
+```env
+S3_ENDPOINT=http://localhost:9000
+S3_REGION=us-east-1
+S3_ACCESS_KEY_ID=lms
+S3_SECRET_ACCESS_KEY=lms_dev_password
+S3_BUCKET=lms-media
+S3_FORCE_PATH_STYLE=true
+MEDIA_UPLOAD_TTL_SECONDS=900
+MEDIA_PLAYBACK_TTL_SECONDS=1800
+```
+
+Create the `lms-media` bucket in the MinIO console before testing upload
+completion against real objects.
+
 ## Realtime Namespaces
 
 ```text
-/sessions        auth.handshake.token, events: session:join, chat:send
+/sessions        auth.handshake.token, events: session:join, chat:send, progress:heartbeat, progress:updated
 /quiz            auth.handshake.token, events: quiz:join, quiz:answer
 /notifications   auth.handshake.token, event: notification:new
 ```
@@ -59,6 +82,63 @@ curl -s -X POST http://localhost:4000/api/auth/login ^
 ```
 
 Both responses should include `"success":true`.
+
+## Media And Progress Smoke
+
+Create an upload URL as `instructor@example.com` or `admin@example.com`:
+
+```bash
+curl -s -X POST http://localhost:4000/api/media/uploads ^
+  -H "Authorization: Bearer %TOKEN%" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"fileName\":\"lesson.mp4\",\"contentType\":\"video/mp4\",\"sizeBytes\":5000000}"
+```
+
+Upload the file directly to the returned `uploadUrl`, then mark the asset
+complete:
+
+```bash
+curl -s -X POST http://localhost:4000/api/media/uploads/%ASSET_ID%/complete ^
+  -H "Authorization: Bearer %TOKEN%"
+```
+
+Playback URLs are authenticated and presigned:
+
+```bash
+curl -s http://localhost:4000/api/media/assets/%ASSET_ID%/playback ^
+  -H "Authorization: Bearer %TOKEN%"
+```
+
+Student progress:
+
+```bash
+curl -s http://localhost:4000/api/me/courses/%COURSE_ID%/progress ^
+  -H "Authorization: Bearer %TOKEN%"
+```
+
+Instructor progress:
+
+```bash
+curl -s http://localhost:4000/api/courses/%COURSE_ID%/progress ^
+  -H "Authorization: Bearer %TOKEN%"
+```
+
+Realtime progress uses the `/sessions` namespace. Join a live session first,
+then emit:
+
+```json
+{
+  "event": "progress:heartbeat",
+  "payload": {
+    "lessonId": "LESSON_ID",
+    "positionSeconds": 120
+  }
+}
+```
+
+The backend stores the latest heartbeat in Redis immediately, debounces a
+PostgreSQL flush through BullMQ, and emits `progress:updated` to instructors
+when a student newly completes a lesson.
 
 ## Frontend Smoke
 

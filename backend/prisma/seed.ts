@@ -58,6 +58,16 @@ async function main(): Promise<void> {
     },
   });
 
+  const introMediaAsset = await prisma.mediaAsset.create({
+    data: {
+      key: 'videos/seed-demo.mp4',
+      fileName: 'seed-demo.mp4',
+      contentType: 'video/mp4',
+      sizeBytes: BigInt(5_000_000),
+      status: 'UPLOADED',
+    },
+  });
+
   const lesson = await prisma.lesson.create({
     data: {
       courseId: course.id,
@@ -65,6 +75,7 @@ async function main(): Promise<void> {
       description: 'First seed lesson',
       order: 1,
       durationSeconds: 600,
+      mediaAssetId: introMediaAsset.id,
     },
   });
 
@@ -147,6 +158,7 @@ async function main(): Promise<void> {
     instructor: instructor.email,
     student: student.email,
     studentTwo: studentTwo.email,
+    mediaAsset: introMediaAsset.key,
   });
 }
 

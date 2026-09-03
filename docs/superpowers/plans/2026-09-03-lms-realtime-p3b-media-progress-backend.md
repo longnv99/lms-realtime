@@ -366,15 +366,15 @@ Expected: tests and builds pass.
 - Produces: local smoke docs for MinIO upload/playback and progress heartbeat.
 - Consumes: all P3b modules.
 
-- [ ] **Step 5.1: Upgrade seed data**
+- [x] **Step 5.1: Upgrade seed data**
 
 Create one `MediaAsset` with status `UPLOADED` and attach it to the first seeded lesson. The object key may point to `videos/seed-demo.mp4`; actual MinIO object upload is documented as optional local smoke.
 
-- [ ] **Step 5.2: Update README**
+- [x] **Step 5.2: Update README**
 
 Document env keys, MinIO console credentials, media upload flow, playback endpoint, student progress endpoints, and realtime `progress:heartbeat`.
 
-- [ ] **Step 5.3: Run final verification**
+- [x] **Step 5.3: Run final verification**
 
 Run:
 
@@ -386,7 +386,7 @@ npm.cmd run test:frontend
 
 Expected: all backend e2e tests, backend/shared/frontend builds, and frontend tests pass.
 
-- [ ] **Step 5.4: Seed local DB**
+- [x] **Step 5.4: Seed local DB**
 
 Run:
 
@@ -396,7 +396,7 @@ npm.cmd run db:seed --workspace=backend
 
 Expected: seed prints demo credentials and creates at least one uploaded media asset.
 
-- [ ] **Step 5.5: Mark plan complete**
+- [x] **Step 5.5: Mark plan complete**
 
 After all verification passes, check off every completed task in this plan.
 
@@ -417,8 +417,8 @@ After all verification passes, check off every completed task in this plan.
 - [x] Redis stores latest heartbeat immediately.
 - [x] BullMQ flush persists heartbeat to PostgreSQL after debounce.
 - [x] Instructor course room receives `progress:updated` on new completion.
-- [ ] Backend e2e tests pass.
-- [ ] Backend, shared, and frontend builds pass.
+- [x] Backend e2e tests pass.
+- [x] Backend, shared, and frontend builds pass.
 
 ## Out of Scope for P3b
 
