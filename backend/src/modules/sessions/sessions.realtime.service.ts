@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { ChatMessagePayload, SessionStatePayload } from '@lms/shared';
+import type { ChatMessagePayload, ProgressUpdatedPayload, SessionStatePayload } from '@lms/shared';
 
 type RoomEmitter = {
   to(room: string): {
@@ -21,5 +21,9 @@ export class SessionsRealtimeService {
 
   emitChatMessage(sessionId: string, payload: ChatMessagePayload): void {
     this.server?.to(`session:${sessionId}`).emit('chat:message', payload);
+  }
+
+  emitProgressUpdated(courseId: string, payload: ProgressUpdatedPayload): void {
+    this.server?.to(`course:${courseId}:instructors`).emit('progress:updated', payload);
   }
 }

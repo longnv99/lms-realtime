@@ -1,7 +1,7 @@
 import { BullModule } from '@nestjs/bullmq';
 import { Global, Module } from '@nestjs/common';
 import { env } from '../config/env';
-import { NOTIFICATIONS_QUEUE } from './queue.constants';
+import { NOTIFICATIONS_QUEUE, PROGRESS_QUEUE } from './queue.constants';
 
 const redisUrl = new URL(env.REDIS_URL);
 
@@ -18,6 +18,15 @@ const redisUrl = new URL(env.REDIS_URL);
     }),
     BullModule.registerQueue({
       name: NOTIFICATIONS_QUEUE,
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: { type: 'exponential', delay: 10_000 },
+        removeOnComplete: true,
+        removeOnFail: false,
+      },
+    }),
+    BullModule.registerQueue({
+      name: PROGRESS_QUEUE,
       defaultJobOptions: {
         attempts: 3,
         backoff: { type: 'exponential', delay: 10_000 },

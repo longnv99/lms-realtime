@@ -17,6 +17,8 @@ import { wsValidationPipe } from '../../common/realtime/ws-validation.pipe';
 import type { AuthenticatedUser } from '../../common/types/authenticated-request';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RedisService } from '../../redis/redis.service';
+import { ProgressHeartbeatDto } from '../progress/dto/progress-heartbeat.dto';
+import { ProgressProducer } from '../progress/progress.producer';
 import { ChatSendDto } from './dto/chat-send.dto';
 import { SessionJoinDto } from './dto/session-join.dto';
 import { SessionsRealtimeService } from './sessions.realtime.service';
@@ -33,6 +35,7 @@ export class SessionsGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     private readonly prisma: PrismaService,
     private readonly redis: RedisService,
     private readonly realtime: SessionsRealtimeService,
+    private readonly progressProducer: ProgressProducer,
   ) {}
 
   afterInit(server: Server): void {
@@ -71,6 +74,9 @@ export class SessionsGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     const session = await this.findLiveSessionForUser(dto.sessionId, user);
 
     await client.join(`session:${session.id}`);
+    if (user.role === 'ADMIN' || session.course.instructorId === user.id) {
+      await client.join(`course:${session.courseId}:instructors`);
+    }
     client.data.sessionIds = [...new Set([...(client.data.sessionIds ?? []), session.id])];
     await this.redis.getClient().sadd(this.participantsKey(session.id), user.id);
     await this.emitState(session.id);
@@ -97,6 +103,34 @@ export class SessionsGateway implements OnGatewayInit, OnGatewayConnection, OnGa
       content: message.content,
       createdAt: message.createdAt.toISOString(),
     });
+  }
+
+  @SubscribeMessage('progress:heartbeat')
+  async recordProgressHeartbeat(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() dto: ProgressHeartbeatDto,
+  ): Promise<void> {
+    const user = client.data.user as AuthenticatedUser;
+    const { lesson, session } = await this.findJoinedLiveSessionForLesson(client, user, dto.lessonId);
+    const key = this.progressKey(user.id, dto.lessonId);
+    const redisClient = this.redis.getClient();
+    const existingProgress = await redisClient.hgetall(key);
+    const existingPositionSeconds = Number(existingProgress.positionSeconds ?? 0);
+    const nextPositionSeconds = Math.max(existingPositionSeconds, dto.positionSeconds);
+
+    await redisClient.hset(key, {
+      courseId: lesson.courseId,
+      sessionId: session.id,
+      positionSeconds: String(nextPositionSeconds),
+      updatedAt: new Date().toISOString(),
+    });
+    await this.progressProducer.enqueueProgressFlush(user.id, dto.lessonId);
+    await this.emitCompletionProgressIfNeeded(
+      lesson,
+      user,
+      nextPositionSeconds,
+      existingProgress.completionEmittedAt,
+    );
   }
 
   private async emitState(sessionId: string): Promise<void> {
@@ -139,7 +173,104 @@ export class SessionsGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     return session;
   }
 
+  private async findJoinedLiveSessionForLesson(
+    client: Socket,
+    user: AuthenticatedUser,
+    lessonId: string,
+  ) {
+    const lesson = await this.prisma.lesson.findUnique({
+      where: { id: lessonId },
+      include: { course: { select: { instructorId: true } } },
+    });
+
+    if (!lesson) {
+      throw new AppError('NOT_FOUND', 'Lesson not found', HttpStatus.NOT_FOUND);
+    }
+
+    const sessionIds = (client.data.sessionIds ?? []) as string[];
+    const session = await this.prisma.session.findFirst({
+      where: {
+        id: { in: sessionIds },
+        courseId: lesson.courseId,
+        status: 'LIVE',
+      },
+      select: { id: true, courseId: true },
+    });
+
+    if (!session) {
+      throw new AppError(
+        'CONFLICT',
+        'Join a live session before sending progress',
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    if (user.role === 'ADMIN' || lesson.course.instructorId === user.id) {
+      return { lesson, session };
+    }
+
+    const enrollment = await this.prisma.enrollment.findUnique({
+      where: { userId_courseId: { userId: user.id, courseId: lesson.courseId } },
+      select: { id: true },
+    });
+
+    if (!enrollment) {
+      throw new AppError('AUTH_FORBIDDEN', 'You are not enrolled in this course', HttpStatus.FORBIDDEN);
+    }
+
+    return { lesson, session };
+  }
+
+  private async emitCompletionProgressIfNeeded(
+    lesson: { id: string; courseId: string; durationSeconds: number },
+    user: AuthenticatedUser,
+    positionSeconds: number,
+    completionEmittedAt?: string,
+  ): Promise<void> {
+    if (lesson.durationSeconds <= 0 || positionSeconds < lesson.durationSeconds || completionEmittedAt) {
+      return;
+    }
+
+    const existingProgress = await this.prisma.lessonProgress.findUnique({
+      where: { userId_lessonId: { userId: user.id, lessonId: lesson.id } },
+      select: { completedAt: true },
+    });
+
+    if (existingProgress?.completedAt) {
+      return;
+    }
+
+    const [totalLessons, completedRows] = await Promise.all([
+      this.prisma.lesson.count({ where: { courseId: lesson.courseId } }),
+      this.prisma.lessonProgress.findMany({
+        where: {
+          userId: user.id,
+          completedAt: { not: null },
+          lesson: { courseId: lesson.courseId },
+        },
+        select: { lessonId: true },
+      }),
+    ]);
+    const completedLessonIds = new Set(completedRows.map((progress) => progress.lessonId));
+    completedLessonIds.add(lesson.id);
+    const percent = totalLessons === 0 ? 0 : Math.round((completedLessonIds.size / totalLessons) * 100);
+
+    await this.redis.getClient().hset(this.progressKey(user.id, lesson.id), {
+      completionEmittedAt: new Date().toISOString(),
+    });
+    this.realtime.emitProgressUpdated(lesson.courseId, {
+      courseId: lesson.courseId,
+      lessonId: lesson.id,
+      userId: user.id,
+      percent,
+    });
+  }
+
   private participantsKey(sessionId: string): string {
     return `session:${sessionId}:participants`;
+  }
+
+  private progressKey(userId: string, lessonId: string): string {
+    return `progress:${userId}:${lessonId}`;
   }
 }

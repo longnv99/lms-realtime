@@ -44,14 +44,14 @@ backend/
       s3-storage.service.ts
     modules/
       sessions/
-        dto/progress-heartbeat.dto.ts
         sessions.gateway.ts
         sessions.realtime.service.ts
       progress/
-      dto/progress-heartbeat.dto.ts
-      progress.controller.ts
-      progress.module.ts
+        dto/progress-heartbeat.dto.ts
+        progress.controller.ts
+        progress.module.ts
         progress.processor.ts
+        progress.producer.ts
         progress.service.ts
     queue/
       queue.constants.ts
@@ -293,10 +293,11 @@ Expected: tests and builds pass.
 - Modify: `shared/src/realtime.ts`
 - Modify: `backend/src/queue/queue.constants.ts`
 - Modify: `backend/src/queue/queue.module.ts`
-- Modify: `backend/src/modules/sessions/dto/progress-heartbeat.dto.ts`
+- Modify: `backend/src/modules/progress/dto/progress-heartbeat.dto.ts`
 - Modify: `backend/src/modules/sessions/sessions.gateway.ts`
 - Modify: `backend/src/modules/sessions/sessions.realtime.service.ts`
 - Create: `backend/src/modules/progress/progress.processor.ts`
+- Create: `backend/src/modules/progress/progress.producer.ts`
 - Modify: `backend/src/modules/progress/progress.module.ts`
 - Create: `backend/test/progress-realtime.e2e-spec.ts`
 
@@ -306,14 +307,14 @@ Expected: tests and builds pass.
 - Produces: BullMQ job `progress-flush`.
 - Consumes: `ProgressService.recordHeartbeat()`, Redis hash `progress:{userId}:{lessonId}`.
 
-- [ ] **Step 4.1: Write realtime progress e2e tests**
+- [x] **Step 4.1: Write realtime progress e2e tests**
 
 Verify:
 - enrolled student emits `progress:heartbeat` and Redis receives latest position.
 - lower subsequent position does not move Redis state backwards.
 - instructor socket receives `progress:updated` when completion occurs.
 
-- [ ] **Step 4.2: Run realtime tests to verify failure**
+- [x] **Step 4.2: Run realtime tests to verify failure**
 
 Run:
 
@@ -323,23 +324,23 @@ $env:REDIS_URL='redis://:123456@localhost:6379'; npm.cmd run test:e2e --workspac
 
 Expected: fail before event handler exists.
 
-- [ ] **Step 4.3: Add shared realtime progress contracts**
+- [x] **Step 4.3: Add shared realtime progress contracts**
 
 Add `ProgressHeartbeatPayload` and `ProgressUpdatedPayload` to `shared/src/realtime.ts`.
 
-- [ ] **Step 4.4: Add heartbeat handler**
+- [x] **Step 4.4: Add heartbeat handler**
 
 Validate `lessonId` and `positionSeconds`. Reuse existing session namespace auth. Ensure the student can access the lesson's course. Store Redis hash fields `positionSeconds`, `updatedAt`, `courseId`, and `sessionId`.
 
-- [ ] **Step 4.5: Add debounced progress flush job**
+- [x] **Step 4.5: Add debounced progress flush job**
 
 Queue job id must be `progress:flush:{userId}:{lessonId}` with 60s delay. Remove the previous delayed job before adding a new one. Processor reads Redis, calls `ProgressService.recordHeartbeat()`, and deletes the hash only after a successful DB write.
 
-- [ ] **Step 4.6: Emit instructor progress updates**
+- [x] **Step 4.6: Emit instructor progress updates**
 
 When `recordHeartbeat()` creates a new completion, emit `progress:updated` to `course:{courseId}:instructors`.
 
-- [ ] **Step 4.7: Verify realtime progress**
+- [x] **Step 4.7: Verify realtime progress**
 
 Run:
 
@@ -412,10 +413,10 @@ After all verification passes, check off every completed task in this plan.
 - [x] Instructor course progress endpoint returns per-student progress.
 - [x] Progress position never decreases.
 - [x] Lesson completion sets `completedAt` only once.
-- [ ] `/sessions` accepts `progress:heartbeat`.
-- [ ] Redis stores latest heartbeat immediately.
-- [ ] BullMQ flush persists heartbeat to PostgreSQL after debounce.
-- [ ] Instructor course room receives `progress:updated` on new completion.
+- [x] `/sessions` accepts `progress:heartbeat`.
+- [x] Redis stores latest heartbeat immediately.
+- [x] BullMQ flush persists heartbeat to PostgreSQL after debounce.
+- [x] Instructor course room receives `progress:updated` on new completion.
 - [ ] Backend e2e tests pass.
 - [ ] Backend, shared, and frontend builds pass.
 

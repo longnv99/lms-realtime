@@ -22,6 +22,18 @@ export interface ChatMessagePayload {
   createdAt: string;
 }
 
+export interface ProgressHeartbeatPayload {
+  lessonId: string;
+  positionSeconds: number;
+}
+
+export interface ProgressUpdatedPayload {
+  courseId: string;
+  lessonId: string;
+  userId?: string;
+  percent: number;
+}
+
 export interface QuizJoinPayload {
   quizRunId: string;
 }
