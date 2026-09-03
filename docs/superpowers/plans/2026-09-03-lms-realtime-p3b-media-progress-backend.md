@@ -48,8 +48,9 @@ backend/
         sessions.gateway.ts
         sessions.realtime.service.ts
       progress/
-        dto/progress-heartbeat.dto.ts
-        progress.module.ts
+      dto/progress-heartbeat.dto.ts
+      progress.controller.ts
+      progress.module.ts
         progress.processor.ts
         progress.service.ts
     queue/
@@ -229,6 +230,7 @@ Expected: tests and backend build pass.
 - Create: `shared/src/progress.ts`
 - Modify: `shared/src/index.ts`
 - Create: `backend/src/modules/progress/dto/progress-heartbeat.dto.ts`
+- Create: `backend/src/modules/progress/progress.controller.ts`
 - Create: `backend/src/modules/progress/progress.service.ts`
 - Create: `backend/src/modules/progress/progress.module.ts`
 - Create: `backend/test/progress.e2e-spec.ts`
@@ -240,7 +242,7 @@ Expected: tests and backend build pass.
 - Produces: `GET /api/courses/:courseId/progress`.
 - Consumes: Prisma `LessonProgress`, enrollment checks, instructor ownership checks.
 
-- [ ] **Step 3.1: Write progress e2e tests**
+- [x] **Step 3.1: Write progress e2e tests**
 
 Verify:
 - enrolled student sees own course progress.
@@ -249,7 +251,7 @@ Verify:
 - instructor sees per-student course progress.
 - unenrolled student cannot read course progress.
 
-- [ ] **Step 3.2: Run progress tests to verify failure**
+- [x] **Step 3.2: Run progress tests to verify failure**
 
 Run:
 
@@ -259,19 +261,19 @@ npm.cmd run test:e2e --workspace=backend -- progress.e2e-spec.ts
 
 Expected: fail before progress module exists.
 
-- [ ] **Step 3.3: Add shared progress types**
+- [x] **Step 3.3: Add shared progress types**
 
 Create `shared/src/progress.ts` with `LessonProgressResponse`, `CourseProgressResponse`, and `InstructorCourseProgressResponse`.
 
-- [ ] **Step 3.4: Implement ProgressService**
+- [x] **Step 3.4: Implement ProgressService**
 
 Use upsert on `(userId, lessonId)`. Store `Math.max(existing.positionSeconds, incomingPositionSeconds)`. Set `completedAt` only once when lesson duration is positive and stored position reaches duration.
 
-- [ ] **Step 3.5: Implement progress controllers and module**
+- [x] **Step 3.5: Implement progress controllers and module**
 
 Expose authenticated REST read endpoints for student and instructor views. Register `ProgressModule` in `AppModule`.
 
-- [ ] **Step 3.6: Verify progress REST**
+- [x] **Step 3.6: Verify progress REST**
 
 Run:
 
@@ -406,10 +408,10 @@ After all verification passes, check off every completed task in this plan.
 - [x] Upload create rejects invalid type and files larger than `2GB`.
 - [x] Upload complete verifies object existence, content length, and content type.
 - [x] Playback endpoint returns a private presigned URL only for uploaded assets.
-- [ ] Student course progress endpoint computes percent from completed lessons.
-- [ ] Instructor course progress endpoint returns per-student progress.
-- [ ] Progress position never decreases.
-- [ ] Lesson completion sets `completedAt` only once.
+- [x] Student course progress endpoint computes percent from completed lessons.
+- [x] Instructor course progress endpoint returns per-student progress.
+- [x] Progress position never decreases.
+- [x] Lesson completion sets `completedAt` only once.
 - [ ] `/sessions` accepts `progress:heartbeat`.
 - [ ] Redis stores latest heartbeat immediately.
 - [ ] BullMQ flush persists heartbeat to PostgreSQL after debounce.

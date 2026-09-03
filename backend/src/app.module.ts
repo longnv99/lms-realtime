@@ -6,6 +6,7 @@ import { CoursesModule } from './modules/courses/courses.module';
 import { EnrollmentsModule } from './modules/enrollments/enrollments.module';
 import { LessonsModule } from './modules/lessons/lessons.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { ProgressModule } from './modules/progress/progress.module';
 import { QuizzesModule } from './modules/quizzes/quizzes.module';
 import { SessionsModule } from './modules/sessions/sessions.module';
 import { UsersModule } from './modules/users/users.module';
@@ -31,6 +32,7 @@ import { MediaModule } from './media/media.module';
     SessionsModule,
     QuizzesModule,
     NotificationsModule,
+    ProgressModule,
   ],
 })
 export class AppModule {}
