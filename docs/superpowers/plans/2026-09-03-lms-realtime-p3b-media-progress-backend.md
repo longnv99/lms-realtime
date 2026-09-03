@@ -178,7 +178,7 @@ Expected: both builds pass.
 - Produces: `GET /api/media/assets/:id/playback`.
 - Consumes: `S3StorageService`, `JwtAuthGuard`, `RolesGuard`, Prisma `MediaAsset`.
 
-- [ ] **Step 2.1: Write media e2e tests**
+- [x] **Step 2.1: Write media e2e tests**
 
 Mock `S3StorageService` in the test module and verify:
 - instructor can create upload for `video/mp4`.
@@ -188,7 +188,7 @@ Mock `S3StorageService` in the test module and verify:
 - complete updates status to `UPLOADED` when size/type match.
 - playback returns a presigned URL only after `UPLOADED`.
 
-- [ ] **Step 2.2: Run media tests to verify failure**
+- [x] **Step 2.2: Run media tests to verify failure**
 
 Run:
 
@@ -198,19 +198,19 @@ npm.cmd run test:e2e --workspace=backend -- media.e2e-spec.ts
 
 Expected: fail before implementation because routes do not exist.
 
-- [ ] **Step 2.3: Implement media DTOs**
+- [x] **Step 2.3: Implement media DTOs**
 
 `CreateUploadDto` has `fileName`, `contentType`, `sizeBytes`; `CompleteUploadDto` is an empty class to preserve explicit body validation.
 
-- [ ] **Step 2.4: Implement media service**
+- [x] **Step 2.4: Implement media service**
 
 Generate object keys as `videos/{crypto.randomUUID()}.{mp4|webm}`. Create `MediaAsset` as `PENDING`, return presigned upload URL. On complete, call `headObject()`, compare content length and content type, then mark `UPLOADED`. Playback rejects missing/PENDING assets with `LESSON_MEDIA_NOT_READY`.
 
-- [ ] **Step 2.5: Implement media controller**
+- [x] **Step 2.5: Implement media controller**
 
 Protect upload and complete with `JwtAuthGuard`, `RolesGuard`, roles `ADMIN` and `INSTRUCTOR`. Protect playback with `JwtAuthGuard`; authorization to lesson-level playback is handled in P4b when attached lesson context is available.
 
-- [ ] **Step 2.6: Verify media API**
+- [x] **Step 2.6: Verify media API**
 
 Run:
 
@@ -401,11 +401,11 @@ After all verification passes, check off every completed task in this plan.
 
 ## P3b Acceptance Checklist
 
-- [ ] Backend validates MinIO/S3 env values.
-- [ ] Instructor/admin can create presigned upload URLs for `video/mp4` and `video/webm`.
-- [ ] Upload create rejects invalid type and files larger than `2GB`.
-- [ ] Upload complete verifies object existence, content length, and content type.
-- [ ] Playback endpoint returns a private presigned URL only for uploaded assets.
+- [x] Backend validates MinIO/S3 env values.
+- [x] Instructor/admin can create presigned upload URLs for `video/mp4` and `video/webm`.
+- [x] Upload create rejects invalid type and files larger than `2GB`.
+- [x] Upload complete verifies object existence, content length, and content type.
+- [x] Playback endpoint returns a private presigned URL only for uploaded assets.
 - [ ] Student course progress endpoint computes percent from completed lessons.
 - [ ] Instructor course progress endpoint returns per-student progress.
 - [ ] Progress position never decreases.
