@@ -17,6 +17,14 @@ import { QuizzesService } from './quizzes.service';
 export class QuizzesController {
   constructor(private readonly quizzesService: QuizzesService) {}
 
+  @Get('lessons/:lessonId/quizzes')
+  listQuizzes(
+    @Param('lessonId') lessonId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.quizzesService.listQuizzes(lessonId, user);
+  }
+
   @UseGuards(RolesGuard)
   @Roles('ADMIN', 'INSTRUCTOR')
   @Post('lessons/:lessonId/quizzes')
@@ -55,6 +63,14 @@ export class QuizzesController {
     @Body() dto: CreateQuizRunDto,
   ) {
     return this.quizzesService.createQuizRun(sessionId, user, dto);
+  }
+
+  @Get('sessions/:sessionId/quiz-runs')
+  listQuizRuns(
+    @Param('sessionId') sessionId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.quizzesService.listQuizRuns(sessionId, user);
   }
 
   @Get('quiz-runs/:id/state')

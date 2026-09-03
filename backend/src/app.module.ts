@@ -13,6 +13,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { QueueModule } from './queue/queue.module';
 import { RedisModule } from './redis/redis.module';
 import { env } from './config/env';
+import { MediaModule } from './media/media.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { env } from './config/env';
     HealthModule,
     AuthModule,
     UsersModule,
+    MediaModule,
     CoursesModule,
     EnrollmentsModule,
     LessonsModule,
