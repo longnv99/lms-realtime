@@ -180,10 +180,10 @@ describe('QuizPanel', () => {
 
     renderQuizPanel();
 
-    await userEvent.click(await screen.findByRole('button', { name: /mo cau tiep/i }));
-    await userEvent.click(screen.getByRole('button', { name: /dong cau/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /next question/i }));
+    await userEvent.click(screen.getByRole('button', { name: /close question/i }));
     await userEvent.click(screen.getByRole('button', { name: /reveal/i }));
-    await userEvent.click(screen.getByRole('button', { name: /ket thuc/i }));
+    await userEvent.click(screen.getByRole('button', { name: /finish/i }));
 
     expect(mockedOpenNextQuestion).toHaveBeenCalledWith('run-1');
     expect(mockedCloseQuestion).toHaveBeenCalledWith('run-1');

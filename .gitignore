@@ -25,3 +25,6 @@ Thumbs.db
 
 # Prisma
 backend/prisma/migrations/dev.db*
+
+# Skills Agents
+.agents/*

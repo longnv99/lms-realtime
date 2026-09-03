@@ -38,9 +38,9 @@ describe('CoursesPage', () => {
     renderCoursesPage();
 
     expect(await screen.findByText('Realtime LMS Foundations')).toBeInTheDocument();
-    expect(screen.getByText('PUBLISHED')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /ghi danh/i })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /tao khoa hoc/i })).not.toBeInTheDocument();
+    expect(screen.getAllByText('Published').length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: /enroll/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /create course/i })).not.toBeInTheDocument();
   });
 
   it('renders instructor create and publish tools', async () => {
@@ -56,7 +56,7 @@ describe('CoursesPage', () => {
 
     renderCoursesPage();
 
-    expect(await screen.findByRole('button', { name: /tao khoa hoc/i })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /create course/i })).toBeInTheDocument();
     expect(await screen.findByText('Realtime LMS Foundations')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /publish/i })).toBeInTheDocument();
   });
@@ -66,7 +66,7 @@ describe('CoursesPage', () => {
 
     renderCoursesPage();
 
-    expect(await screen.findByText(/chua co khoa hoc/i)).toBeInTheDocument();
+    expect(await screen.findByText(/no courses yet/i)).toBeInTheDocument();
   });
 });
 

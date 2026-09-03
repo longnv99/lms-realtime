@@ -96,7 +96,7 @@ export function SessionsPanel({ canManage, courseId }: SessionsPanelProps) {
           </p>
         )}
         {!sessionsQuery.isLoading && !sessionsQuery.isError && count === 0 && (
-          <EmptyState description="No rooms have been scheduled." title="Chua co session" />
+          <EmptyState description="No rooms have been scheduled." title="No sessions yet" />
         )}
         {count > 0 && (
           <div className="session-groups">
@@ -145,7 +145,7 @@ export function SessionsPanel({ canManage, courseId }: SessionsPanelProps) {
               icon={<Plus size={16} aria-hidden="true" />}
               type="submit"
             >
-              Tao session
+              Create session
             </Button>
           </form>
         )}
@@ -186,12 +186,12 @@ function SessionRow({
       <div className="session-actions">
         {session.status === 'LIVE' && (
           <Link
-            aria-label={`Vao live ${session.title}`}
+            aria-label={`Enter live room ${session.title}`}
             className="button button-primary"
             to={`/sessions/${session.id}/live`}
           >
             <Play size={16} aria-hidden="true" />
-            Vao live
+            Enter live
           </Link>
         )}
         {canManage && session.status === 'SCHEDULED' && (

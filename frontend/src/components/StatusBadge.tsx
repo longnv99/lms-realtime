@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Badge } from './ui/badge';
 
 type StatusTone = 'live' | 'muted' | 'success';
 
@@ -8,5 +9,5 @@ type StatusBadgeProps = {
 };
 
 export function StatusBadge({ children, tone = 'muted' }: StatusBadgeProps) {
-  return <span className={`badge badge-${tone}`}>{children}</span>;
+  return <Badge variant={tone}>{children}</Badge>;
 }

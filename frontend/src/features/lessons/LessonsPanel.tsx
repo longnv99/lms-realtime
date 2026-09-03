@@ -72,7 +72,7 @@ export function LessonsPanel({ canManage, courseId }: LessonsPanelProps) {
           </p>
         )}
         {!lessonsQuery.isLoading && !lessonsQuery.isError && sortedLessons.length === 0 && (
-          <EmptyState description="Curriculum is empty." title="Chua co lesson" />
+          <EmptyState description="Curriculum is empty." title="No lessons yet" />
         )}
         {sortedLessons.length > 0 && (
           <div className="lesson-list">
@@ -108,7 +108,7 @@ export function LessonsPanel({ canManage, courseId }: LessonsPanelProps) {
               icon={<Plus size={16} aria-hidden="true" />}
               type="submit"
             >
-              Tao lesson
+              Create lesson
             </Button>
           </form>
         )}

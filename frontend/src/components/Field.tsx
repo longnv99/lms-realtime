@@ -1,4 +1,5 @@
 import type { InputHTMLAttributes } from 'react';
+import { Input } from './ui/input';
 
 type FieldProps = InputHTMLAttributes<HTMLInputElement> & {
   error?: string;
@@ -15,10 +16,9 @@ export function Field({ error, help, id, label, name, ...props }: FieldProps) {
   return (
     <label className="field" htmlFor={inputId}>
       <span className="field-label">{label}</span>
-      <input
+      <Input
         aria-describedby={[helpId, errorId].filter(Boolean).join(' ') || undefined}
         aria-invalid={error ? true : undefined}
-        className="field-control"
         id={inputId}
         name={name}
         {...props}

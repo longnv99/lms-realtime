@@ -2,6 +2,7 @@ import { useMemo, useState, type FormEvent } from 'react';
 import { Send } from 'lucide-react';
 import type { ChatMessagePayload } from '@lms/shared';
 import { Button } from '../../components/Button';
+import { Textarea } from '../../components/ui/textarea';
 
 type ChatPanelProps = {
   messages: ChatMessagePayload[];
@@ -62,9 +63,8 @@ export function ChatPanel({ messages, onSend }: ChatPanelProps) {
         <label className="chat-input-label" htmlFor="chat-message">
           Chat message
         </label>
-        <textarea
+        <Textarea
           aria-label="Chat message"
-          className="chat-input"
           id="chat-message"
           maxLength={maxMessageLength}
           onChange={(event) => setContent(event.target.value)}

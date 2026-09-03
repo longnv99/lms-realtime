@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { Button as ShadcnButton } from './ui/button';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 
@@ -17,19 +18,19 @@ export function Button({
   variant = 'primary',
   ...props
 }: ButtonProps) {
-  const classes = [
-    'button',
-    `button-${variant}`,
-    iconOnly ? 'button-icon' : '',
-    className,
-  ]
-    .filter(Boolean)
-    .join(' ');
+  const shadcnVariant = variant === 'primary' ? 'default' : variant;
+  const shadcnSize = iconOnly ? 'icon' : 'default';
 
   return (
-    <button className={classes} type={type} {...props}>
+    <ShadcnButton
+      className={className}
+      size={shadcnSize}
+      type={type}
+      variant={shadcnVariant}
+      {...props}
+    >
       {icon}
       {!iconOnly && children}
-    </button>
+    </ShadcnButton>
   );
 }

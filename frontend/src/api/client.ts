@@ -26,7 +26,7 @@ export function setAccessTokenGetter(getter: () => string | null): void {
 
 export function unwrapEnvelope<T>(envelope: ApiEnvelope<T>): T {
   if (!envelope.success || envelope.data === null) {
-    throw new Error(envelope.error?.message ?? 'Request failed');
+    throw new Error(normalizeApiError(envelope.error?.code, envelope.error?.message));
   }
 
   return envelope.data;
@@ -34,8 +34,16 @@ export function unwrapEnvelope<T>(envelope: ApiEnvelope<T>): T {
 
 export function unwrapVoidEnvelope(envelope: ApiEnvelope<unknown>): void {
   if (!envelope.success) {
-    throw new Error(envelope.error?.message ?? 'Request failed');
+    throw new Error(normalizeApiError(envelope.error?.code, envelope.error?.message));
   }
+}
+
+function normalizeApiError(code?: string, message?: string): string {
+  if (code === 'AUTH_INVALID_CREDENTIALS') {
+    return 'Email or password is incorrect.';
+  }
+
+  return message ?? 'Request failed.';
 }
 
 export async function getEnvelope<T>(path: string, params?: Record<string, unknown>): Promise<T> {

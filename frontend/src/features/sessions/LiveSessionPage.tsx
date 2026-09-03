@@ -61,7 +61,8 @@ export function LiveSessionPage() {
   const state = liveState ?? stateQuery.data ?? null;
   const participantCount = state?.participantCount ?? 0;
   const sessionStatus = state?.status ?? 'SCHEDULED';
-  const statusTone = sessionStatus === 'LIVE' ? 'live' : sessionStatus === 'ENDED' ? 'success' : 'muted';
+  const statusTone =
+    sessionStatus === 'LIVE' ? 'live' : sessionStatus === 'ENDED' ? 'success' : 'muted';
   const connectionLabel = useMemo(
     () => (socketStatus === 'connected' ? 'Socket connected' : 'Socket offline'),
     [socketStatus],
@@ -99,31 +100,29 @@ export function LiveSessionPage() {
         <ArrowLeft size={18} aria-hidden="true" />
         Courses
       </Link>
+      <section className="live-room-banner" aria-label="Live session status">
+        <div className="live-room-copy">
+          <StatusBadge tone={statusTone}>{sessionStatus}</StatusBadge>
+          <h2 className="page-title">Live room</h2>
+          <p className="page-description">{connectionLabel}</p>
+        </div>
+        <div className="live-banner-metrics">
+          <div className="metric-line">
+            <Users size={18} aria-hidden="true" />
+            <strong>{participantCount} online</strong>
+          </div>
+          <div className="metric-line">
+            <Radio size={18} aria-hidden="true" />
+            <span>{sessionId}</span>
+          </div>
+        </div>
+      </section>
       <section className="live-workspace">
-        <aside className="panel live-rail" aria-label="Live session status">
-          <div className="panel-header">
-            <div>
-              <h2 className="panel-title">Live room</h2>
-              <p className="panel-subtitle">{connectionLabel}</p>
-            </div>
-            <StatusBadge tone={statusTone}>{sessionStatus}</StatusBadge>
-          </div>
-          <div className="panel-body live-metrics">
-            <div className="metric-line">
-              <Users size={18} aria-hidden="true" />
-              <strong>{participantCount} online</strong>
-            </div>
-            <div className="metric-line">
-              <Radio size={18} aria-hidden="true" />
-              <span>{sessionId}</span>
-            </div>
-          </div>
-        </aside>
         <section className="panel live-stage" aria-labelledby="live-stage-title">
           <div className="panel-header">
             <div>
               <h2 className="panel-title" id="live-stage-title">
-                Lesson surface
+                Classroom stage
               </h2>
               <p className="panel-subtitle">Session workspace</p>
             </div>

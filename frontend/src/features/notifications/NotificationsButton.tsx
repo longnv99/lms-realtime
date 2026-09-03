@@ -3,7 +3,8 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { Bell } from 'lucide-react';
 import type { NotificationPayload, NotificationResponse } from '@lms/shared';
 import { listNotifications, markNotificationRead } from '../../api/notifications';
-import { Button } from '../../components/Button';
+import { Button } from '../../components/ui/button';
+import { Sheet, SheetTrigger } from '../../components/ui/sheet';
 import { getErrorMessage } from '../../lib/errors';
 import { createNamespaceSocket } from '../../lib/realtime';
 import { useAuthStore } from '../auth/auth.store';
@@ -57,21 +58,6 @@ export function NotificationsButton() {
     };
   }, [accessToken]);
 
-  useEffect(() => {
-    if (!isOpen) {
-      return undefined;
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsOpen(false);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen]);
-
   const unreadCount = useMemo(
     () => notifications.filter((notification) => !notification.readAt).length,
     [notifications],
@@ -82,29 +68,32 @@ export function NotificationsButton() {
   }
 
   return (
-    <div className="notifications-shell">
-      <Button
-        aria-label="Notifications"
-        className="notification-button"
-        icon={<Bell size={18} aria-hidden="true" />}
-        iconOnly
-        onClick={() => setIsOpen((current) => !current)}
-        variant="ghost"
-      />
-      {unreadCount > 0 && <span className="notification-count">{unreadCount}</span>}
-      {notificationsQuery.isError && (
-        <span className="notification-error" role="alert">
-          {getErrorMessage(notificationsQuery.error)}
-        </span>
-      )}
-      {isOpen && (
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <div className="notifications-shell">
+        <SheetTrigger asChild>
+          <Button
+            aria-label="Notifications"
+            className="notification-button"
+            size="icon"
+            variant="ghost"
+          >
+            <Bell size={18} aria-hidden="true" />
+          </Button>
+        </SheetTrigger>
+        {unreadCount > 0 && <span className="notification-count">{unreadCount}</span>}
+        {notificationsQuery.isError && (
+          <span className="notification-error" role="alert">
+            {getErrorMessage(notificationsQuery.error)}
+          </span>
+        )}
+      </div>
+      {isOpen ? (
         <NotificationsDrawer
           isLoading={notificationsQuery.isLoading}
           notifications={notifications}
-          onClose={() => setIsOpen(false)}
           onMarkRead={handleMarkRead}
         />
-      )}
-    </div>
+      ) : null}
+    </Sheet>
   );
 }

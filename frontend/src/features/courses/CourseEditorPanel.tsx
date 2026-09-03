@@ -46,7 +46,7 @@ export function CourseEditorPanel() {
           </p>
         )}
         <Field
-          label="Ten khoa hoc"
+          label="Course title"
           name="course-title"
           onChange={(event) => setTitle(event.target.value)}
           required
@@ -60,13 +60,13 @@ export function CourseEditorPanel() {
           value={slug}
         />
         <Field
-          label="Mo ta"
+          label="Description"
           name="course-description"
           onChange={(event) => setDescription(event.target.value)}
           value={description}
         />
         <Button disabled={createMutation.isPending} icon={<Plus size={18} />} type="submit">
-          {createMutation.isPending ? 'Dang tao' : 'Tao khoa hoc'}
+          {createMutation.isPending ? 'Creating course' : 'Create course'}
         </Button>
       </div>
     </form>

@@ -66,11 +66,13 @@ describe('Course detail panels', () => {
 
     const titles = await screen.findAllByTestId('lesson-row-title');
     expect(titles.map((title) => title.textContent)).toEqual(['First lesson', 'Second lesson']);
-    expect(screen.getByRole('link', { name: /vao live live room/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /enter live room live room/i })).toHaveAttribute(
       'href',
       '/sessions/session-live/live',
     );
-    expect(screen.queryByRole('link', { name: /vao live ended review/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: /enter live room ended review/i }),
+    ).not.toBeInTheDocument();
   });
 
   it('lets instructors start scheduled sessions', async () => {

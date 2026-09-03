@@ -1,11 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Eye, ListRestart, Lock, Square } from 'lucide-react';
-import {
-  closeQuestion,
-  finishQuizRun,
-  openNextQuestion,
-  revealQuestion,
-} from '../../api/quizzes';
+import { closeQuestion, finishQuizRun, openNextQuestion, revealQuestion } from '../../api/quizzes';
 import { Button } from '../../components/Button';
 import { getErrorMessage } from '../../lib/errors';
 
@@ -54,7 +49,7 @@ export function QuizInstructorControls({ quizRunId }: QuizInstructorControlsProp
           onClick={() => openMutation.mutate()}
           variant="secondary"
         >
-          Mo cau tiep
+          Next question
         </Button>
         <Button
           disabled={busy}
@@ -62,7 +57,7 @@ export function QuizInstructorControls({ quizRunId }: QuizInstructorControlsProp
           onClick={() => closeMutation.mutate()}
           variant="secondary"
         >
-          Dong cau
+          Close question
         </Button>
         <Button
           disabled={busy}
@@ -78,7 +73,7 @@ export function QuizInstructorControls({ quizRunId }: QuizInstructorControlsProp
           onClick={() => finishMutation.mutate()}
           variant="ghost"
         >
-          Ket thuc
+          Finish
         </Button>
       </div>
       {error && (

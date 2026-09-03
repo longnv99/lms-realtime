@@ -1,37 +1,50 @@
-:root {
-  color-scheme: light;
-  --font-sans: "Outfit Variable", "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", "SFMono-Regular", monospace;
-  --bg: #f7f8f5;
-  --surface: #ffffff;
-  --surface-strong: #eff3ee;
-  --text: #181c1a;
-  --muted: #68736e;
-  --line: #dfe6e1;
-  --accent: #0f766e;
-  --accent-strong: #0b4f49;
-  --live: #b45309;
-  --danger: #b42318;
-  --success: #157f3b;
-  --warning: #a15c07;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --shadow-soft: 0 18px 45px rgba(25, 36, 30, 0.08);
-}
-
+:root,
 [data-theme="dark"] {
   color-scheme: dark;
-  --bg: #101411;
-  --surface: #171d19;
-  --surface-strong: #202820;
-  --text: #edf4ef;
-  --muted: #a7b4ad;
-  --line: #2d3831;
-  --accent: #5eead4;
-  --accent-strong: #99f6e4;
+  --font-sans: "Outfit Variable", "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", monospace;
+  --bg: #09090b;
+  --surface: #111113;
+  --surface-soft: #141417;
+  --surface-strong: #1c1c20;
+  --surface-inset: #0c0c0f;
+  --text: #fafafa;
+  --text-muted: #a1a1aa;
+  --line: #27272a;
+  --line-strong: #3f3f46;
+  --accent: #2dd4bf;
+  --accent-strong: #5eead4;
+  --accent-soft: #123835;
   --live: #f59e0b;
-  --danger: #f97066;
-  --success: #7ddc95;
-  --warning: #facc15;
-  --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.28);
+  --danger: #f87171;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --shadow-soft: 0 20px 64px rgba(0, 0, 0, 0.42);
+  --shadow-lift: 0 28px 90px rgba(0, 0, 0, 0.56);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-press: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f4f5;
+  --surface: #fafafa;
+  --surface-soft: #f4f4f5;
+  --surface-strong: #e4e4e7;
+  --surface-inset: #f0f0f2;
+  --text: #09090b;
+  --text-muted: #71717a;
+  --line: #d4d4d8;
+  --line-strong: #a1a1aa;
+  --accent: #0f766e;
+  --accent-strong: #115e59;
+  --accent-soft: #ccfbf1;
+  --live: #b45309;
+  --danger: #b91c1c;
+  --success: #047857;
+  --warning: #a16207;
+  --shadow-soft: 0 18px 48px rgba(24, 24, 27, 0.1);
+  --shadow-lift: 0 24px 70px rgba(24, 24, 27, 0.14);
 }

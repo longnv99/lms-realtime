@@ -1,4 +1,4 @@
-import { UserPlus } from 'lucide-react';
+import { BookOpenCheck, GraduationCap, UserPlus } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { register } from '../../api/auth';
@@ -34,61 +34,97 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="page auth-page">
-      <section className="page-header">
-        <StatusBadge>New workspace</StatusBadge>
-        <h2 className="page-title">Create your classroom account.</h2>
-        <p className="page-description">
-          Register as a student for course access or as an instructor for authoring workflows.
-        </p>
-      </section>
-      <form className="panel auth-card" onSubmit={onSubmit}>
-        <div className="panel-header">
-          <h3 className="panel-title">Account details</h3>
-        </div>
-        <div className="panel-body auth-form">
-          {error && (
-            <p className="error-banner" role="alert">
-              {error}
-            </p>
-          )}
-          <Field
-            autoComplete="name"
-            label="Ten hien thi"
-            name="name"
-            onChange={(event) => setName(event.target.value)}
-            required
-            value={name}
-          />
-          <Field
-            autoComplete="email"
-            label="Email"
-            name="email"
-            onChange={(event) => setEmail(event.target.value)}
-            required
-            type="email"
-            value={email}
-          />
-          <Field
-            autoComplete="new-password"
-            help="At least 8 characters, including letters and numbers."
-            label="Mat khau"
-            name="password"
-            onChange={(event) => setPassword(event.target.value)}
-            required
-            type="password"
-            value={password}
-          />
-          <div className="toolbar">
-            <Button disabled={submitting} icon={<UserPlus size={18} />} type="submit">
-              {submitting ? 'Dang tao' : 'Tao tai khoan'}
-            </Button>
-            <Link className="button button-secondary" to="/login">
-              Dang nhap
-            </Link>
+    <div className="auth-page">
+      <section className="auth-shell auth-shell-register">
+        <form className="auth-form-panel" onSubmit={onSubmit}>
+          <div className="auth-brand-row">
+            <span className="auth-logo">LR</span>
+            <span>LMS Realtime</span>
           </div>
-        </div>
-      </form>
+          <div className="auth-heading">
+            <StatusBadge>New workspace</StatusBadge>
+            <h1>Create your classroom account</h1>
+            <p>Start with a student account, then use instructor roles for authoring workflows.</p>
+          </div>
+          <div className="auth-form">
+            {error && (
+              <p className="error-banner" role="alert">
+                {error}
+              </p>
+            )}
+            <Field
+              autoComplete="name"
+              label="Display name"
+              name="name"
+              onChange={(event) => setName(event.target.value)}
+              required
+              value={name}
+            />
+            <Field
+              autoComplete="email"
+              label="Email"
+              name="email"
+              onChange={(event) => setEmail(event.target.value)}
+              required
+              type="email"
+              value={email}
+            />
+            <Field
+              autoComplete="new-password"
+              help="At least 8 characters, including letters and numbers."
+              label="Password"
+              name="password"
+              onChange={(event) => setPassword(event.target.value)}
+              required
+              type="password"
+              value={password}
+            />
+            <Button disabled={submitting} icon={<UserPlus size={18} />} type="submit">
+              {submitting ? 'Creating account' : 'Create account'}
+            </Button>
+          </div>
+          <p className="auth-switch">
+            Already registered? <Link to="/login">Sign in</Link>
+          </p>
+        </form>
+        <aside className="auth-visual-panel" aria-label="Workspace overview">
+          <div className="auth-visual-header">
+            <GraduationCap size={22} aria-hidden="true" />
+            <div>
+              <h2>Course-first workspace</h2>
+              <p>Accounts enter the same dark console used by instructors and students.</p>
+            </div>
+          </div>
+          <div className="auth-stat-grid">
+            <div>
+              <strong>Role</strong>
+              <span>student ready</span>
+            </div>
+            <div>
+              <strong>Live</strong>
+              <span>sessions</span>
+            </div>
+            <div>
+              <strong>Quiz</strong>
+              <span>responses</span>
+            </div>
+          </div>
+          <div className="auth-flow-list">
+            <span>
+              <BookOpenCheck size={16} aria-hidden="true" />
+              Browse courses
+            </span>
+            <span>
+              <BookOpenCheck size={16} aria-hidden="true" />
+              Join live rooms
+            </span>
+            <span>
+              <BookOpenCheck size={16} aria-hidden="true" />
+              Submit quiz answers
+            </span>
+          </div>
+        </aside>
+      </section>
     </div>
   );
 }

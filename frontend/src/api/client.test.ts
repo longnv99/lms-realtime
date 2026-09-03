@@ -8,7 +8,7 @@ describe('unwrapEnvelope', () => {
     });
   });
 
-  it('throws API error messages from failed envelopes', () => {
+  it('normalizes API error messages to English UI copy', () => {
     expect(() =>
       unwrapEnvelope({
         success: false,
@@ -16,6 +16,6 @@ describe('unwrapEnvelope', () => {
         error: { code: 'AUTH_INVALID_CREDENTIALS', message: 'Sai email/password' },
         meta: null,
       }),
-    ).toThrow('Sai email/password');
+    ).toThrow('Email or password is incorrect.');
   });
 });

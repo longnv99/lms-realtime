@@ -1,4 +1,4 @@
-import { LogIn } from 'lucide-react';
+import { Activity, BookOpenCheck, LogIn } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../../api/auth';
@@ -33,22 +33,21 @@ export function LoginPage() {
   }
 
   return (
-    <div className="page auth-page">
-      <section className="page-header">
-        <StatusBadge tone="live">Portfolio demo</StatusBadge>
-        <h2 className="page-title">Run the live classroom.</h2>
-        <p className="page-description">
-          Sign in as instructor or student to manage courses, enter live sessions, chat, and run
-          realtime quizzes.
-        </p>
-      </section>
-      <section className="auth-grid">
-        <form className="panel auth-card" onSubmit={onSubmit}>
-          <div className="panel-header">
-            <h3 className="panel-title">Access</h3>
-            <StatusBadge>Seed ready</StatusBadge>
+    <div className="auth-page">
+      <section className="auth-shell">
+        <form className="auth-form-panel" onSubmit={onSubmit}>
+          <div className="auth-brand-row">
+            <span className="auth-logo">LR</span>
+            <span>LMS Realtime</span>
           </div>
-          <div className="panel-body auth-form">
+          <div className="auth-heading">
+            <StatusBadge tone="live">Realtime LMS</StatusBadge>
+            <h1>Sign in to your workspace</h1>
+            <p>
+              Manage courses, live sessions, chat, and realtime quizzes from one focused console.
+            </p>
+          </div>
+          <div className="auth-form">
             {error && (
               <p className="error-banner" role="alert">
                 {error}
@@ -65,31 +64,51 @@ export function LoginPage() {
             />
             <Field
               autoComplete="current-password"
-              label="Mat khau"
+              label="Password"
               name="password"
               onChange={(event) => setPassword(event.target.value)}
               required
               type="password"
               value={password}
             />
-            <div className="toolbar">
-              <Button disabled={submitting} icon={<LogIn size={18} />} type="submit">
-                {submitting ? 'Dang xu ly' : 'Dang nhap'}
-              </Button>
-              <Link className="button button-secondary" to="/register">
-                Tao tai khoan
-              </Link>
+            <Button disabled={submitting} icon={<LogIn size={18} />} type="submit">
+              {submitting ? 'Signing in' : 'Sign in'}
+            </Button>
+          </div>
+          <p className="auth-switch">
+            Need an account? <Link to="/register">Create account</Link>
+          </p>
+        </form>
+        <aside className="auth-visual-panel" aria-label="Seed accounts">
+          <div className="auth-visual-header">
+            <BookOpenCheck size={22} aria-hidden="true" />
+            <div>
+              <h2>Live cohort command</h2>
+              <p>Seed data is ready for local instructor and student flows.</p>
             </div>
           </div>
-        </form>
-        <aside className="panel auth-notes" aria-label="Seed accounts">
-          <div className="panel-header">
-            <h3 className="panel-title">Seed accounts</h3>
+          <div className="auth-stat-grid">
+            <div>
+              <strong>3</strong>
+              <span>demo users</span>
+            </div>
+            <div>
+              <strong>1</strong>
+              <span>seed course</span>
+            </div>
+            <div>
+              <strong>API</strong>
+              <span>local ready</span>
+            </div>
           </div>
-          <div className="panel-body seed-list">
+          <div className="seed-list">
             <code>instructor@example.com</code>
             <code>student@example.com</code>
             <code>student2@example.com</code>
+          </div>
+          <div className="auth-live-strip">
+            <Activity size={18} aria-hidden="true" />
+            <span>Realtime classroom preview</span>
           </div>
         </aside>
       </section>

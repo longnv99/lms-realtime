@@ -1,18 +1,20 @@
-import { X } from 'lucide-react';
 import type { NotificationResponse } from '@lms/shared';
-import { Button } from '../../components/Button';
+import {
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '../../components/ui/sheet';
 
 type NotificationsDrawerProps = {
   isLoading: boolean;
   notifications: NotificationResponse[];
-  onClose: () => void;
   onMarkRead: (id: string) => void;
 };
 
 export function NotificationsDrawer({
   isLoading,
   notifications,
-  onClose,
   onMarkRead,
 }: NotificationsDrawerProps) {
   const sortedNotifications = [...notifications].sort(
@@ -20,24 +22,17 @@ export function NotificationsDrawer({
   );
 
   return (
-    <aside
+    <SheetContent
       aria-labelledby="notifications-drawer-title"
       className="notifications-drawer"
-      role="dialog"
+      side="right"
     >
-      <div className="drawer-header">
+      <SheetHeader className="drawer-header">
         <div>
-          <h2 id="notifications-drawer-title">Notifications</h2>
-          <p>{notifications.length} total</p>
+          <SheetTitle id="notifications-drawer-title">Notifications</SheetTitle>
+          <SheetDescription>{notifications.length} total</SheetDescription>
         </div>
-        <Button
-          aria-label="Close notifications"
-          icon={<X size={18} aria-hidden="true" />}
-          iconOnly
-          onClick={onClose}
-          variant="ghost"
-        />
-      </div>
+      </SheetHeader>
       <div className="drawer-body">
         {isLoading && (
           <div className="drawer-loading" role="status" aria-label="Loading notifications" />
@@ -74,6 +69,6 @@ export function NotificationsDrawer({
           </div>
         )}
       </div>
-    </aside>
+    </SheetContent>
   );
 }

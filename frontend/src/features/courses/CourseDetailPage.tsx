@@ -45,12 +45,28 @@ export function CourseDetailPage() {
         <ArrowLeft size={18} aria-hidden="true" />
         Courses
       </Link>
-      <section className="page-header">
-        <StatusBadge tone={course.status === 'PUBLISHED' ? 'success' : 'muted'}>
-          {course.status}
-        </StatusBadge>
-        <h2 className="page-title">{course.title}</h2>
-        <p className="page-description">{course.description ?? course.slug}</p>
+      <section className="detail-hero">
+        <div className="detail-hero-copy">
+          <StatusBadge tone={course.status === 'PUBLISHED' ? 'success' : 'muted'}>
+            {course.status}
+          </StatusBadge>
+          <h2 className="page-title">{course.title}</h2>
+          <p className="page-description">{course.description ?? course.slug}</p>
+        </div>
+        <dl className="detail-meta-grid" aria-label="Course metadata">
+          <div>
+            <dt>Slug</dt>
+            <dd>{course.slug}</dd>
+          </div>
+          <div>
+            <dt>Access</dt>
+            <dd>{canManage ? 'Manage' : 'Learn'}</dd>
+          </div>
+          <div>
+            <dt>Updated</dt>
+            <dd>{new Date(course.updatedAt).toLocaleDateString()}</dd>
+          </div>
+        </dl>
       </section>
       <section className="dashboard-grid">
         <LessonsPanel canManage={canManage} courseId={course.id} />

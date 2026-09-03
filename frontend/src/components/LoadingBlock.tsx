@@ -1,15 +1,15 @@
 import type { CSSProperties } from 'react';
+import { Skeleton } from './ui/skeleton';
 
 type LoadingBlockProps = {
   height?: number;
   label?: string;
 };
 
-export function LoadingBlock({ height = 120, label = 'Dang tai' }: LoadingBlockProps) {
+export function LoadingBlock({ height = 120, label = 'Loading' }: LoadingBlockProps) {
   return (
-    <div
+    <Skeleton
       aria-label={label}
-      className="loading-block"
       role="status"
       style={{ '--loading-height': `${height}px` } as CSSProperties}
     />

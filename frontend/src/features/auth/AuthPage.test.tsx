@@ -42,8 +42,8 @@ describe('LoginPage', () => {
     );
 
     await userEvent.type(screen.getByLabelText(/email/i), 'instructor@example.com');
-    await userEvent.type(screen.getByLabelText(/mat khau/i), 'Password123!');
-    await userEvent.click(screen.getByRole('button', { name: /dang nhap/i }));
+    await userEvent.type(screen.getByLabelText(/password/i), 'Password123!');
+    await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /Courses reached/i })).toBeInTheDocument();
