@@ -8,7 +8,7 @@ Learning Management System with realtime chat and quiz features.
 npm install
 npm.cmd run infra:up
 npm.cmd run db:migrate --workspace=backend
-npm.cmd run db:seed --workspace=backend
+npm.cmd run db:seed
 npm.cmd run dev:backend
 ```
 
@@ -33,9 +33,21 @@ student@example.com / Password123!
 student2@example.com / Password123!
 ```
 
-The seed script also creates an uploaded demo media asset at `videos/seed-demo.mp4`
-and attaches it to the first lesson. Uploading the matching object to MinIO is
-optional for local playback smoke tests.
+The default seed is safe to rerun. It upserts one published course, four lessons,
+two enrolled students, uploaded demo media asset records, one live session, one
+intro quiz, and sample learner progress rows.
+
+Use reset mode only when you intentionally want to recreate the local demo
+dataset:
+
+```bash
+npm.cmd run db:seed:reset
+```
+
+The seeded media keys are `videos/seed-demo-intro.mp4`,
+`videos/seed-demo-realtime-room.mp4`, `videos/seed-demo-quiz.mp4`, and
+`videos/seed-demo-progress.mp4`. Uploading matching objects to MinIO is optional
+for local playback smoke tests.
 
 ## Local Environment
 
@@ -159,7 +171,7 @@ when a student newly completes a lesson.
 ```bash
 npm.cmd run infra:up
 npm.cmd run db:migrate --workspace=backend
-npm.cmd run db:seed --workspace=backend
+npm.cmd run db:seed
 npm.cmd run dev:backend
 ```
 
