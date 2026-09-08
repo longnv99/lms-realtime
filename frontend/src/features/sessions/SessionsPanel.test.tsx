@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CourseResponse, LessonResponse, SessionResponse } from '@lms/shared';
 import { getCourse } from '../../api/courses';
 import { listLessons } from '../../api/lessons';
+import { getCourseProgress, getMyCourseProgress } from '../../api/progress';
 import { listSessions, startSession } from '../../api/sessions';
 import { CourseDetailPage } from '../courses/CourseDetailPage';
 import { useAuthStore } from '../auth/auth.store';
@@ -19,6 +20,11 @@ vi.mock('../../api/lessons', () => ({
   listLessons: vi.fn(),
 }));
 
+vi.mock('../../api/progress', () => ({
+  getCourseProgress: vi.fn(),
+  getMyCourseProgress: vi.fn(),
+}));
+
 vi.mock('../../api/sessions', () => ({
   createSession: vi.fn(),
   endSession: vi.fn(),
@@ -27,6 +33,8 @@ vi.mock('../../api/sessions', () => ({
 }));
 
 const mockedGetCourse = vi.mocked(getCourse);
+const mockedGetCourseProgress = vi.mocked(getCourseProgress);
+const mockedGetMyCourseProgress = vi.mocked(getMyCourseProgress);
 const mockedListLessons = vi.mocked(listLessons);
 const mockedListSessions = vi.mocked(listSessions);
 const mockedStartSession = vi.mocked(startSession);
@@ -45,10 +53,24 @@ describe('Course detail panels', () => {
       },
     });
     mockedGetCourse.mockReset();
+    mockedGetCourseProgress.mockReset();
+    mockedGetMyCourseProgress.mockReset();
     mockedListLessons.mockReset();
     mockedListSessions.mockReset();
     mockedStartSession.mockReset();
     mockedGetCourse.mockResolvedValue(course());
+    mockedGetCourseProgress.mockResolvedValue({
+      courseId: 'course-1',
+      students: [],
+      totalLessons: 0,
+    });
+    mockedGetMyCourseProgress.mockResolvedValue({
+      completedLessons: 0,
+      courseId: 'course-1',
+      lessons: [],
+      percent: 0,
+      totalLessons: 0,
+    });
   });
 
   it('sorts lessons and shows live entry only for live sessions', async () => {
@@ -68,7 +90,7 @@ describe('Course detail panels', () => {
     expect(titles.map((title) => title.textContent)).toEqual(['First lesson', 'Second lesson']);
     expect(screen.getByRole('link', { name: /enter live room live room/i })).toHaveAttribute(
       'href',
-      '/sessions/session-live/live',
+      '/courses/course-1/sessions/session-live/live',
     );
     expect(
       screen.queryByRole('link', { name: /enter live room ended review/i }),

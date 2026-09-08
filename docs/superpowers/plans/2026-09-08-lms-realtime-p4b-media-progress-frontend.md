@@ -334,6 +334,8 @@ git push
 - Create: `frontend/src/features/progress/InstructorProgressPanel.tsx`
 - Modify: `frontend/src/features/courses/CourseDetailPage.tsx`
 - Create: `frontend/src/features/courses/CourseDetailPage.test.tsx`
+- Modify: `frontend/src/features/sessions/SessionsPanel.test.tsx`
+- Modify: `frontend/src/styles/global.css`
 
 **Interfaces:**
 - Consumes: `getMyCourseProgress(courseId)`.
@@ -342,7 +344,7 @@ git push
 - Produces: student course progress summary on course detail.
 - Produces: instructor per-student progress table on course detail.
 
-- [ ] **Step 4.1: Write progress surface tests**
+- [x] **Step 4.1: Write progress surface tests**
 
 Verify:
 - Student detail page renders percent, completed lesson count, and lesson progress rows.
@@ -350,7 +352,7 @@ Verify:
 - `progress:updated` invalidates instructor progress query for the matching course.
 - Empty progress states use English copy and do not show raw JSON or IDs as primary text.
 
-- [ ] **Step 4.2: Run tests to verify failure**
+- [x] **Step 4.2: Run tests to verify failure**
 
 Run:
 
@@ -360,11 +362,11 @@ npm.cmd run test --workspace=frontend -- CourseDetailPage.test.tsx
 
 Expected: fail because progress panels do not exist.
 
-- [ ] **Step 4.3: Implement `ProgressSummary`**
+- [x] **Step 4.3: Implement `ProgressSummary`**
 
 Use the shadcn progress primitive, compact stats, and a lesson list with fit-content completion badges. Do not use large background progress tracks for every row.
 
-- [ ] **Step 4.4: Implement `InstructorProgressPanel`**
+- [x] **Step 4.4: Implement `InstructorProgressPanel`**
 
 Use a balanced table-like grid:
 - Student
@@ -374,11 +376,11 @@ Use a balanced table-like grid:
 
 Keep labels fit-content and actions icon-only when actions are introduced later.
 
-- [ ] **Step 4.5: Wire progress into course detail**
+- [x] **Step 4.5: Wire progress into course detail**
 
 Render student progress for students. Render instructor progress for instructors/admins. Keep lesson/session panels in the existing two-column dashboard grid.
 
-- [ ] **Step 4.6: Wire realtime invalidation**
+- [x] **Step 4.6: Wire realtime invalidation**
 
 When a `progress:updated` event arrives for the active course, invalidate:
 
@@ -387,7 +389,7 @@ When a `progress:updated` event arrives for the active course, invalidate:
 ['my-course-progress', courseId]
 ```
 
-- [ ] **Step 4.7: Verify Task 4**
+- [x] **Step 4.7: Verify Task 4**
 
 Run:
 
@@ -398,12 +400,12 @@ npm.cmd run build:frontend
 
 Expected: tests and frontend build pass.
 
-- [ ] **Step 4.8: Commit Task 4**
+- [x] **Step 4.8: Commit Task 4**
 
 Run:
 
 ```bash
-git add frontend/src/features/progress/ProgressSummary.tsx frontend/src/features/progress/InstructorProgressPanel.tsx frontend/src/features/courses/CourseDetailPage.tsx frontend/src/features/courses/CourseDetailPage.test.tsx
+git add frontend/src/features/progress/ProgressSummary.tsx frontend/src/features/progress/InstructorProgressPanel.tsx frontend/src/features/courses/CourseDetailPage.tsx frontend/src/features/courses/CourseDetailPage.test.tsx frontend/src/features/sessions/SessionsPanel.test.tsx frontend/src/styles/global.css
 git commit -m "feat(frontend): show course progress"
 git push
 ```
@@ -486,9 +488,9 @@ git push
 - [x] Upload UI attaches completed media asset to the lesson.
 - [x] Student can select a lesson and play private media through a backend playback URL.
 - [x] Student playback emits throttled `progress:heartbeat` events.
-- [ ] Student course detail shows course percent and per-lesson progress.
-- [ ] Instructor course detail shows per-student progress.
-- [ ] Instructor progress refreshes after realtime `progress:updated`.
+- [x] Student course detail shows course percent and per-lesson progress.
+- [x] Instructor course detail shows per-student progress.
+- [x] Instructor progress refreshes after realtime `progress:updated`.
 - [ ] All new visible UI copy is English.
 - [ ] shadcn dark theme remains the only product UI theme.
 - [ ] Desktop and mobile layouts have no incoherent overlap or desktop table scroll.
