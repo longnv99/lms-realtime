@@ -1,6 +1,6 @@
 import type { AuthTokensResponse, AuthUserResponse } from '@lms/shared';
 import { create } from 'zustand';
-import { setAccessTokenGetter } from '../../api/client';
+import { setAccessTokenGetter, setAuthRefreshHandlers } from '../../api/client';
 
 type AuthState = {
   accessToken: string | null;
@@ -18,6 +18,11 @@ const storageKeys = {
 
 export const useAuthStore = create<AuthState>((set, get) => {
   setAccessTokenGetter(() => get().accessToken);
+  setAuthRefreshHandlers({
+    getRefreshToken: () => get().refreshToken,
+    onRefreshFailure: () => get().logoutLocal(),
+    onRefreshSuccess: (tokens) => get().loginSuccess(tokens),
+  });
 
   return {
     accessToken: readStorage(storageKeys.accessToken),

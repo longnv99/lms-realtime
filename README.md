@@ -39,6 +39,18 @@ optional for local playback smoke tests.
 
 ## Local Environment
 
+Backend auth tokens use these local development defaults:
+
+```env
+JWT_ACCESS_SECRET=dev_access_secret_change_me
+JWT_REFRESH_SECRET=dev_refresh_secret_change_me
+JWT_ACCESS_EXPIRES_IN=8h
+JWT_REFRESH_EXPIRES_IN_DAYS=30
+```
+
+The local access token TTL is intentionally set to `8h` for Swagger and manual
+testing. Use a shorter value such as `15m` for production deployments.
+
 Backend media uploads use a private MinIO/S3-compatible bucket:
 
 ```env
@@ -158,12 +170,15 @@ npm.cmd run dev:frontend
 ```
 
 3. Open http://localhost:5173 and login as `instructor@example.com / Password123!`.
-4. Open `Realtime LMS Foundations`, confirm the seeded `Live intro session`, then enter the live room.
-5. In another browser profile, login as `student@example.com / Password123!` and enter the same live room.
-6. Verify chat messages appear in both profiles.
-7. As instructor, use quiz controls to open a question, close it, reveal it, and finish the quiz run.
-8. As student, answer a quiz question and confirm the leaderboard updates.
-9. Confirm the notification button shows unread count and the drawer can mark a notification read.
+4. Open `Realtime LMS Foundations`, confirm the seeded `Live intro session`, then upload an MP4 or WebM from the lesson list if the seeded lesson object is not available in MinIO.
+5. Enter the live room from the course sessions panel.
+6. In another browser profile, login as `student@example.com / Password123!` and enter the same live room from the course detail page.
+7. Play the lesson video for at least 10 seconds and confirm the student course detail shows course percent plus per-lesson progress.
+8. As instructor, return to course detail and confirm learner progress shows the student's completed count, percent, and last watched time.
+9. Verify chat messages appear in both profiles.
+10. As instructor, use quiz controls to open a question, close it, reveal it, and finish the quiz run.
+11. As student, answer a quiz question and confirm the leaderboard updates.
+12. Confirm the notification button shows unread count and the drawer can mark a notification read.
 
 ## Structure
 

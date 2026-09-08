@@ -418,6 +418,18 @@ git push
 - Modify: `frontend/src/styles/global.css`
 - Modify: `frontend/src/features/lessons/LessonsPanel.tsx`
 - Modify: `frontend/src/features/sessions/LiveSessionPage.tsx`
+- Modify: `frontend/src/api/client.ts`
+- Modify: `frontend/src/api/client.test.ts`
+- Modify: `frontend/src/features/auth/auth.store.ts`
+- Modify: `frontend/src/lib/realtime.ts`
+- Modify: `frontend/src/lib/realtime.test.ts`
+- Modify: `backend/.env.example`
+- Modify: `backend/src/common/http/api-cache.ts`
+- Modify: `backend/src/main.ts`
+- Modify: `backend/test/auth.e2e-spec.ts`
+- Modify: `backend/test/helpers/app.ts`
+- Modify: `backend/test/helpers/ws-app.ts`
+- Modify: `backend/test/notifications.e2e-spec.ts`
 - Modify: `README.md`
 - Modify: `docs/superpowers/plans/2026-09-08-lms-realtime-p4b-media-progress-frontend.md`
 
@@ -425,6 +437,8 @@ git push
 - Consumes: all P4b UI pieces.
 - Produces: visually consistent dark shadcn media/progress workflow.
 - Produces: README smoke steps for upload, playback, and progress.
+- Produces: frontend auth refresh/retry for expired access tokens.
+- Produces: stable local API responses without conditional `304` JSON responses.
 
 - [ ] **Step 5.1: Audit desktop and mobile layout**
 
@@ -440,11 +454,11 @@ Check:
 - progress labels fit content.
 - buttons are readable and do not wrap.
 
-- [ ] **Step 5.2: Polish CSS only where needed**
+- [x] **Step 5.2: Polish CSS only where needed**
 
 Adjust spacing, grid widths, panel heights, tooltip layering, and empty/loading states. Keep dark theme tokens and radius scale consistent.
 
-- [ ] **Step 5.3: Update README frontend smoke**
+- [x] **Step 5.3: Update README frontend smoke**
 
 Add steps for:
 - instructor uploads a lesson video.
@@ -452,7 +466,7 @@ Add steps for:
 - student progress updates after playback.
 - instructor sees progress update.
 
-- [ ] **Step 5.4: Run final verification**
+- [x] **Step 5.4: Run final verification**
 
 Run:
 
@@ -469,12 +483,12 @@ Expected: frontend tests/build, backend e2e, and backend build pass.
 
 Check off every completed task and acceptance item in this plan.
 
-- [ ] **Step 5.6: Commit Task 5**
+- [x] **Step 5.6: Commit Task 5**
 
 Run:
 
 ```bash
-git add README.md frontend/src/styles/global.css frontend/src/features/lessons/LessonsPanel.tsx frontend/src/features/sessions/LiveSessionPage.tsx docs/superpowers/plans/2026-09-08-lms-realtime-p4b-media-progress-frontend.md
+git add README.md backend/.env.example backend/src/common/http/api-cache.ts backend/src/main.ts backend/test/auth.e2e-spec.ts backend/test/helpers/app.ts backend/test/helpers/ws-app.ts backend/test/notifications.e2e-spec.ts frontend/src/api/client.ts frontend/src/api/client.test.ts frontend/src/features/auth/auth.store.ts frontend/src/styles/global.css frontend/src/lib/realtime.ts frontend/src/lib/realtime.test.ts docs/superpowers/plans/2026-09-08-lms-realtime-p4b-media-progress-frontend.md
 git commit -m "docs(frontend): document media progress smoke"
 git push
 ```
@@ -491,13 +505,16 @@ git push
 - [x] Student course detail shows course percent and per-lesson progress.
 - [x] Instructor course detail shows per-student progress.
 - [x] Instructor progress refreshes after realtime `progress:updated`.
-- [ ] All new visible UI copy is English.
-- [ ] shadcn dark theme remains the only product UI theme.
+- [x] All new visible UI copy is English.
+- [x] shadcn dark theme remains the only product UI theme.
 - [ ] Desktop and mobile layouts have no incoherent overlap or desktop table scroll.
-- [ ] `npm.cmd run test:frontend` passes.
-- [ ] `npm.cmd run build:frontend` passes.
-- [ ] `npm.cmd run test:e2e --workspace=backend` passes.
-- [ ] `npm.cmd run build:backend` passes.
+- [x] Expired frontend access tokens refresh once, store rotated tokens, and retry the original request.
+- [x] Refresh failure clears local auth state.
+- [x] API JSON responses avoid ETag-driven `304` responses during local manual testing.
+- [x] `npm.cmd run test:frontend` passes.
+- [x] `npm.cmd run build:frontend` passes.
+- [x] `npm.cmd run test:e2e --workspace=backend` passes.
+- [x] `npm.cmd run build:backend` passes.
 
 ## Out of Scope for P4b
 

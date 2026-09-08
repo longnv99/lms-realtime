@@ -49,6 +49,14 @@ describe('Notifications (e2e)', () => {
       .set('Authorization', `Bearer ${student.accessToken}`)
       .expect(200);
     expect(listRes.body.data).toHaveLength(1);
+    expect(listRes.headers['cache-control']).toContain('no-store');
+    expect(listRes.headers.etag).toBeUndefined();
+
+    await request(app.getHttpServer())
+      .get('/api/me/notifications')
+      .set('Authorization', `Bearer ${student.accessToken}`)
+      .set('If-None-Match', 'W/"stale-notification-cache"')
+      .expect(200);
 
     const readRes = await request(app.getHttpServer())
       .patch(`/api/me/notifications/${notification.id}/read`)

@@ -1,10 +1,25 @@
+import { AxiosError, type AxiosAdapter, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { apiClient, unwrapEnvelope } from './client';
+import type { AuthTokensResponse } from '@lms/shared';
+import {
+  apiClient,
+  getEnvelope,
+  setAccessTokenGetter,
+  setAuthRefreshHandlers,
+  unwrapEnvelope,
+} from './client';
 import { completeMediaUpload, createMediaUpload, getMediaPlayback } from './media';
 import { getCourseProgress, getMyCourseProgress } from './progress';
 
 describe('unwrapEnvelope', () => {
   afterEach(() => {
+    apiClient.defaults.adapter = undefined;
+    setAccessTokenGetter(() => null);
+    setAuthRefreshHandlers({
+      getRefreshToken: () => null,
+      onRefreshFailure: () => undefined,
+      onRefreshSuccess: () => undefined,
+    });
     vi.restoreAllMocks();
   });
 
@@ -124,4 +139,139 @@ describe('unwrapEnvelope', () => {
       params: undefined,
     });
   });
+
+  it('refreshes an expired access token and retries the original request', async () => {
+    let currentAccessToken = 'expired-access';
+    const refreshSuccess = vi.fn((tokens: AuthTokensResponse) => {
+      currentAccessToken = tokens.accessToken;
+    });
+    const refreshFailure = vi.fn();
+    const refreshedTokens = authTokens({ accessToken: 'fresh-access', refreshToken: 'fresh-refresh' });
+    const adapter = vi.fn(async (config: InternalAxiosRequestConfig) => {
+      if (config.url === '/auth/refresh') {
+        return jsonResponse(config, 201, {
+          success: true,
+          data: refreshedTokens,
+          error: null,
+          meta: null,
+        });
+      }
+
+      if (config.url === '/me/notifications' && currentAccessToken === 'expired-access') {
+        throw unauthorizedError(config);
+      }
+
+      return jsonResponse(config, 200, {
+        success: true,
+        data: [{ id: 'notification-1' }],
+        error: null,
+        meta: null,
+      });
+    });
+    apiClient.defaults.adapter = adapter as AxiosAdapter;
+    setAccessTokenGetter(() => currentAccessToken);
+    setAuthRefreshHandlers({
+      getRefreshToken: () => 'old-refresh',
+      onRefreshFailure: refreshFailure,
+      onRefreshSuccess: refreshSuccess,
+    });
+
+    await expect(getEnvelope('/me/notifications')).resolves.toEqual([{ id: 'notification-1' }]);
+
+    expect(adapter).toHaveBeenCalledTimes(3);
+    expect(adapter).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        data: '{"refreshToken":"old-refresh"}',
+        url: '/auth/refresh',
+      }),
+    );
+    expect(refreshSuccess).toHaveBeenCalledWith(refreshedTokens);
+    expect(refreshFailure).not.toHaveBeenCalled();
+    expect(getAuthorizationHeader(adapter.mock.calls[2][0])).toBe('Bearer fresh-access');
+  });
+
+  it('logs out locally when refresh token rotation fails', async () => {
+    const refreshFailure = vi.fn();
+    const adapter = vi.fn(async (config: InternalAxiosRequestConfig) => {
+      if (config.url === '/auth/refresh') {
+        throw unauthorizedError(config);
+      }
+
+      throw unauthorizedError(config);
+    });
+    apiClient.defaults.adapter = adapter as AxiosAdapter;
+    setAccessTokenGetter(() => 'expired-access');
+    setAuthRefreshHandlers({
+      getRefreshToken: () => 'revoked-refresh',
+      onRefreshFailure: refreshFailure,
+      onRefreshSuccess: () => undefined,
+    });
+
+    await expect(getEnvelope('/me/notifications')).rejects.toThrow('Refresh failed');
+
+    expect(adapter).toHaveBeenCalledTimes(2);
+    expect(refreshFailure).toHaveBeenCalledTimes(1);
+  });
 });
+
+function authTokens(overrides: Partial<AuthTokensResponse> = {}): AuthTokensResponse {
+  return {
+    accessToken: 'access-token',
+    refreshToken: 'refresh-token',
+    user: {
+      email: 'student@example.com',
+      id: 'student-1',
+      name: 'Student',
+      role: 'STUDENT',
+    },
+    ...overrides,
+  };
+}
+
+function jsonResponse<T>(
+  config: InternalAxiosRequestConfig,
+  status: number,
+  data: T,
+): AxiosResponse<T> {
+  return {
+    config,
+    data,
+    headers: {},
+    status,
+    statusText: statusText(status),
+  };
+}
+
+function unauthorizedError(config: InternalAxiosRequestConfig): AxiosError {
+  return new AxiosError(
+    'Refresh failed',
+    AxiosError.ERR_BAD_REQUEST,
+    config,
+    {},
+    jsonResponse(config, 401, {
+      success: false,
+      data: null,
+      error: { code: 'AUTH_UNAUTHENTICATED', message: 'Unauthorized' },
+      meta: null,
+    }),
+  );
+}
+
+function getAuthorizationHeader(config: InternalAxiosRequestConfig): string | undefined {
+  const headers = config.headers;
+  const value = typeof headers.get === 'function' ? headers.get('Authorization') : headers.Authorization;
+  return typeof value === 'string' ? value : undefined;
+}
+
+function statusText(status: number): string {
+  if (status === 201) {
+    return 'Created';
+  }
+
+  if (status === 401) {
+    return 'Unauthorized';
+  }
+
+  return 'OK';
+}

@@ -12,7 +12,7 @@ export type RealtimeSocket = {
 };
 
 export function createNamespaceSocket(namespace: RealtimeNamespace, token: string): Socket {
-  return io(namespace, {
+  return io(getNamespaceUrl(namespace), {
     auth: { token },
     reconnection: true,
     reconnectionAttempts: 8,
@@ -38,6 +38,16 @@ export function emitProgressHeartbeat(
   payload: ProgressHeartbeatPayload,
 ): void {
   socket.emit('progress:heartbeat', payload);
+}
+
+function getNamespaceUrl(namespace: RealtimeNamespace): string {
+  const socketBaseUrl = import.meta.env.VITE_SOCKET_URL?.trim();
+
+  if (!socketBaseUrl) {
+    return namespace;
+  }
+
+  return `${socketBaseUrl.replace(/\/$/, '')}${namespace}`;
 }
 
 export function useSocketStatus(socket: RealtimeSocket | null): SocketStatus {

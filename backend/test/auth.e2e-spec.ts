@@ -36,6 +36,17 @@ describe('Auth (e2e)', () => {
     expect(res.body.data.user.passwordHash).toBeUndefined();
   });
 
+  it('issues access tokens that are long enough for local manual testing', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/api/auth/register')
+      .send({ email: 'ttl@example.com', password: 'Password123!', name: 'TTL User' })
+      .expect(201);
+
+    const payload = decodeJwtPayload(res.body.data.accessToken);
+
+    expect(payload.exp - payload.iat).toBe(8 * 60 * 60);
+  });
+
   it('rejects invalid credentials', async () => {
     await request(app.getHttpServer())
       .post('/api/auth/login')
@@ -72,3 +83,8 @@ describe('Auth (e2e)', () => {
     expect(activeTokens).toHaveLength(0);
   });
 });
+
+function decodeJwtPayload(token: string): { exp: number; iat: number } {
+  const [, payload] = token.split('.');
+  return JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
+}

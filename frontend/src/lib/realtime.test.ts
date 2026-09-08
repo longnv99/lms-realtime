@@ -41,6 +41,7 @@ describe('realtime socket helpers', () => {
   beforeEach(() => {
     handlers.clear();
     emitMock.mockClear();
+    vi.stubEnv('VITE_SOCKET_URL', 'http://localhost:4000');
     mockedIo.mockClear();
     mockedSocket.connected = false;
     offMock.mockClear();
@@ -51,7 +52,7 @@ describe('realtime socket helpers', () => {
     const socket = createNamespaceSocket('/sessions', 'access-token');
 
     expect(socket).toBe(mockedSocket);
-    expect(mockedIo).toHaveBeenCalledWith('/sessions', {
+    expect(mockedIo).toHaveBeenCalledWith('http://localhost:4000/sessions', {
       auth: { token: 'access-token' },
       reconnection: true,
       reconnectionAttempts: 8,
@@ -59,6 +60,14 @@ describe('realtime socket helpers', () => {
       reconnectionDelayMax: 5000,
       transports: ['websocket'],
     });
+  });
+
+  it('falls back to relative namespace sockets without a socket base URL', () => {
+    vi.stubEnv('VITE_SOCKET_URL', '');
+
+    createNamespaceSocket('/notifications', 'access-token');
+
+    expect(mockedIo).toHaveBeenCalledWith('/notifications', expect.any(Object));
   });
 
   it('does not create optional sockets without a token', () => {
