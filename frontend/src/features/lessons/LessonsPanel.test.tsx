@@ -103,7 +103,9 @@ describe('LessonsPanel', () => {
 
     await user.upload(await screen.findByLabelText(/upload video for intro lesson/i), file);
 
-    expect(await screen.findByText('Only MP4 or WebM video files are supported.')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Only MP4 or WebM video files are supported.'),
+    ).toBeInTheDocument();
     expect(mockedCreateMediaUpload).not.toHaveBeenCalled();
     expect(fetchMock).not.toHaveBeenCalled();
   });

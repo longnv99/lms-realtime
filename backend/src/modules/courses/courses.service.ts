@@ -69,10 +69,7 @@ export class CoursesService {
     }
 
     if (query.keyword) {
-      where.OR = [
-        { title: { contains: query.keyword } },
-        { slug: { contains: query.keyword } },
-      ];
+      where.OR = [{ title: { contains: query.keyword } }, { slug: { contains: query.keyword } }];
     }
 
     const [courses, total] = await this.prisma.$transaction([
@@ -93,11 +90,7 @@ export class CoursesService {
     return this.findCourseOrThrow(id);
   }
 
-  async update(
-    id: string,
-    actor: AuthenticatedUser,
-    dto: UpdateCourseDto,
-  ): Promise<PublicCourse> {
+  async update(id: string, actor: AuthenticatedUser, dto: UpdateCourseDto): Promise<PublicCourse> {
     const course = await this.findCourseOrThrow(id);
     this.ensureCanManage(course, actor);
 

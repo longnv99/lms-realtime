@@ -57,7 +57,11 @@ export class AuthService {
     const matched = await this.findMatchingRefreshToken(refreshToken, candidates);
 
     if (!matched) {
-      throw new AppError('AUTH_UNAUTHENTICATED', 'Refresh token khong hop le', HttpStatus.UNAUTHORIZED);
+      throw new AppError(
+        'AUTH_UNAUTHENTICATED',
+        'Refresh token khong hop le',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
     if (matched.revokedAt) {
@@ -104,9 +108,7 @@ export class AuthService {
     );
     const refreshToken = randomBytes(48).toString('base64url');
     const tokenHash = await bcrypt.hash(refreshToken, 12);
-    const expiresAt = new Date(
-      Date.now() + env.JWT_REFRESH_EXPIRES_IN_DAYS * 24 * 60 * 60 * 1000,
-    );
+    const expiresAt = new Date(Date.now() + env.JWT_REFRESH_EXPIRES_IN_DAYS * 24 * 60 * 60 * 1000);
 
     await this.prisma.refreshToken.create({
       data: { userId: user.id, tokenHash, expiresAt },

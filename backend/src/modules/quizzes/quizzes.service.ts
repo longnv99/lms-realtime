@@ -122,11 +122,7 @@ export class QuizzesService {
     return { deleted: true };
   }
 
-  async createQuizRun(
-    sessionId: string,
-    actor: AuthenticatedUser,
-    dto: CreateQuizRunDto,
-  ) {
+  async createQuizRun(sessionId: string, actor: AuthenticatedUser, dto: CreateQuizRunDto) {
     const session = await this.findSessionWithCourseOrThrow(sessionId);
     this.coursesService.ensureCanManage(session.course, actor);
     const quiz = await this.findQuizWithLessonOrThrow(dto.quizId);
@@ -248,9 +244,7 @@ export class QuizzesService {
 
     const question = run.quiz.questions[run.currentQuestionIndex - 1];
     const answerCount = Number(
-      (await this.redis
-        .getClient()
-        .get(`quiz-run:${id}:q:${run.currentQuestionIndex}:count`)) ?? 0,
+      (await this.redis.getClient().get(`quiz-run:${id}:q:${run.currentQuestionIndex}:count`)) ?? 0,
     );
     const updated = await this.prisma.quizRun.update({
       where: { id },

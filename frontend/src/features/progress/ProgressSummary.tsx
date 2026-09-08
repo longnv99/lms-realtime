@@ -48,7 +48,8 @@ export function ProgressSummary({ courseId }: ProgressSummaryProps) {
               <div className="progress-score">
                 <span>{progressQuery.data.percent}%</span>
                 <strong>
-                  {progressQuery.data.completedLessons} of {progressQuery.data.totalLessons} completed
+                  {progressQuery.data.completedLessons} of {progressQuery.data.totalLessons}{' '}
+                  completed
                 </strong>
               </div>
               <Progress aria-label="Course completion" value={progressQuery.data.percent} />

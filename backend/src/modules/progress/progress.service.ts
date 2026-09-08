@@ -25,7 +25,9 @@ export class ProgressService {
         lessonId: { in: course.lessons.map((lesson) => lesson.id) },
       },
     });
-    const progressByLessonId = new Map(progressRows.map((progress) => [progress.lessonId, progress]));
+    const progressByLessonId = new Map(
+      progressRows.map((progress) => [progress.lessonId, progress]),
+    );
     const lessons = course.lessons.map((lesson) =>
       mapLessonProgress(lesson, progressByLessonId.get(lesson.id)),
     );
@@ -34,7 +36,10 @@ export class ProgressService {
       courseId,
       totalLessons: lessons.length,
       completedLessons: lessons.filter((lesson) => lesson.completedAt !== null).length,
-      percent: calculatePercent(lessons.filter((lesson) => lesson.completedAt !== null).length, lessons.length),
+      percent: calculatePercent(
+        lessons.filter((lesson) => lesson.completedAt !== null).length,
+        lessons.length,
+      ),
       lessons,
     };
   }
@@ -189,7 +194,11 @@ export class ProgressService {
     });
 
     if (!enrollment) {
-      throw new AppError('AUTH_FORBIDDEN', 'You are not enrolled in this course', HttpStatus.FORBIDDEN);
+      throw new AppError(
+        'AUTH_FORBIDDEN',
+        'You are not enrolled in this course',
+        HttpStatus.FORBIDDEN,
+      );
     }
   }
 }

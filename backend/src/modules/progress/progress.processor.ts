@@ -43,7 +43,11 @@ export class ProgressProcessor extends WorkerHost {
       return;
     }
 
-    await this.progressService.recordHeartbeat(user as AuthenticatedUser, job.data.lessonId, positionSeconds);
+    await this.progressService.recordHeartbeat(
+      user as AuthenticatedUser,
+      job.data.lessonId,
+      positionSeconds,
+    );
     await this.redis.getClient().del(key);
   }
 

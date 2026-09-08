@@ -30,7 +30,10 @@ export async function createCourse(input: CourseInput): Promise<CourseResponse> 
   return postEnvelope<CourseResponse>('/courses', input);
 }
 
-export async function updateCourse(id: string, input: Partial<CourseInput>): Promise<CourseResponse> {
+export async function updateCourse(
+  id: string,
+  input: Partial<CourseInput>,
+): Promise<CourseResponse> {
   return patchEnvelope<CourseResponse>(`/courses/${id}`, input);
 }
 

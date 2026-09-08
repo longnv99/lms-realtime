@@ -44,10 +44,7 @@ export async function deleteQuiz(id: string): Promise<DeletedResponse> {
   return deleteEnvelope<DeletedResponse>(`/quizzes/${id}`);
 }
 
-export async function createQuizRun(
-  sessionId: string,
-  quizId: string,
-): Promise<QuizRunResponse> {
+export async function createQuizRun(sessionId: string, quizId: string): Promise<QuizRunResponse> {
   return postEnvelope<QuizRunResponse>(`/sessions/${sessionId}/quiz-runs`, { quizId });
 }
 
@@ -73,7 +70,9 @@ export async function closeQuestion(
 
 export async function revealQuestion(
   id: string,
-): Promise<QuizRunResponse & { correctCount: number; correctOptionId: string; questionId: string }> {
+): Promise<
+  QuizRunResponse & { correctCount: number; correctOptionId: string; questionId: string }
+> {
   return postEnvelope<
     QuizRunResponse & { correctCount: number; correctOptionId: string; questionId: string }
   >(`/quiz-runs/${id}/reveal`);

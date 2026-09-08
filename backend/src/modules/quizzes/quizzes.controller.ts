@@ -18,10 +18,7 @@ export class QuizzesController {
   constructor(private readonly quizzesService: QuizzesService) {}
 
   @Get('lessons/:lessonId/quizzes')
-  listQuizzes(
-    @Param('lessonId') lessonId: string,
-    @CurrentUser() user: AuthenticatedUser,
-  ) {
+  listQuizzes(@Param('lessonId') lessonId: string, @CurrentUser() user: AuthenticatedUser) {
     return this.quizzesService.listQuizzes(lessonId, user);
   }
 
@@ -66,10 +63,7 @@ export class QuizzesController {
   }
 
   @Get('sessions/:sessionId/quiz-runs')
-  listQuizRuns(
-    @Param('sessionId') sessionId: string,
-    @CurrentUser() user: AuthenticatedUser,
-  ) {
+  listQuizRuns(@Param('sessionId') sessionId: string, @CurrentUser() user: AuthenticatedUser) {
     return this.quizzesService.listQuizRuns(sessionId, user);
   }
 

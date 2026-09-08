@@ -899,10 +899,10 @@ git commit -m "test(e2e): add production stack smoke coverage"
 - Modify: `README.md`
 
 **Interfaces:**
-- Produces: CI jobs for quality checks, Docker builds, backend e2e, and Playwright e2e.
+- Produces: CI jobs for workspace quality checks, Docker builds, and Playwright production-stack e2e.
 - Consumes: npm scripts, Dockerfiles, `docker-compose.infra.yml`, `docker-compose.prod.yml`, Playwright config, safe seed script.
 
-- [ ] **Step 1: Add CI workflow**
+- [x] **Step 1: Add CI workflow**
 
 Create `.github/workflows/ci.yml` with:
 
@@ -959,7 +959,7 @@ jobs:
         run: docker compose --env-file .env.prod -f docker-compose.prod.yml down -v
 ```
 
-- [ ] **Step 2: Validate workflow file exists**
+- [x] **Step 2: Validate workflow file exists**
 
 Run:
 
@@ -969,7 +969,7 @@ Test-Path .github/workflows/ci.yml
 
 Expected: `True`.
 
-- [ ] **Step 3: Run local CI equivalent**
+- [x] **Step 3: Run local CI equivalent**
 
 Run:
 
@@ -986,7 +986,9 @@ docker build -f frontend/Dockerfile -t lms-frontend:ci-local .
 
 Expected: All commands pass. If `npm.cmd ci` modifies `package-lock.json`, inspect and commit only intentional lockfile changes.
 
-- [ ] **Step 4: Run production E2E local equivalent**
+Actual: `npm.cmd ci` on this Windows working tree failed with `EPERM` unlinking native Vite/Tailwind binaries while dev processes were active. `npm.cmd install` restored dependencies; `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd run test:frontend`, `npm.cmd run test:backend`, `npm.cmd run build`, and both Docker builds passed. Linux clean install was also exercised by Docker `npm ci` layers.
+
+- [x] **Step 4: Run production E2E local equivalent**
 
 Run:
 
@@ -999,7 +1001,7 @@ docker compose --env-file .env.prod.example -f docker-compose.prod.yml down
 
 Expected: Production stack E2E passes and volumes are preserved locally.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run:
 

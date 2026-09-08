@@ -103,7 +103,10 @@ export function LiveSessionPage() {
 
   return (
     <div className="page live-page">
-      <Link className="button button-ghost detail-back" to={courseId ? `/courses/${courseId}` : '/courses'}>
+      <Link
+        className="button button-ghost detail-back"
+        to={courseId ? `/courses/${courseId}` : '/courses'}
+      >
         <ArrowLeft size={18} aria-hidden="true" />
         {courseId ? 'Course detail' : 'Courses'}
       </Link>
@@ -144,7 +147,10 @@ export function LiveSessionPage() {
                 socketStatus={socketStatus}
               />
             ) : (
-              <EmptyState description="Open this live room from a course to load lesson media." title="Ready" />
+              <EmptyState
+                description="Open this live room from a course to load lesson media."
+                title="Ready"
+              />
             )}
           </div>
         </section>

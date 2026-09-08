@@ -189,7 +189,9 @@ describe('CourseDetailPage progress surfaces', () => {
     renderCourseDetail();
 
     expect(await screen.findByText('No progress yet')).toBeInTheDocument();
-    expect(screen.getByText('Start a lesson video to build your progress history.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Start a lesson video to build your progress history.'),
+    ).toBeInTheDocument();
     expect(screen.queryByText('course-1')).not.toBeInTheDocument();
   });
 });

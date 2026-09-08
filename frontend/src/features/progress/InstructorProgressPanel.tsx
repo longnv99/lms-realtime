@@ -87,7 +87,9 @@ function InstructorProgressRow({
       </strong>
       <div className="student-progress-cell">
         <Progress aria-label={`${student.name} completion`} value={student.percent} />
-        <StatusBadge tone={student.percent >= 100 ? 'success' : student.percent > 0 ? 'live' : 'muted'}>
+        <StatusBadge
+          tone={student.percent >= 100 ? 'success' : student.percent > 0 ? 'live' : 'muted'}
+        >
           {student.percent}%
         </StatusBadge>
       </div>

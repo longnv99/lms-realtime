@@ -76,11 +76,7 @@ export class LessonsService {
     });
   }
 
-  async update(
-    id: string,
-    actor: AuthenticatedUser,
-    dto: UpdateLessonDto,
-  ): Promise<PublicLesson> {
+  async update(id: string, actor: AuthenticatedUser, dto: UpdateLessonDto): Promise<PublicLesson> {
     const lesson = await this.findLessonWithCourseOrThrow(id);
     this.coursesService.ensureCanManage(lesson.course, actor);
     await this.ensureMediaAssetReady(dto.mediaAssetId);

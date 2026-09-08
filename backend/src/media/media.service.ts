@@ -134,7 +134,11 @@ export class MediaService {
 
   private ensureAllowedSize(sizeBytes: number): void {
     if (sizeBytes > MAX_UPLOAD_SIZE_BYTES) {
-      throw new AppError('MEDIA_TOO_LARGE', 'Media must be 2GB or smaller', HttpStatus.PAYLOAD_TOO_LARGE);
+      throw new AppError(
+        'MEDIA_TOO_LARGE',
+        'Media must be 2GB or smaller',
+        HttpStatus.PAYLOAD_TOO_LARGE,
+      );
     }
   }
 }
