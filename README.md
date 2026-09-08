@@ -79,6 +79,45 @@ MEDIA_PLAYBACK_TTL_SECONDS=1800
 Create the `lms-media` bucket in the MinIO console before testing upload
 completion against real objects.
 
+## Production-Like Docker
+
+Create a local production env file from the committed example:
+
+```bash
+copy .env.prod.example .env.prod
+```
+
+Start the full app stack through Nginx:
+
+```bash
+docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
+npm.cmd run db:seed:prod
+curl http://localhost:8080/api/health
+```
+
+Production-like local URLs:
+
+```text
+App: http://localhost:8080
+API through Nginx: http://localhost:8080/api
+Swagger through Nginx: http://localhost:8080/api/docs
+MinIO console: http://localhost:9101
+MinIO credentials: lms / lms_prod_password
+Postgres host port: 15432
+Redis host port: 16379
+```
+
+Stop the production stack without deleting volumes:
+
+```bash
+docker compose --env-file .env.prod -f docker-compose.prod.yml down
+```
+
+Use `npm.cmd run db:seed` for safe demo data upserts in dev and
+`npm.cmd run db:seed:prod` for the production-like Docker database. Use
+`npm.cmd run db:seed:reset` only for disposable local or CI databases because it
+clears tables before seeding.
+
 ## Realtime Namespaces
 
 ```text
@@ -210,6 +249,19 @@ Run the production-stack smoke test after `docker-compose.prod.yml` is up:
 ```bash
 npm.cmd run db:seed:prod
 npm.cmd run test:e2e:prod
+```
+
+## Production Verification
+
+```bash
+npm.cmd run typecheck
+npm.cmd run lint
+npm.cmd run test
+npm.cmd run build
+docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
+npm.cmd run db:seed:prod
+npm.cmd run test:e2e:prod
+docker compose --env-file .env.prod -f docker-compose.prod.yml down
 ```
 
 ## Structure

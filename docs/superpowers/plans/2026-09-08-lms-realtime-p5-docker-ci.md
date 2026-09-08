@@ -1021,7 +1021,7 @@ git commit -m "ci: add docker and e2e workflow"
 - Produces: README instructions that let a new developer run dev infra, seed, production Docker stack, and Playwright checks.
 - Consumes: `.env.example`, `.env.prod.example`, `backend/.env.production.example`, `frontend/.env.production.example`, npm scripts, Docker Compose files.
 
-- [ ] **Step 1: Inspect current README sections**
+- [x] **Step 1: Inspect current README sections**
 
 Run:
 
@@ -1031,7 +1031,7 @@ Get-Content README.md
 
 Expected: Current dev setup exists and needs a P5 production section.
 
-- [ ] **Step 2: Document production local setup**
+- [x] **Step 2: Document production local setup**
 
 Add a `Production-like Docker` section with these commands:
 
@@ -1042,7 +1042,7 @@ npm run db:seed:prod
 curl http://localhost:8080/api/health
 ```
 
-- [ ] **Step 3: Document production verification**
+- [x] **Step 3: Document production verification**
 
 Add a `Production verification` section with:
 
@@ -1055,7 +1055,7 @@ npm run test:e2e:prod
 docker compose --env-file .env.prod -f docker-compose.prod.yml down
 ```
 
-- [ ] **Step 4: Document reset boundary**
+- [x] **Step 4: Document reset boundary**
 
 Add explicit copy:
 
@@ -1063,7 +1063,7 @@ Add explicit copy:
 Use `npm run db:seed` for safe demo data upserts. Use `npm run db:seed:reset` only for disposable local or CI databases because it clears tables before seeding.
 ```
 
-- [ ] **Step 5: Verify docs commands still match scripts**
+- [x] **Step 5: Verify docs commands still match scripts**
 
 Run:
 
@@ -1075,7 +1075,7 @@ npm.cmd run build:frontend
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 Run:
 
