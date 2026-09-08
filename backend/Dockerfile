@@ -23,6 +23,7 @@ RUN addgroup -S lms && adduser -S lms -G lms
 COPY --chown=lms:lms --from=build /app/package.json /app/package-lock.json ./
 COPY --chown=lms:lms --from=build /app/node_modules ./node_modules
 COPY --chown=lms:lms --from=build /app/backend/package.json ./backend/package.json
+COPY --chown=lms:lms --from=build /app/backend/prisma.config.ts ./backend/prisma.config.ts
 COPY --chown=lms:lms --from=build /app/backend/dist ./backend/dist
 COPY --chown=lms:lms --from=build /app/backend/prisma ./backend/prisma
 COPY --chown=lms:lms --from=build /app/backend/src/generated ./backend/src/generated

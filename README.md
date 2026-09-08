@@ -205,6 +205,13 @@ Run the Playwright UI audit after the backend and frontend are available:
 npm.cmd run test:e2e:ui
 ```
 
+Run the production-stack smoke test after `docker-compose.prod.yml` is up:
+
+```bash
+npm.cmd run db:seed:prod
+npm.cmd run test:e2e:prod
+```
+
 ## Structure
 
 - `backend/` - NestJS modular monolith

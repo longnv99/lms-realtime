@@ -1,5 +1,5 @@
 #!/bin/sh
 set -eu
 
-npx prisma migrate deploy --schema backend/prisma/schema.prisma
+npm run db:migrate:deploy --workspace=backend
 exec "$@"

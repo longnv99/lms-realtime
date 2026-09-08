@@ -2,6 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 const frontendUrl = process.env.E2E_BASE_URL ?? 'http://localhost:5173';
 const backendHealthUrl = process.env.E2E_BACKEND_HEALTH_URL ?? 'http://localhost:4000/api/health';
+const shouldStartWebServers = process.env.E2E_SKIP_WEBSERVER !== '1';
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -26,18 +27,20 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  webServer: [
-    {
-      command: 'npm run dev:backend',
-      reuseExistingServer: !process.env.CI,
-      timeout: 120_000,
-      url: backendHealthUrl,
-    },
-    {
-      command: 'npm run dev:frontend',
-      reuseExistingServer: !process.env.CI,
-      timeout: 120_000,
-      url: frontendUrl,
-    },
-  ],
+  webServer: shouldStartWebServers
+    ? [
+        {
+          command: 'npm run dev:backend',
+          reuseExistingServer: !process.env.CI,
+          timeout: 120_000,
+          url: backendHealthUrl,
+        },
+        {
+          command: 'npm run dev:frontend',
+          reuseExistingServer: !process.env.CI,
+          timeout: 120_000,
+          url: frontendUrl,
+        },
+      ]
+    : undefined,
 });

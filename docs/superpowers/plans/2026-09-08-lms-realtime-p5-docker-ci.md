@@ -16,6 +16,7 @@
 
 - Frontend dev port is `5173`; backend dev port is `4000`.
 - Production Docker stack must expose the frontend/Nginx entrypoint and keep backend private on the Compose network unless explicitly mapped for debugging.
+- Production-like host ports should avoid the dev infra defaults so `docker-compose.prod.yml` can run next to `docker-compose.infra.yml`.
 - Nginx must proxy `/api` to backend port `4000`.
 - Nginx must proxy `/socket.io` to backend port `4000` with WebSocket upgrade headers.
 - Postgres image remains `postgres:16-alpine`.
@@ -218,7 +219,7 @@ git commit -m "chore(ci): add workspace typecheck scripts"
 
 **Interfaces:**
 - Produces: Docker image target that starts with `npm run start:prod --workspace=backend`.
-- Produces: Backend entrypoint that runs `npx prisma migrate deploy --schema backend/prisma/schema.prisma` before starting the app.
+- Produces: Backend entrypoint that runs `npm run db:migrate:deploy --workspace=backend` before starting the app.
 - Consumes: Root `package-lock.json`, npm workspaces, `backend/prisma`, generated Prisma client output, `shared/dist`, and backend `dist`.
 
 - [x] **Step 1: Add failing Docker build check**
@@ -265,11 +266,11 @@ Create `backend/docker-entrypoint.sh` with:
 #!/bin/sh
 set -eu
 
-npx prisma migrate deploy --schema backend/prisma/schema.prisma
+npm run db:migrate:deploy --workspace=backend
 exec "$@"
 ```
 
-Implementation note: Move `prisma` from `backend/package.json` `devDependencies` to `dependencies`, then run `npm.cmd install --package-lock-only`, because the production entrypoint needs Prisma CLI after `npm prune --omit=dev`.
+Implementation note: Add `db:migrate:deploy` to `backend/package.json`, move `prisma` from `backend/package.json` `devDependencies` to `dependencies`, then run `npm.cmd install --package-lock-only`, because the production entrypoint needs Prisma CLI after `npm prune --omit=dev`.
 
 - [x] **Step 4: Add backend Dockerfile**
 
@@ -301,6 +302,7 @@ RUN addgroup -S lms && adduser -S lms -G lms
 COPY --chown=lms:lms --from=build /app/package.json /app/package-lock.json ./
 COPY --chown=lms:lms --from=build /app/node_modules ./node_modules
 COPY --chown=lms:lms --from=build /app/backend/package.json ./backend/package.json
+COPY --chown=lms:lms --from=build /app/backend/prisma.config.ts ./backend/prisma.config.ts
 COPY --chown=lms:lms --from=build /app/backend/dist ./backend/dist
 COPY --chown=lms:lms --from=build /app/backend/prisma ./backend/prisma
 COPY --chown=lms:lms --from=build /app/backend/src/generated ./backend/src/generated
@@ -551,14 +553,13 @@ Create `.env.prod.example` with:
 POSTGRES_USER=lms
 POSTGRES_PASSWORD=lms_prod_password
 POSTGRES_DB=lms
-POSTGRES_PORT=5432
-REDIS_PORT=6379
+POSTGRES_PORT=15432
+REDIS_PORT=16379
 MINIO_ROOT_USER=lms
 MINIO_ROOT_PASSWORD=lms_prod_password
-MINIO_API_PORT=9000
-MINIO_CONSOLE_PORT=9001
+MINIO_API_PORT=9100
+MINIO_CONSOLE_PORT=9101
 APP_PORT=8080
-BACKEND_PORT=4000
 JWT_ACCESS_SECRET=replace_with_at_least_16_chars_access_secret
 JWT_REFRESH_SECRET=replace_with_at_least_16_chars_refresh_secret
 JWT_ACCESS_EXPIRES_IN=15m
@@ -738,11 +739,11 @@ git commit -m "build(docker): add production compose stack"
 - Modify: `README.md`
 
 **Interfaces:**
-- Produces: Root script `test:e2e:prod`.
+- Produces: Root scripts `db:seed:prod` and `test:e2e:prod`.
 - Produces: Playwright support for `E2E_BASE_URL=http://localhost:8080` and `E2E_SKIP_WEBSERVER=1`.
 - Consumes: `docker-compose.prod.yml`, seeded demo accounts from `backend/prisma/seeds/data.ts`, existing Playwright helpers in `tests/e2e/helpers`.
 
-- [ ] **Step 1: Add failing production E2E command**
+- [x] **Step 1: Add failing production E2E command**
 
 Run:
 
@@ -752,26 +753,33 @@ npm.cmd run test:e2e:prod
 
 Expected before implementation: FAIL with missing script `test:e2e:prod`.
 
-- [ ] **Step 2: Add production smoke spec**
+- [x] **Step 2: Add production smoke spec**
 
 Create `tests/e2e/p5-production-stack.spec.ts` with:
 
 ```ts
 import { expect, test } from '@playwright/test';
-import { DEMO_USERS } from './helpers/demo-data';
-import { loginAs } from './helpers/auth';
+import { loginAs, newAuthenticatedPage } from './helpers/auth';
 
-test('production stack serves app, api, and authenticated dashboard', async ({ page, request }) => {
+test('production stack serves app, api, and authenticated dashboard', async ({
+  browser,
+  request,
+}) => {
   const health = await request.get('/api/health');
   expect(health.ok()).toBe(true);
 
-  await loginAs(page, DEMO_USERS.admin);
+  const tokens = await loginAs(request, 'admin@example.com');
+  const page = await newAuthenticatedPage(browser, tokens, { width: 1440, height: 900 });
+
+  await page.goto('/courses', { waitUntil: 'networkidle' });
   await expect(page).toHaveURL(/\/courses$/);
   await expect(page.getByRole('heading', { name: /courses/i })).toBeVisible();
+
+  await page.context().close();
 });
 ```
 
-- [ ] **Step 3: Add Playwright webServer skip**
+- [x] **Step 3: Add Playwright webServer skip**
 
 Modify `playwright.config.ts` so `webServer` is omitted when `E2E_SKIP_WEBSERVER=1`:
 
@@ -799,19 +807,20 @@ export default defineConfig({
 });
 ```
 
-- [ ] **Step 4: Add root production E2E script**
+- [x] **Step 4: Add root production E2E script**
 
 Update root `package.json` scripts:
 
 ```json
 {
-  "test:e2e:prod": "cross-env E2E_SKIP_WEBSERVER=1 E2E_BASE_URL=http://localhost:8080 E2E_BACKEND_HEALTH_URL=http://localhost:8080/api/health playwright test tests/e2e/p5-production-stack.spec.ts"
+  "db:seed:prod": "cross-env DATABASE_URL=postgresql://lms:lms_prod_password@localhost:15432/lms?schema=public JWT_ACCESS_SECRET=replace_with_at_least_16_chars_access_secret JWT_REFRESH_SECRET=replace_with_at_least_16_chars_refresh_secret npm run db:seed",
+  "test:e2e:prod": "cross-env E2E_SKIP_WEBSERVER=1 E2E_BASE_URL=http://localhost:8080 E2E_API_URL=http://localhost:8080/api E2E_BACKEND_HEALTH_URL=http://localhost:8080/api/health playwright test tests/e2e/p5-production-stack.spec.ts"
 }
 ```
 
 If `cross-env` is not present, add it as a dev dependency so the script works on Windows and Linux.
 
-- [ ] **Step 5: Start production stack**
+- [x] **Step 5: Start production stack**
 
 Run:
 
@@ -821,17 +830,17 @@ docker compose --env-file .env.prod.example -f docker-compose.prod.yml up -d --b
 
 Expected: All services start and backend healthcheck becomes healthy.
 
-- [ ] **Step 6: Seed production local stack**
+- [x] **Step 6: Seed production local stack**
 
 Run:
 
 ```bash
-docker compose --env-file .env.prod.example -f docker-compose.prod.yml exec backend npm run db:seed --workspace=backend
+npm.cmd run db:seed:prod
 ```
 
 Expected: Seed completes without clearing existing data.
 
-- [ ] **Step 7: Verify health through Nginx**
+- [x] **Step 7: Verify health through Nginx**
 
 Run:
 
@@ -841,7 +850,7 @@ curl.exe -f http://localhost:8080/api/health
 
 Expected: HTTP 200 with health response.
 
-- [ ] **Step 8: Verify production E2E**
+- [x] **Step 8: Verify production E2E**
 
 Run:
 
@@ -851,7 +860,7 @@ npm.cmd run test:e2e:prod
 
 Expected: PASS.
 
-- [ ] **Step 9: Verify local builds still pass**
+- [x] **Step 9: Verify local builds still pass**
 
 Run:
 
@@ -862,7 +871,7 @@ npm.cmd run build:frontend
 
 Expected: PASS.
 
-- [ ] **Step 10: Stop production stack without deleting volumes**
+- [x] **Step 10: Stop production stack without deleting volumes**
 
 Run:
 
@@ -872,7 +881,7 @@ docker compose --env-file .env.prod.example -f docker-compose.prod.yml down
 
 Expected: Containers stop. Named volumes remain.
 
-- [ ] **Step 11: Commit**
+- [x] **Step 11: Commit**
 
 Run:
 
@@ -942,7 +951,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: cp .env.prod.example .env.prod
       - run: docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
-      - run: docker compose --env-file .env.prod -f docker-compose.prod.yml exec -T backend npm run db:seed --workspace=backend
+      - run: npm run db:seed:prod
       - run: npm run test:e2e:prod
       - if: always()
         run: docker compose --env-file .env.prod -f docker-compose.prod.yml logs
@@ -983,7 +992,7 @@ Run:
 
 ```bash
 docker compose --env-file .env.prod.example -f docker-compose.prod.yml up -d --build
-docker compose --env-file .env.prod.example -f docker-compose.prod.yml exec backend npm run db:seed --workspace=backend
+npm.cmd run db:seed:prod
 npm.cmd run test:e2e:prod
 docker compose --env-file .env.prod.example -f docker-compose.prod.yml down
 ```
@@ -1027,7 +1036,7 @@ Add a `Production-like Docker` section with these commands:
 ```bash
 cp .env.prod.example .env.prod
 docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
-docker compose --env-file .env.prod -f docker-compose.prod.yml exec backend npm run db:seed --workspace=backend
+npm run db:seed:prod
 curl http://localhost:8080/api/health
 ```
 
@@ -1108,7 +1117,7 @@ Run:
 
 ```bash
 docker compose --env-file .env.prod.example -f docker-compose.prod.yml up -d --build
-docker compose --env-file .env.prod.example -f docker-compose.prod.yml exec backend npm run db:seed --workspace=backend
+npm.cmd run db:seed:prod
 curl.exe -f http://localhost:8080/api/health
 npm.cmd run test:e2e:prod
 docker compose --env-file .env.prod.example -f docker-compose.prod.yml down
