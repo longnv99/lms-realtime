@@ -533,7 +533,7 @@ git commit -m "build(frontend): add nginx production image"
 - Produces: Production-like stack with services `postgres`, `redis`, `minio`, `backend`, and `frontend`.
 - Consumes: `backend/Dockerfile`, `frontend/Dockerfile`, backend env schema, frontend Nginx proxy.
 
-- [ ] **Step 1: Add failing compose validation**
+- [x] **Step 1: Add failing compose validation**
 
 Run:
 
@@ -543,7 +543,7 @@ docker compose --env-file .env.prod.example -f docker-compose.prod.yml config
 
 Expected before implementation: FAIL because `.env.prod.example` and `docker-compose.prod.yml` do not exist.
 
-- [ ] **Step 2: Add root production env example**
+- [x] **Step 2: Add root production env example**
 
 Create `.env.prod.example` with:
 
@@ -571,7 +571,7 @@ MEDIA_UPLOAD_TTL_SECONDS=900
 MEDIA_PLAYBACK_TTL_SECONDS=1800
 ```
 
-- [ ] **Step 3: Add production compose file**
+- [x] **Step 3: Add production compose file**
 
 Create `docker-compose.prod.yml` with:
 
@@ -687,7 +687,7 @@ volumes:
   minio_prod_data:
 ```
 
-- [ ] **Step 4: Validate compose config**
+- [x] **Step 4: Validate compose config**
 
 Run:
 
@@ -697,7 +697,7 @@ docker compose --env-file .env.prod.example -f docker-compose.prod.yml config
 
 Expected: PASS and show resolved services.
 
-- [ ] **Step 5: Build compose services**
+- [x] **Step 5: Build compose services**
 
 Run:
 
@@ -707,7 +707,7 @@ docker compose --env-file .env.prod.example -f docker-compose.prod.yml build
 
 Expected: Backend and frontend images build successfully.
 
-- [ ] **Step 6: Verify local builds still pass**
+- [x] **Step 6: Verify local builds still pass**
 
 Run:
 
@@ -718,7 +718,7 @@ npm.cmd run build:frontend
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 Run:
 

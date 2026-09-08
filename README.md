@@ -211,5 +211,6 @@ npm.cmd run test:e2e:ui
 - `frontend/` - Vite + React
 - `shared/` - shared TypeScript contracts
 - `docker-compose.infra.yml` - Postgres, Redis, and MinIO
+- `docker-compose.prod.yml` - production-like app stack with Nginx, backend, Postgres, Redis, and MinIO
 
 See `docs/superpowers/specs/2026-08-26-lms-realtime-design.md` for the project design.
