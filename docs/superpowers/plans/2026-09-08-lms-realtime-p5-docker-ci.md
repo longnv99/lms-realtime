@@ -386,7 +386,7 @@ git commit -m "build(backend): add production docker image"
 - Produces: Nginx routes `/api/*` and `/socket.io/*` to `http://backend:4000`.
 - Consumes: `VITE_API_BASE_URL=/api` and empty `VITE_SOCKET_URL` for production same-origin sockets.
 
-- [ ] **Step 1: Add failing Docker build check**
+- [x] **Step 1: Add failing Docker build check**
 
 Run:
 
@@ -396,7 +396,7 @@ docker build -f frontend/Dockerfile -t lms-frontend:local .
 
 Expected before implementation: FAIL because `frontend/Dockerfile` does not exist.
 
-- [ ] **Step 2: Add Nginx config**
+- [x] **Step 2: Add Nginx config**
 
 Create `frontend/nginx.conf` with:
 
@@ -443,7 +443,7 @@ server {
 }
 ```
 
-- [ ] **Step 3: Add frontend Dockerfile**
+- [x] **Step 3: Add frontend Dockerfile**
 
 Create `frontend/Dockerfile` with:
 
@@ -474,7 +474,7 @@ COPY --from=build /app/frontend/dist /usr/share/nginx/html
 EXPOSE 80
 ```
 
-- [ ] **Step 4: Update frontend env examples**
+- [x] **Step 4: Update frontend env examples**
 
 Update `frontend/.env.example` so dev still works and production intent is clear:
 
@@ -490,7 +490,7 @@ VITE_API_BASE_URL=/api
 VITE_SOCKET_URL=
 ```
 
-- [ ] **Step 5: Verify frontend image build**
+- [x] **Step 5: Verify frontend image build**
 
 Run:
 
@@ -500,7 +500,7 @@ docker build -f frontend/Dockerfile -t lms-frontend:local .
 
 Expected: Docker image builds successfully.
 
-- [ ] **Step 6: Verify frontend build still passes outside Docker**
+- [x] **Step 6: Verify frontend build still passes outside Docker**
 
 Run:
 
@@ -510,7 +510,7 @@ npm.cmd run build:frontend
 
 Expected: PASS. Existing Vite chunk-size warning is acceptable.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 Run:
 
