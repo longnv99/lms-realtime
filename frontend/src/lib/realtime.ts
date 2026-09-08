@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { io, type Socket } from 'socket.io-client';
+import type { ProgressHeartbeatPayload } from '@lms/shared';
 
 export type RealtimeNamespace = '/sessions' | '/quiz' | '/notifications';
 export type SocketStatus = 'connected' | 'disconnected';
@@ -30,6 +31,13 @@ export function createOptionalNamespaceSocket(
   }
 
   return createNamespaceSocket(namespace, token);
+}
+
+export function emitProgressHeartbeat(
+  socket: { emit: (event: 'progress:heartbeat', payload: ProgressHeartbeatPayload) => unknown },
+  payload: ProgressHeartbeatPayload,
+): void {
+  socket.emit('progress:heartbeat', payload);
 }
 
 export function useSocketStatus(socket: RealtimeSocket | null): SocketStatus {

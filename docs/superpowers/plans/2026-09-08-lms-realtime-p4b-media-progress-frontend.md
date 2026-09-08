@@ -82,14 +82,14 @@ shared/
 
 **Interfaces:**
 - Produces: `createMediaUpload(input): Promise<CreateMediaUploadResponse>`.
-- Produces: `completeMediaUpload(assetId): Promise<CreateMediaUploadResponse | { assetId: string }>` only if backend response is consumed by UI.
+- Produces: `completeMediaUpload(assetId): Promise<CompletedMediaAssetResponse>`.
 - Produces: `getMediaPlayback(assetId): Promise<MediaPlaybackResponse>`.
 - Produces: `getMyCourseProgress(courseId): Promise<CourseProgressResponse>`.
 - Produces: `getCourseProgress(courseId): Promise<InstructorCourseProgressResponse>`.
 - Produces: `emitProgressHeartbeat(socket, payload): void`.
 - Consumes: `CreateMediaUploadResponse`, `MediaPlaybackResponse`, `CourseProgressResponse`, `InstructorCourseProgressResponse`, `ProgressHeartbeatPayload`.
 
-- [ ] **Step 1.1: Write API client tests**
+- [x] **Step 1.1: Write API client tests**
 
 Add tests that verify:
 
@@ -102,7 +102,7 @@ expect(getMyCourseProgress('course-1')).resolves.toMatchObject({ percent: 50 });
 expect(getCourseProgress('course-1')).resolves.toMatchObject({ totalLessons: 2 });
 ```
 
-- [ ] **Step 1.2: Write realtime helper test**
+- [x] **Step 1.2: Write realtime helper test**
 
 Add a test that creates a mock socket and verifies:
 
@@ -114,7 +114,7 @@ expect(socket.emit).toHaveBeenCalledWith('progress:heartbeat', {
 });
 ```
 
-- [ ] **Step 1.3: Run tests to verify failure**
+- [x] **Step 1.3: Run tests to verify failure**
 
 Run:
 
@@ -124,19 +124,19 @@ npm.cmd run test --workspace=frontend -- client.test.ts realtime.test.ts
 
 Expected: fail because `media.ts`, `progress.ts`, and `emitProgressHeartbeat()` do not exist yet.
 
-- [ ] **Step 1.4: Implement media and progress API modules**
+- [x] **Step 1.4: Implement media and progress API modules**
 
 Use `postEnvelope`, `getEnvelope`, and existing shared contracts:
 
 ```ts
 export async function createMediaUpload(input: CreateMediaUploadInput): Promise<CreateMediaUploadResponse>;
-export async function completeMediaUpload(assetId: string): Promise<CreateMediaUploadResponse>;
+export async function completeMediaUpload(assetId: string): Promise<CompletedMediaAssetResponse>;
 export async function getMediaPlayback(assetId: string): Promise<MediaPlaybackResponse>;
 export async function getMyCourseProgress(courseId: string): Promise<CourseProgressResponse>;
 export async function getCourseProgress(courseId: string): Promise<InstructorCourseProgressResponse>;
 ```
 
-- [ ] **Step 1.5: Add shadcn progress and tooltip primitives**
+- [x] **Step 1.5: Add shadcn progress and tooltip primitives**
 
 Create owned primitives compatible with the existing token system:
 
@@ -145,17 +145,20 @@ Create owned primitives compatible with the existing token system:
 <TooltipProvider><Tooltip><TooltipTrigger /><TooltipContent /></Tooltip></TooltipProvider>
 ```
 
-- [ ] **Step 1.6: Add realtime heartbeat helper**
+- [x] **Step 1.6: Add realtime heartbeat helper**
 
 Add:
 
 ```ts
-export function emitProgressHeartbeat(socket: Pick<Socket, 'emit'>, payload: ProgressHeartbeatPayload): void {
+export function emitProgressHeartbeat(
+  socket: { emit: (event: 'progress:heartbeat', payload: ProgressHeartbeatPayload) => unknown },
+  payload: ProgressHeartbeatPayload,
+): void {
   socket.emit('progress:heartbeat', payload);
 }
 ```
 
-- [ ] **Step 1.7: Verify Task 1**
+- [x] **Step 1.7: Verify Task 1**
 
 Run:
 
@@ -166,7 +169,7 @@ npm.cmd run build:frontend
 
 Expected: tests and frontend build pass.
 
-- [ ] **Step 1.8: Commit Task 1**
+- [x] **Step 1.8: Commit Task 1**
 
 Run:
 
@@ -513,3 +516,4 @@ git push
 - [x] **Placeholder scan:** No TBD/TODO placeholders remain.
 - [x] **Type consistency:** API names align with P3b shared contracts and backend routes.
 - [x] **Verification discipline:** Each implementation task ends with focused tests and `npm.cmd run build:frontend`.
+

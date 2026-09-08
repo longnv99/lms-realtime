@@ -4,6 +4,7 @@ import { io } from 'socket.io-client';
 import {
   createNamespaceSocket,
   createOptionalNamespaceSocket,
+  emitProgressHeartbeat,
   useSocketStatus,
   type RealtimeSocket,
 } from './realtime';
@@ -11,10 +12,12 @@ import {
 type Handler = () => void;
 type MockedSocket = {
   connected: boolean;
+  emit: ReturnType<typeof vi.fn>;
   off: (event: string, handler: Handler) => MockedSocket;
   on: (event: string, handler: Handler) => MockedSocket;
 };
 
+const emitMock = vi.fn();
 const handlers = new Map<string, Handler>();
 const offMock = vi.fn((_event: string, _handler: Handler): MockedSocket => mockedSocket);
 const onMock = vi.fn((event: string, handler: Handler): MockedSocket => {
@@ -23,6 +26,7 @@ const onMock = vi.fn((event: string, handler: Handler): MockedSocket => {
 });
 const mockedSocket: MockedSocket = {
   connected: false,
+  emit: emitMock,
   off: offMock,
   on: onMock,
 };
@@ -36,6 +40,7 @@ const mockedIo = vi.mocked(io);
 describe('realtime socket helpers', () => {
   beforeEach(() => {
     handlers.clear();
+    emitMock.mockClear();
     mockedIo.mockClear();
     mockedSocket.connected = false;
     offMock.mockClear();
@@ -77,5 +82,14 @@ describe('realtime socket helpers', () => {
       handlers.get('disconnect')?.();
     });
     expect(result.current).toBe('disconnected');
+  });
+
+  it('emits progress heartbeats through an existing sessions socket', () => {
+    emitProgressHeartbeat(mockedSocket, { lessonId: 'lesson-1', positionSeconds: 42 });
+
+    expect(emitMock).toHaveBeenCalledWith('progress:heartbeat', {
+      lessonId: 'lesson-1',
+      positionSeconds: 42,
+    });
   });
 });
