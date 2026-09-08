@@ -221,7 +221,7 @@ git commit -m "chore(ci): add workspace typecheck scripts"
 - Produces: Backend entrypoint that runs `npx prisma migrate deploy --schema backend/prisma/schema.prisma` before starting the app.
 - Consumes: Root `package-lock.json`, npm workspaces, `backend/prisma`, generated Prisma client output, `shared/dist`, and backend `dist`.
 
-- [ ] **Step 1: Add failing Docker build check**
+- [x] **Step 1: Add failing Docker build check**
 
 Run:
 
@@ -231,7 +231,7 @@ docker build -f backend/Dockerfile -t lms-backend:local .
 
 Expected before implementation: FAIL because `backend/Dockerfile` does not exist.
 
-- [ ] **Step 2: Add Docker ignore rules**
+- [x] **Step 2: Add Docker ignore rules**
 
 Create `.dockerignore` with:
 
@@ -257,7 +257,7 @@ test-results
 blob-report
 ```
 
-- [ ] **Step 3: Add backend entrypoint**
+- [x] **Step 3: Add backend entrypoint**
 
 Create `backend/docker-entrypoint.sh` with:
 
@@ -269,7 +269,9 @@ npx prisma migrate deploy --schema backend/prisma/schema.prisma
 exec "$@"
 ```
 
-- [ ] **Step 4: Add backend Dockerfile**
+Implementation note: Move `prisma` from `backend/package.json` `devDependencies` to `dependencies`, then run `npm.cmd install --package-lock-only`, because the production entrypoint needs Prisma CLI after `npm prune --omit=dev`.
+
+- [x] **Step 4: Add backend Dockerfile**
 
 Create `backend/Dockerfile` with:
 
@@ -296,23 +298,23 @@ FROM node:20-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 RUN addgroup -S lms && adduser -S lms -G lms
-COPY --from=build /app/package.json /app/package-lock.json ./
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/backend/package.json ./backend/package.json
-COPY --from=build /app/backend/dist ./backend/dist
-COPY --from=build /app/backend/prisma ./backend/prisma
-COPY --from=build /app/backend/src/generated ./backend/src/generated
-COPY --from=build /app/shared/package.json ./shared/package.json
-COPY --from=build /app/shared/dist ./shared/dist
-COPY backend/docker-entrypoint.sh ./backend/docker-entrypoint.sh
-RUN chmod +x ./backend/docker-entrypoint.sh && chown -R lms:lms /app
+COPY --chown=lms:lms --from=build /app/package.json /app/package-lock.json ./
+COPY --chown=lms:lms --from=build /app/node_modules ./node_modules
+COPY --chown=lms:lms --from=build /app/backend/package.json ./backend/package.json
+COPY --chown=lms:lms --from=build /app/backend/dist ./backend/dist
+COPY --chown=lms:lms --from=build /app/backend/prisma ./backend/prisma
+COPY --chown=lms:lms --from=build /app/backend/src/generated ./backend/src/generated
+COPY --chown=lms:lms --from=build /app/shared/package.json ./shared/package.json
+COPY --chown=lms:lms --from=build /app/shared/dist ./shared/dist
+COPY --chown=lms:lms backend/docker-entrypoint.sh ./backend/docker-entrypoint.sh
+RUN chmod +x ./backend/docker-entrypoint.sh
 USER lms
 EXPOSE 4000
 ENTRYPOINT ["./backend/docker-entrypoint.sh"]
 CMD ["npm", "run", "start:prod", "--workspace=backend"]
 ```
 
-- [ ] **Step 5: Add production env example**
+- [x] **Step 5: Add production env example**
 
 Create `backend/.env.production.example` with:
 
@@ -340,7 +342,7 @@ MEDIA_UPLOAD_TTL_SECONDS=900
 MEDIA_PLAYBACK_TTL_SECONDS=1800
 ```
 
-- [ ] **Step 6: Verify backend image build**
+- [x] **Step 6: Verify backend image build**
 
 Run:
 
@@ -350,7 +352,7 @@ docker build -f backend/Dockerfile -t lms-backend:local .
 
 Expected: Docker image builds successfully.
 
-- [ ] **Step 7: Verify backend build still passes outside Docker**
+- [x] **Step 7: Verify backend build still passes outside Docker**
 
 Run:
 
@@ -360,7 +362,7 @@ npm.cmd run build:backend
 
 Expected: PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 Run:
 
