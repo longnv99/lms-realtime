@@ -193,7 +193,7 @@ git push
 - Produces: instructor-only upload action per lesson.
 - Produces: visible media state per lesson: `No video`, `Video attached`, `Upload pending`, `Upload failed`.
 
-- [ ] **Step 2.1: Write lesson upload tests**
+- [x] **Step 2.1: Write lesson upload tests**
 
 Verify:
 - Instructor sees an icon-only upload action on each lesson row.
@@ -201,7 +201,7 @@ Verify:
 - Selecting a `video/mp4` file calls `createMediaUpload()`, uploads to `uploadUrl` with `fetch(..., { method: 'PUT', body: file })`, calls `completeMediaUpload()`, then calls `updateLesson()`.
 - Selecting `text/plain` shows `Only MP4 or WebM video files are supported.` and does not call the API.
 
-- [ ] **Step 2.2: Run tests to verify failure**
+- [x] **Step 2.2: Run tests to verify failure**
 
 Run:
 
@@ -211,22 +211,22 @@ npm.cmd run test --workspace=frontend -- LessonsPanel.test.tsx
 
 Expected: fail because upload controls do not exist.
 
-- [ ] **Step 2.3: Implement `LessonMediaUpload`**
+- [x] **Step 2.3: Implement `LessonMediaUpload`**
 
 Use an icon-only shadcn button with tooltip text `Upload video`. Keep file input visually hidden but accessible through the button label. Validate content type before API calls.
 
-- [ ] **Step 2.4: Integrate upload into lesson rows**
+- [x] **Step 2.4: Integrate upload into lesson rows**
 
 Pass `canManage` into `LessonRow`. Show:
 - media badge `Video attached` when `lesson.mediaAssetId` exists.
 - media badge `No video` when missing.
 - upload action only for managers.
 
-- [ ] **Step 2.5: Handle loading and errors inline**
+- [x] **Step 2.5: Handle loading and errors inline**
 
 During upload, disable the row action and show `Upload pending`. On failure, show the API error under the row.
 
-- [ ] **Step 2.6: Verify Task 2**
+- [x] **Step 2.6: Verify Task 2**
 
 Run:
 
@@ -237,7 +237,7 @@ npm.cmd run build:frontend
 
 Expected: tests and frontend build pass.
 
-- [ ] **Step 2.7: Commit Task 2**
+- [x] **Step 2.7: Commit Task 2**
 
 Run:
 
@@ -478,9 +478,9 @@ git push
 
 ## P4b Acceptance Checklist
 
-- [ ] Instructor/admin can create lesson video uploads from the lesson list.
-- [ ] Upload UI accepts only `video/mp4` and `video/webm`.
-- [ ] Upload UI attaches completed media asset to the lesson.
+- [x] Instructor/admin can create lesson video uploads from the lesson list.
+- [x] Upload UI accepts only `video/mp4` and `video/webm`.
+- [x] Upload UI attaches completed media asset to the lesson.
 - [ ] Student can select a lesson and play private media through a backend playback URL.
 - [ ] Student playback emits throttled `progress:heartbeat` events.
 - [ ] Student course detail shows course percent and per-lesson progress.

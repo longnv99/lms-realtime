@@ -938,7 +938,7 @@ a {
 }
 
 .lesson-row {
-  grid-template-columns: 34px minmax(0, 1fr) auto;
+  grid-template-columns: 34px minmax(0, 1fr) minmax(190px, auto);
 }
 
 .lesson-row,
@@ -1002,6 +1002,57 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+
+.lesson-side {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.lesson-side > .badge {
+  width: fit-content;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.lesson-upload {
+  position: relative;
+  display: inline-flex;
+  min-width: 32px;
+  align-items: center;
+  gap: 8px;
+}
+
+.lesson-upload-control {
+  flex: 0 0 auto;
+}
+
+.lesson-upload-control[aria-disabled='true'] {
+  pointer-events: none;
+  opacity: 0.48;
+}
+
+.lesson-upload-state {
+  color: var(--text-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.lesson-upload-error {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 20;
+  width: max-content;
+  max-width: min(280px, 70vw);
+  border: 1px solid color-mix(in srgb, var(--danger) 38%, var(--line));
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  padding: 8px 10px;
 }
 
 .session-group {
@@ -1881,6 +1932,11 @@ a {
   .lesson-duration,
   .session-actions {
     justify-self: start;
+  }
+
+  .lesson-side {
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
 
   .live-workspace {
