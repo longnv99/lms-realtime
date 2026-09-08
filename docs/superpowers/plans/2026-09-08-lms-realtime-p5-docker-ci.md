@@ -1095,7 +1095,7 @@ git commit -m "docs: add production docker runbook"
 - Produces: Completed P5 checklist and verification summary.
 - Consumes: All artifacts from Tasks 2-8.
 
-- [ ] **Step 1: Run full non-destructive verification**
+- [x] **Step 1: Run full non-destructive verification**
 
 Run:
 
@@ -1113,7 +1113,7 @@ docker compose --env-file .env.prod.example -f docker-compose.prod.yml config
 
 Expected: PASS. Do not run local reset scripts.
 
-- [ ] **Step 2: Run production stack verification**
+- [x] **Step 2: Run production stack verification**
 
 Run:
 
@@ -1127,11 +1127,28 @@ docker compose --env-file .env.prod.example -f docker-compose.prod.yml down
 
 Expected: PASS. Stop containers but preserve local volumes.
 
-- [ ] **Step 3: Update this plan checklist**
+- [x] **Step 3: Update this plan checklist**
 
 Mark completed task steps with `[x]` and add a short verification note under this task with exact commands and outcomes.
 
-- [ ] **Step 4: Inspect git diff**
+Verification note:
+
+- `npm.cmd run typecheck` passed.
+- `npm.cmd run lint` passed with existing warnings only: backend `no-explicit-any` warnings and frontend Fast Refresh export warnings.
+- `npm.cmd run test:frontend` passed: 11 files, 38 tests, with existing React `act(...)` warnings in `App.test.tsx`.
+- `npm.cmd run test:backend` passed with `jest --passWithNoTests` and no backend Jest specs found.
+- `npm.cmd run build:backend` passed.
+- `npm.cmd run build:frontend` passed with the existing Vite chunk-size warning.
+- `docker build -f backend/Dockerfile -t lms-backend:p5-final .` passed; `npm prune --omit=dev` reported audit warnings but did not fail.
+- `docker build -f frontend/Dockerfile -t lms-frontend:p5-final .` passed.
+- `docker compose --env-file .env.prod.example -f docker-compose.prod.yml config` passed.
+- `docker compose --env-file .env.prod.example -f docker-compose.prod.yml up -d --build` passed and services became healthy.
+- `npm.cmd run db:seed:prod` passed in safe mode with 4 lessons, 2 enrollments, and 5 progress rows.
+- `curl.exe -f http://localhost:8080/api/health` passed with HTTP 200.
+- `npm.cmd run test:e2e:prod` passed: 1 Chromium smoke test.
+- `docker compose --env-file .env.prod.example -f docker-compose.prod.yml down` passed and preserved named volumes.
+
+- [x] **Step 4: Inspect git diff**
 
 Run:
 
@@ -1142,7 +1159,7 @@ git diff --stat
 
 Expected: Only P5 files are modified.
 
-- [ ] **Step 5: Commit closeout**
+- [x] **Step 5: Commit closeout**
 
 Run:
 
