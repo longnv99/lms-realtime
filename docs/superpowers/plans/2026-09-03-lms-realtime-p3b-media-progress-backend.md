@@ -44,13 +44,14 @@ backend/
       s3-storage.service.ts
     modules/
       sessions/
-        dto/progress-heartbeat.dto.ts
         sessions.gateway.ts
         sessions.realtime.service.ts
       progress/
         dto/progress-heartbeat.dto.ts
+        progress.controller.ts
         progress.module.ts
         progress.processor.ts
+        progress.producer.ts
         progress.service.ts
     queue/
       queue.constants.ts
@@ -178,7 +179,7 @@ Expected: both builds pass.
 - Produces: `GET /api/media/assets/:id/playback`.
 - Consumes: `S3StorageService`, `JwtAuthGuard`, `RolesGuard`, Prisma `MediaAsset`.
 
-- [ ] **Step 2.1: Write media e2e tests**
+- [x] **Step 2.1: Write media e2e tests**
 
 Mock `S3StorageService` in the test module and verify:
 - instructor can create upload for `video/mp4`.
@@ -188,7 +189,7 @@ Mock `S3StorageService` in the test module and verify:
 - complete updates status to `UPLOADED` when size/type match.
 - playback returns a presigned URL only after `UPLOADED`.
 
-- [ ] **Step 2.2: Run media tests to verify failure**
+- [x] **Step 2.2: Run media tests to verify failure**
 
 Run:
 
@@ -198,19 +199,19 @@ npm.cmd run test:e2e --workspace=backend -- media.e2e-spec.ts
 
 Expected: fail before implementation because routes do not exist.
 
-- [ ] **Step 2.3: Implement media DTOs**
+- [x] **Step 2.3: Implement media DTOs**
 
 `CreateUploadDto` has `fileName`, `contentType`, `sizeBytes`; `CompleteUploadDto` is an empty class to preserve explicit body validation.
 
-- [ ] **Step 2.4: Implement media service**
+- [x] **Step 2.4: Implement media service**
 
 Generate object keys as `videos/{crypto.randomUUID()}.{mp4|webm}`. Create `MediaAsset` as `PENDING`, return presigned upload URL. On complete, call `headObject()`, compare content length and content type, then mark `UPLOADED`. Playback rejects missing/PENDING assets with `LESSON_MEDIA_NOT_READY`.
 
-- [ ] **Step 2.5: Implement media controller**
+- [x] **Step 2.5: Implement media controller**
 
 Protect upload and complete with `JwtAuthGuard`, `RolesGuard`, roles `ADMIN` and `INSTRUCTOR`. Protect playback with `JwtAuthGuard`; authorization to lesson-level playback is handled in P4b when attached lesson context is available.
 
-- [ ] **Step 2.6: Verify media API**
+- [x] **Step 2.6: Verify media API**
 
 Run:
 
@@ -229,6 +230,7 @@ Expected: tests and backend build pass.
 - Create: `shared/src/progress.ts`
 - Modify: `shared/src/index.ts`
 - Create: `backend/src/modules/progress/dto/progress-heartbeat.dto.ts`
+- Create: `backend/src/modules/progress/progress.controller.ts`
 - Create: `backend/src/modules/progress/progress.service.ts`
 - Create: `backend/src/modules/progress/progress.module.ts`
 - Create: `backend/test/progress.e2e-spec.ts`
@@ -240,7 +242,7 @@ Expected: tests and backend build pass.
 - Produces: `GET /api/courses/:courseId/progress`.
 - Consumes: Prisma `LessonProgress`, enrollment checks, instructor ownership checks.
 
-- [ ] **Step 3.1: Write progress e2e tests**
+- [x] **Step 3.1: Write progress e2e tests**
 
 Verify:
 - enrolled student sees own course progress.
@@ -249,7 +251,7 @@ Verify:
 - instructor sees per-student course progress.
 - unenrolled student cannot read course progress.
 
-- [ ] **Step 3.2: Run progress tests to verify failure**
+- [x] **Step 3.2: Run progress tests to verify failure**
 
 Run:
 
@@ -259,19 +261,19 @@ npm.cmd run test:e2e --workspace=backend -- progress.e2e-spec.ts
 
 Expected: fail before progress module exists.
 
-- [ ] **Step 3.3: Add shared progress types**
+- [x] **Step 3.3: Add shared progress types**
 
 Create `shared/src/progress.ts` with `LessonProgressResponse`, `CourseProgressResponse`, and `InstructorCourseProgressResponse`.
 
-- [ ] **Step 3.4: Implement ProgressService**
+- [x] **Step 3.4: Implement ProgressService**
 
 Use upsert on `(userId, lessonId)`. Store `Math.max(existing.positionSeconds, incomingPositionSeconds)`. Set `completedAt` only once when lesson duration is positive and stored position reaches duration.
 
-- [ ] **Step 3.5: Implement progress controllers and module**
+- [x] **Step 3.5: Implement progress controllers and module**
 
 Expose authenticated REST read endpoints for student and instructor views. Register `ProgressModule` in `AppModule`.
 
-- [ ] **Step 3.6: Verify progress REST**
+- [x] **Step 3.6: Verify progress REST**
 
 Run:
 
@@ -291,10 +293,11 @@ Expected: tests and builds pass.
 - Modify: `shared/src/realtime.ts`
 - Modify: `backend/src/queue/queue.constants.ts`
 - Modify: `backend/src/queue/queue.module.ts`
-- Modify: `backend/src/modules/sessions/dto/progress-heartbeat.dto.ts`
+- Modify: `backend/src/modules/progress/dto/progress-heartbeat.dto.ts`
 - Modify: `backend/src/modules/sessions/sessions.gateway.ts`
 - Modify: `backend/src/modules/sessions/sessions.realtime.service.ts`
 - Create: `backend/src/modules/progress/progress.processor.ts`
+- Create: `backend/src/modules/progress/progress.producer.ts`
 - Modify: `backend/src/modules/progress/progress.module.ts`
 - Create: `backend/test/progress-realtime.e2e-spec.ts`
 
@@ -304,14 +307,14 @@ Expected: tests and builds pass.
 - Produces: BullMQ job `progress-flush`.
 - Consumes: `ProgressService.recordHeartbeat()`, Redis hash `progress:{userId}:{lessonId}`.
 
-- [ ] **Step 4.1: Write realtime progress e2e tests**
+- [x] **Step 4.1: Write realtime progress e2e tests**
 
 Verify:
 - enrolled student emits `progress:heartbeat` and Redis receives latest position.
 - lower subsequent position does not move Redis state backwards.
 - instructor socket receives `progress:updated` when completion occurs.
 
-- [ ] **Step 4.2: Run realtime tests to verify failure**
+- [x] **Step 4.2: Run realtime tests to verify failure**
 
 Run:
 
@@ -321,23 +324,23 @@ $env:REDIS_URL='redis://:123456@localhost:6379'; npm.cmd run test:e2e --workspac
 
 Expected: fail before event handler exists.
 
-- [ ] **Step 4.3: Add shared realtime progress contracts**
+- [x] **Step 4.3: Add shared realtime progress contracts**
 
 Add `ProgressHeartbeatPayload` and `ProgressUpdatedPayload` to `shared/src/realtime.ts`.
 
-- [ ] **Step 4.4: Add heartbeat handler**
+- [x] **Step 4.4: Add heartbeat handler**
 
 Validate `lessonId` and `positionSeconds`. Reuse existing session namespace auth. Ensure the student can access the lesson's course. Store Redis hash fields `positionSeconds`, `updatedAt`, `courseId`, and `sessionId`.
 
-- [ ] **Step 4.5: Add debounced progress flush job**
+- [x] **Step 4.5: Add debounced progress flush job**
 
 Queue job id must be `progress:flush:{userId}:{lessonId}` with 60s delay. Remove the previous delayed job before adding a new one. Processor reads Redis, calls `ProgressService.recordHeartbeat()`, and deletes the hash only after a successful DB write.
 
-- [ ] **Step 4.6: Emit instructor progress updates**
+- [x] **Step 4.6: Emit instructor progress updates**
 
 When `recordHeartbeat()` creates a new completion, emit `progress:updated` to `course:{courseId}:instructors`.
 
-- [ ] **Step 4.7: Verify realtime progress**
+- [x] **Step 4.7: Verify realtime progress**
 
 Run:
 
@@ -363,15 +366,15 @@ Expected: tests and builds pass.
 - Produces: local smoke docs for MinIO upload/playback and progress heartbeat.
 - Consumes: all P3b modules.
 
-- [ ] **Step 5.1: Upgrade seed data**
+- [x] **Step 5.1: Upgrade seed data**
 
 Create one `MediaAsset` with status `UPLOADED` and attach it to the first seeded lesson. The object key may point to `videos/seed-demo.mp4`; actual MinIO object upload is documented as optional local smoke.
 
-- [ ] **Step 5.2: Update README**
+- [x] **Step 5.2: Update README**
 
 Document env keys, MinIO console credentials, media upload flow, playback endpoint, student progress endpoints, and realtime `progress:heartbeat`.
 
-- [ ] **Step 5.3: Run final verification**
+- [x] **Step 5.3: Run final verification**
 
 Run:
 
@@ -383,7 +386,7 @@ npm.cmd run test:frontend
 
 Expected: all backend e2e tests, backend/shared/frontend builds, and frontend tests pass.
 
-- [ ] **Step 5.4: Seed local DB**
+- [x] **Step 5.4: Seed local DB**
 
 Run:
 
@@ -393,7 +396,7 @@ npm.cmd run db:seed --workspace=backend
 
 Expected: seed prints demo credentials and creates at least one uploaded media asset.
 
-- [ ] **Step 5.5: Mark plan complete**
+- [x] **Step 5.5: Mark plan complete**
 
 After all verification passes, check off every completed task in this plan.
 
@@ -401,21 +404,21 @@ After all verification passes, check off every completed task in this plan.
 
 ## P3b Acceptance Checklist
 
-- [ ] Backend validates MinIO/S3 env values.
-- [ ] Instructor/admin can create presigned upload URLs for `video/mp4` and `video/webm`.
-- [ ] Upload create rejects invalid type and files larger than `2GB`.
-- [ ] Upload complete verifies object existence, content length, and content type.
-- [ ] Playback endpoint returns a private presigned URL only for uploaded assets.
-- [ ] Student course progress endpoint computes percent from completed lessons.
-- [ ] Instructor course progress endpoint returns per-student progress.
-- [ ] Progress position never decreases.
-- [ ] Lesson completion sets `completedAt` only once.
-- [ ] `/sessions` accepts `progress:heartbeat`.
-- [ ] Redis stores latest heartbeat immediately.
-- [ ] BullMQ flush persists heartbeat to PostgreSQL after debounce.
-- [ ] Instructor course room receives `progress:updated` on new completion.
-- [ ] Backend e2e tests pass.
-- [ ] Backend, shared, and frontend builds pass.
+- [x] Backend validates MinIO/S3 env values.
+- [x] Instructor/admin can create presigned upload URLs for `video/mp4` and `video/webm`.
+- [x] Upload create rejects invalid type and files larger than `2GB`.
+- [x] Upload complete verifies object existence, content length, and content type.
+- [x] Playback endpoint returns a private presigned URL only for uploaded assets.
+- [x] Student course progress endpoint computes percent from completed lessons.
+- [x] Instructor course progress endpoint returns per-student progress.
+- [x] Progress position never decreases.
+- [x] Lesson completion sets `completedAt` only once.
+- [x] `/sessions` accepts `progress:heartbeat`.
+- [x] Redis stores latest heartbeat immediately.
+- [x] BullMQ flush persists heartbeat to PostgreSQL after debounce.
+- [x] Instructor course room receives `progress:updated` on new completion.
+- [x] Backend e2e tests pass.
+- [x] Backend, shared, and frontend builds pass.
 
 ## Out of Scope for P3b
 

@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { configureApiResponseCaching } from './common/http/api-cache';
 import { EnvelopeInterceptor } from './common/interceptors/envelope.interceptor';
 import { RedisIoAdapter } from './common/realtime/redis-io.adapter';
 import { env } from './config/env';
@@ -16,6 +17,7 @@ async function bootstrap() {
     origin: corsOrigin.split(',').map((s) => s.trim()),
     credentials: true,
   });
+  configureApiResponseCaching(app);
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

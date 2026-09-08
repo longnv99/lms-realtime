@@ -18,12 +18,18 @@
     "build:backend": "npm run build:shared && npm run build --workspace=backend",
     "build:frontend": "npm run build:shared && npm run build --workspace=frontend",
     "build": "npm run build:backend && npm run build:frontend",
+    "db:seed": "npm run db:seed --workspace=backend",
+    "db:seed:reset": "npm run db:seed:reset --workspace=backend",
+    "test:e2e:ui": "playwright test",
+    "test:e2e:ui:headed": "playwright test --headed",
+    "test:e2e:ui:report": "playwright show-report",
     "test:backend": "npm run test --workspace=backend",
     "test:frontend": "npm run test --workspace=frontend",
     "test": "npm run test:backend && npm run test:frontend",
     "lint": "npm run lint --workspaces --if-present"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "npm-run-all": "^4.1.5"
   },
   "engines": {

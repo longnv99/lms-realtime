@@ -65,6 +65,14 @@ export function AppRoutes() {
           }
         />
         <Route
+          path="/courses/:courseId/sessions/:sessionId/live"
+          element={
+            <ProtectedRoute>
+              <LiveSessionPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/sessions/:sessionId/live"
           element={
             <ProtectedRoute>

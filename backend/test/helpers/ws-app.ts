@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AddressInfo } from 'node:net';
 import { AppModule } from '../../src/app.module';
 import { AllExceptionsFilter } from '../../src/common/filters/all-exceptions.filter';
+import { configureApiResponseCaching } from '../../src/common/http/api-cache';
 import { EnvelopeInterceptor } from '../../src/common/interceptors/envelope.interceptor';
 import { RedisIoAdapter } from '../../src/common/realtime/redis-io.adapter';
 
@@ -12,6 +13,7 @@ export async function createWsTestApp(): Promise<{ app: INestApplication; url: s
   }).compile();
 
   const app = moduleFixture.createNestApplication();
+  configureApiResponseCaching(app);
   app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({

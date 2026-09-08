@@ -2,6 +2,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../../src/app.module';
 import { AllExceptionsFilter } from '../../src/common/filters/all-exceptions.filter';
+import { configureApiResponseCaching } from '../../src/common/http/api-cache';
 import { EnvelopeInterceptor } from '../../src/common/interceptors/envelope.interceptor';
 
 export async function createTestApp(
@@ -12,6 +13,7 @@ export async function createTestApp(
   }).compile();
 
   const app = moduleFixture.createNestApplication();
+  configureApiResponseCaching(app);
   app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({

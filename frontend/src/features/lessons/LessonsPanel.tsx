@@ -9,6 +9,7 @@ import { Field } from '../../components/Field';
 import { LoadingBlock } from '../../components/LoadingBlock';
 import { StatusBadge } from '../../components/StatusBadge';
 import { getErrorMessage } from '../../lib/errors';
+import { LessonMediaUpload } from './LessonMediaUpload';
 
 type LessonsPanelProps = {
   canManage: boolean;
@@ -77,7 +78,7 @@ export function LessonsPanel({ canManage, courseId }: LessonsPanelProps) {
         {sortedLessons.length > 0 && (
           <div className="lesson-list">
             {sortedLessons.map((lesson) => (
-              <LessonRow key={lesson.id} lesson={lesson} />
+              <LessonRow canManage={canManage} courseId={courseId} key={lesson.id} lesson={lesson} />
             ))}
           </div>
         )}
@@ -122,7 +123,15 @@ export function LessonsPanel({ canManage, courseId }: LessonsPanelProps) {
   );
 }
 
-function LessonRow({ lesson }: { lesson: LessonResponse }) {
+function LessonRow({
+  canManage,
+  courseId,
+  lesson,
+}: {
+  canManage: boolean;
+  courseId: string;
+  lesson: LessonResponse;
+}) {
   return (
     <article className="lesson-row">
       <span className="lesson-order">{lesson.order}</span>
@@ -130,10 +139,16 @@ function LessonRow({ lesson }: { lesson: LessonResponse }) {
         <strong data-testid="lesson-row-title">{lesson.title}</strong>
         {lesson.description && <span>{lesson.description}</span>}
       </div>
-      <span className="lesson-duration">
-        <Clock size={15} aria-hidden="true" />
-        {formatDuration(lesson.durationSeconds)}
-      </span>
+      <div className="lesson-side">
+        <StatusBadge tone={lesson.mediaAssetId ? 'success' : 'muted'}>
+          {lesson.mediaAssetId ? 'Video attached' : 'No video'}
+        </StatusBadge>
+        <span className="lesson-duration">
+          <Clock size={15} aria-hidden="true" />
+          {formatDuration(lesson.durationSeconds)}
+        </span>
+        {canManage && <LessonMediaUpload courseId={courseId} lesson={lesson} />}
+      </div>
     </article>
   );
 }

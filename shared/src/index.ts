@@ -6,6 +6,7 @@ export * from './health';
 export * from './lessons';
 export * from './media';
 export * from './notifications';
+export * from './progress';
 export * from './quizzes';
 export * from './realtime';
 export * from './sessions';
