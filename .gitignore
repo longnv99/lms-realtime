@@ -5,6 +5,9 @@ build/
 coverage/
 .nyc_output/
 *.tsbuildinfo
+playwright-report/
+test-results/
+blob-report/
 
 # Env
 .env

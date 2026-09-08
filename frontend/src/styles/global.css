@@ -1017,11 +1017,11 @@ a {
   display: grid;
   min-width: 0;
   grid-template-columns:
-    minmax(220px, 1.35fr)
-    minmax(92px, 0.48fr)
-    minmax(180px, 0.92fr)
-    minmax(150px, 0.7fr);
-  gap: 14px;
+    minmax(190px, 1.35fr)
+    minmax(78px, 0.48fr)
+    minmax(138px, 0.92fr)
+    minmax(120px, 0.7fr);
+  gap: 10px;
   align-items: center;
   border-top: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
   padding: 12px 0;
@@ -1077,8 +1077,8 @@ a {
 .student-progress-cell {
   display: grid;
   min-width: 0;
-  grid-template-columns: minmax(84px, 1fr) max-content;
-  gap: 9px;
+  grid-template-columns: minmax(56px, 1fr) max-content;
+  gap: 8px;
   align-items: center;
 }
 

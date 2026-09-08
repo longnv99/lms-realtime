@@ -94,6 +94,13 @@ npm.cmd run test:e2e --workspace=backend
 npm.cmd run build:backend
 npm.cmd run build:frontend
 npm.cmd run test:frontend
+npm.cmd run test:e2e:ui
+```
+
+Install Playwright browsers once on a new machine:
+
+```bash
+npx playwright install chromium
 ```
 
 ## Local API Smoke
@@ -191,6 +198,12 @@ npm.cmd run dev:frontend
 10. As instructor, use quiz controls to open a question, close it, reveal it, and finish the quiz run.
 11. As student, answer a quiz question and confirm the leaderboard updates.
 12. Confirm the notification button shows unread count and the drawer can mark a notification read.
+
+Run the Playwright UI audit after the backend and frontend are available:
+
+```bash
+npm.cmd run test:e2e:ui
+```
 
 ## Structure
 

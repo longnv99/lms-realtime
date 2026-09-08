@@ -440,7 +440,7 @@ git push
 - Produces: frontend auth refresh/retry for expired access tokens.
 - Produces: stable local API responses without conditional `304` JSON responses.
 
-- [ ] **Step 5.1: Audit desktop and mobile layout**
+- [x] **Step 5.1: Audit desktop and mobile layout**
 
 Use local browser or screenshots at:
 - `1440x900`
@@ -453,6 +453,8 @@ Check:
 - video panel keeps 16:9 aspect ratio.
 - progress labels fit content.
 - buttons are readable and do not wrap.
+
+Verified with `npm.cmd run test:e2e:ui` across course catalog, instructor course detail, student course detail, and student live room at `1440x900`, `1024x768`, and `390x844`.
 
 - [x] **Step 5.2: Polish CSS only where needed**
 
@@ -475,11 +477,12 @@ npm.cmd run test:frontend
 npm.cmd run build:frontend
 npm.cmd run test:e2e --workspace=backend
 npm.cmd run build:backend
+npm.cmd run test:e2e:ui
 ```
 
-Expected: frontend tests/build, backend e2e, and backend build pass.
+Expected: frontend tests/build, backend e2e, backend build, and Playwright UI audit pass.
 
-- [ ] **Step 5.5: Mark plan complete**
+- [x] **Step 5.5: Mark plan complete**
 
 Check off every completed task and acceptance item in this plan.
 
@@ -507,7 +510,7 @@ git push
 - [x] Instructor progress refreshes after realtime `progress:updated`.
 - [x] All new visible UI copy is English.
 - [x] shadcn dark theme remains the only product UI theme.
-- [ ] Desktop and mobile layouts have no incoherent overlap or desktop table scroll.
+- [x] Desktop and mobile layouts have no incoherent overlap or desktop table scroll.
 - [x] Expired frontend access tokens refresh once, store rotated tokens, and retry the original request.
 - [x] Refresh failure clears local auth state.
 - [x] API JSON responses avoid ETag-driven `304` responses during local manual testing.
