@@ -26,6 +26,10 @@
     "test:backend": "npm run test --workspace=backend",
     "test:frontend": "npm run test --workspace=frontend",
     "test": "npm run test:backend && npm run test:frontend",
+    "typecheck:shared": "npm run typecheck --workspace=shared",
+    "typecheck:backend": "npm run typecheck --workspace=backend",
+    "typecheck:frontend": "npm run typecheck --workspace=frontend",
+    "typecheck": "npm run typecheck:shared && npm run typecheck:backend && npm run typecheck:frontend",
     "lint": "npm run lint --workspaces --if-present"
   },
   "devDependencies": {
