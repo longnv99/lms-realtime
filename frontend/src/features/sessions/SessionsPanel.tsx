@@ -188,7 +188,7 @@ function SessionRow({
           <Link
             aria-label={`Enter live room ${session.title}`}
             className="button button-primary"
-            to={`/sessions/${session.id}/live`}
+            to={`/courses/${session.courseId}/sessions/${session.id}/live`}
           >
             <Play size={16} aria-hidden="true" />
             Enter live

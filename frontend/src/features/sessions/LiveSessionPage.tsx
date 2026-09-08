@@ -4,6 +4,7 @@ import { ArrowLeft, Radio, Users } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import type { Socket } from 'socket.io-client';
 import type { ChatMessagePayload, SessionStatePayload } from '@lms/shared';
+import { listLessons } from '../../api/lessons';
 import { getSessionState } from '../../api/sessions';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadingBlock } from '../../components/LoadingBlock';
@@ -13,9 +14,10 @@ import { createNamespaceSocket, useSocketStatus } from '../../lib/realtime';
 import { useAuthStore } from '../auth/auth.store';
 import { QuizPanel } from '../quizzes/QuizPanel';
 import { ChatPanel } from './ChatPanel';
+import { LessonPlaybackPanel } from './LessonPlaybackPanel';
 
 export function LiveSessionPage() {
-  const { sessionId } = useParams<{ sessionId: string }>();
+  const { courseId, sessionId } = useParams<{ courseId?: string; sessionId: string }>();
   const accessToken = useAuthStore((state) => state.accessToken);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [messages, setMessages] = useState<ChatMessagePayload[]>([]);
@@ -26,6 +28,11 @@ export function LiveSessionPage() {
     enabled: Boolean(sessionId),
     queryKey: ['session-state', sessionId],
     queryFn: () => getSessionState(sessionId ?? ''),
+  });
+  const lessonsQuery = useQuery({
+    enabled: Boolean(courseId),
+    queryKey: ['lessons', courseId],
+    queryFn: () => listLessons(courseId ?? ''),
   });
 
   useEffect(() => {
@@ -96,9 +103,9 @@ export function LiveSessionPage() {
 
   return (
     <div className="page live-page">
-      <Link className="button button-ghost detail-back" to="/courses">
+      <Link className="button button-ghost detail-back" to={courseId ? `/courses/${courseId}` : '/courses'}>
         <ArrowLeft size={18} aria-hidden="true" />
-        Courses
+        {courseId ? 'Course detail' : 'Courses'}
       </Link>
       <section className="live-room-banner" aria-label="Live session status">
         <div className="live-room-copy">
@@ -128,7 +135,17 @@ export function LiveSessionPage() {
             </div>
           </div>
           <div className="panel-body live-stage-body">
-            <EmptyState description="No stream attached" title="Ready" />
+            {courseId ? (
+              <LessonPlaybackPanel
+                lessons={lessonsQuery.data ?? []}
+                lessonsError={lessonsQuery.error}
+                lessonsLoading={lessonsQuery.isLoading}
+                socket={socket}
+                socketStatus={socketStatus}
+              />
+            ) : (
+              <EmptyState description="Open this live room from a course to load lesson media." title="Ready" />
+            )}
           </div>
         </section>
         <div className="live-side">

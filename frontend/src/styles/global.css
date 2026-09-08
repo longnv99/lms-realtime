@@ -1176,6 +1176,59 @@ a {
     color-mix(in srgb, var(--surface-strong) 72%, var(--surface));
 }
 
+.playback-shell {
+  display: grid;
+  width: 100%;
+  align-self: stretch;
+  gap: 14px;
+}
+
+.playback-toolbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.playback-select {
+  width: min(100%, 440px);
+}
+
+.video-frame {
+  display: grid;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 300px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--line) 86%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-inset) 80%, var(--bg));
+}
+
+.lesson-video-player {
+  width: 100%;
+  height: 100%;
+  background: var(--surface-inset);
+  object-fit: contain;
+}
+
+.playback-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.playback-meta span {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+}
+
 .chat-panel {
   display: grid;
   min-height: 438px;
@@ -1945,6 +1998,12 @@ a {
 
   .live-stage-body {
     min-height: 320px;
+  }
+
+  .playback-toolbar,
+  .playback-meta {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .course-row-head {

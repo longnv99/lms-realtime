@@ -255,6 +255,9 @@ git push
 - Create: `frontend/src/features/sessions/LessonPlaybackPanel.tsx`
 - Modify: `frontend/src/features/sessions/LiveSessionPage.tsx`
 - Modify: `frontend/src/features/sessions/LiveSessionPage.test.tsx`
+- Modify: `frontend/src/features/sessions/SessionsPanel.tsx`
+- Modify: `frontend/src/app/routes.tsx`
+- Modify: `frontend/src/styles/global.css`
 
 **Interfaces:**
 - Consumes: `listLessons(courseId)` after resolving the active session's course context.
@@ -262,7 +265,7 @@ git push
 - Consumes: `emitProgressHeartbeat(socket, { lessonId, positionSeconds })`.
 - Produces: a lesson playback stage that replaces the current `No stream attached` empty state.
 
-- [ ] **Step 3.1: Write playback tests**
+- [x] **Step 3.1: Write playback tests**
 
 Verify:
 - Live room renders a lesson selector when lessons exist.
@@ -271,7 +274,7 @@ Verify:
 - Video `timeupdate` emits `progress:heartbeat` with current lesson id and floored seconds.
 - Heartbeats are throttled to at most once every 10 seconds per lesson.
 
-- [ ] **Step 3.2: Run tests to verify failure**
+- [x] **Step 3.2: Run tests to verify failure**
 
 Run:
 
@@ -281,11 +284,11 @@ npm.cmd run test --workspace=frontend -- LiveSessionPage.test.tsx
 
 Expected: fail because playback panel and heartbeat wiring do not exist.
 
-- [ ] **Step 3.3: Add course context to live room**
+- [x] **Step 3.3: Add course context to live room**
 
 Use session state data or add a lightweight API call if needed. The implementation must know `courseId` before calling `listLessons(courseId)`.
 
-- [ ] **Step 3.4: Implement `LessonPlaybackPanel`**
+- [x] **Step 3.4: Implement `LessonPlaybackPanel`**
 
 Use a shadcn panel layout with:
 - lesson select at top.
@@ -294,14 +297,14 @@ Use a shadcn panel layout with:
 - inline error banner.
 - compact progress metadata below the player.
 
-- [ ] **Step 3.5: Emit throttled heartbeats**
+- [x] **Step 3.5: Emit throttled heartbeats**
 
 On video `timeupdate`, emit only when:
 - socket exists and is connected.
 - selected lesson id exists.
 - `Math.floor(video.currentTime)` is at least 10 seconds beyond the last emitted position, or the lesson reaches duration.
 
-- [ ] **Step 3.6: Verify Task 3**
+- [x] **Step 3.6: Verify Task 3**
 
 Run:
 
@@ -312,12 +315,12 @@ npm.cmd run build:frontend
 
 Expected: tests and frontend build pass.
 
-- [ ] **Step 3.7: Commit Task 3**
+- [x] **Step 3.7: Commit Task 3**
 
 Run:
 
 ```bash
-git add frontend/src/features/sessions/LessonPlaybackPanel.tsx frontend/src/features/sessions/LiveSessionPage.tsx frontend/src/features/sessions/LiveSessionPage.test.tsx
+git add frontend/src/features/sessions/LessonPlaybackPanel.tsx frontend/src/features/sessions/LiveSessionPage.tsx frontend/src/features/sessions/LiveSessionPage.test.tsx frontend/src/features/sessions/SessionsPanel.tsx frontend/src/app/routes.tsx frontend/src/styles/global.css
 git commit -m "feat(frontend): add lesson playback heartbeat"
 git push
 ```
@@ -481,8 +484,8 @@ git push
 - [x] Instructor/admin can create lesson video uploads from the lesson list.
 - [x] Upload UI accepts only `video/mp4` and `video/webm`.
 - [x] Upload UI attaches completed media asset to the lesson.
-- [ ] Student can select a lesson and play private media through a backend playback URL.
-- [ ] Student playback emits throttled `progress:heartbeat` events.
+- [x] Student can select a lesson and play private media through a backend playback URL.
+- [x] Student playback emits throttled `progress:heartbeat` events.
 - [ ] Student course detail shows course percent and per-lesson progress.
 - [ ] Instructor course detail shows per-student progress.
 - [ ] Instructor progress refreshes after realtime `progress:updated`.
