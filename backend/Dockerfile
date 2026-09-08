@@ -12,7 +12,7 @@ FROM deps AS build
 WORKDIR /app
 COPY . .
 RUN npm run build:shared
-RUN npm run db:generate --workspace=backend
+RUN DATABASE_URL="postgresql://lms:lms@localhost:5432/lms?schema=public" npm run db:generate --workspace=backend
 RUN npm run build --workspace=backend
 RUN npm prune --omit=dev
 
