@@ -52,6 +52,8 @@ model Lesson {
   mediaAsset     MediaAsset?      @relation(fields: [mediaAssetId], references: [id])
   quizzes        Quiz[]
   lessonProgress LessonProgress[]
+  transcriptCues LessonTranscriptCue[]
+  notes          LessonNote[]
 
   @@unique([courseId, order])
   @@index([courseId])

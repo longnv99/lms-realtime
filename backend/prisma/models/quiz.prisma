@@ -26,6 +26,7 @@ model Question {
   text            String
   options         Json
   correctOptionId String
+  explanation     String?
   order           Int
 
   quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)

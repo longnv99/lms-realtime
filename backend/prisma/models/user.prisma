@@ -17,6 +17,7 @@ model User {
   courses         Course[]         @relation("CourseInstructor")
   enrollments     Enrollment[]
   lessonProgress  LessonProgress[]
+  lessonNotes     LessonNote[]
   chatMessages    ChatMessage[]
   quizAnswers     QuizAnswer[]
   notifications   Notification[]
