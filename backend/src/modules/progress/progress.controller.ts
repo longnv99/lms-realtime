@@ -1,5 +1,6 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import type { UpdateLessonProgressInput } from '@lms/shared';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -17,6 +18,16 @@ export class ProgressController {
   @Get('me/courses/:courseId/progress')
   getMine(@Param('courseId') courseId: string, @CurrentUser() user: AuthenticatedUser) {
     return this.progressService.getMine(courseId, user);
+  }
+
+  @Patch('me/lessons/:lessonId/progress')
+  @ApiOperation({ summary: 'Update my lesson progress' })
+  updateMyLessonProgress(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('lessonId') lessonId: string,
+    @Body() input: UpdateLessonProgressInput,
+  ) {
+    return this.progressService.updateLessonProgress(user, lessonId, input);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
