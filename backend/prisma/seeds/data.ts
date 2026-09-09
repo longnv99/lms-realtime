@@ -164,6 +164,8 @@ export const seedQuestions = [
       { id: 'b', text: 'Redis' },
     ] as Prisma.InputJsonValue,
     correctOptionId: 'a',
+    explanation:
+      'PostgreSQL stores relational LMS records such as users, courses, lessons, quizzes, and answers.',
     order: 1,
   },
   {
@@ -173,6 +175,8 @@ export const seedQuestions = [
       { id: 'b', text: 'SMTP' },
     ] as Prisma.InputJsonValue,
     correctOptionId: 'a',
+    explanation:
+      'Socket.IO powers bidirectional realtime classroom events between the server and connected clients.',
     order: 2,
   },
   {
@@ -182,6 +186,8 @@ export const seedQuestions = [
       { id: 'b', text: 'MinIO' },
     ] as Prisma.InputJsonValue,
     correctOptionId: 'a',
+    explanation:
+      'Redis backs BullMQ queues and also supports fast realtime counters and leaderboard state.',
     order: 3,
   },
   {
@@ -191,6 +197,8 @@ export const seedQuestions = [
       { id: 'b', text: 'course:' },
     ] as Prisma.InputJsonValue,
     correctOptionId: 'a',
+    explanation:
+      'The quiz-run: prefix scopes realtime rooms and cache keys to one active quiz run.',
     order: 4,
   },
   {
@@ -200,6 +208,8 @@ export const seedQuestions = [
       { id: 'b', text: 'Yes' },
     ] as Prisma.InputJsonValue,
     correctOptionId: 'a',
+    explanation:
+      'Live question events hide correctOptionId so learners cannot see the answer before reveal or review.',
     order: 5,
   },
 ];
