@@ -20,10 +20,16 @@ describe('Quiz review (e2e)', () => {
     await prisma.$disconnect();
   });
 
-  it('returns a completed learner quiz review with answer feedback', async () => {
-    const { courseId, studentToken } = await createFinishedQuizReviewFixture();
+  it('returns a revealed and completed learner quiz review with a stable finish time', async () => {
+    const { courseId, instructorToken, runId, studentToken } =
+      await createRevealedQuizReviewFixture();
 
     await request(app.getHttpServer())
+      .post(`/api/quiz-runs/${runId}/finish`)
+      .set('Authorization', `Bearer ${instructorToken}`)
+      .expect(201);
+
+    const firstReview = await request(app.getHttpServer())
       .get(`/api/me/courses/${courseId}/quiz-reviews`)
       .set('Authorization', `Bearer ${studentToken}`)
       .expect(200)
@@ -36,15 +42,65 @@ describe('Quiz review (e2e)', () => {
           totalScore: expect.any(Number),
           questionCount: expect.any(Number),
           correctCount: expect.any(Number),
+          finishedAt: expect.any(String),
         });
         expect(body.data.reviews[0].questions[0]).toMatchObject({
           correctOptionId: expect.any(String),
           explanation: expect.any(String),
         });
       });
+
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    await request(app.getHttpServer())
+      .post(`/api/quiz-runs/${runId}/finish`)
+      .set('Authorization', `Bearer ${instructorToken}`)
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .get(`/api/me/courses/${courseId}/quiz-reviews`)
+      .set('Authorization', `Bearer ${studentToken}`)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.data.reviews[0].finishedAt).toBe(firstReview.body.data.reviews[0].finishedAt);
+      });
   });
 
-  async function createFinishedQuizReviewFixture() {
+  it('does not expose answer feedback for finished runs that were never revealed', async () => {
+    const { courseId, studentToken } = await createUnrevealedFinishedQuizReviewFixture();
+
+    await request(app.getHttpServer())
+      .get(`/api/me/courses/${courseId}/quiz-reviews`)
+      .set('Authorization', `Bearer ${studentToken}`)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.data.courseId).toBe(courseId);
+        expect(body.data.reviews).toEqual([]);
+      });
+  });
+
+  async function createRevealedQuizReviewFixture() {
+    const fixture = await createQuizReviewFixture();
+
+    await request(app.getHttpServer())
+      .post(`/api/quiz-runs/${fixture.runId}/reveal`)
+      .set('Authorization', `Bearer ${fixture.instructorToken}`)
+      .expect(201);
+
+    return fixture;
+  }
+
+  async function createUnrevealedFinishedQuizReviewFixture() {
+    const fixture = await createQuizReviewFixture();
+
+    await prisma.quizRun.update({
+      where: { id: fixture.runId },
+      data: { status: 'FINISHED' },
+    });
+
+    return fixture;
+  }
+
+  async function createQuizReviewFixture() {
     const instructor = await registerAndLogin(app, 'INSTRUCTOR');
     const student = await registerAndLogin(app, 'STUDENT');
     const course = await prisma.course.create({
@@ -95,7 +151,9 @@ describe('Quiz review (e2e)', () => {
       data: {
         quizId: quiz.id,
         sessionId: session.id,
-        status: 'FINISHED',
+        currentQuestionIndex: 1,
+        status: 'CLOSED',
+        questionOpenedAt: new Date(Date.now() - 10_000),
       },
     });
 
@@ -116,6 +174,11 @@ describe('Quiz review (e2e)', () => {
       },
     });
 
-    return { courseId: course.id, studentToken: student.accessToken };
+    return {
+      courseId: course.id,
+      instructorToken: instructor.accessToken,
+      runId: run.id,
+      studentToken: student.accessToken,
+    };
   }
 });

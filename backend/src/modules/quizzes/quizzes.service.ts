@@ -217,6 +217,8 @@ export class QuizzesService {
     const runs = await this.prisma.quizRun.findMany({
       where: {
         status: 'FINISHED',
+        revealedAt: { not: null },
+        finishedAt: { not: null },
         quiz: { lesson: { courseId } },
         answers: { some: { userId: user.id } },
       },
@@ -229,7 +231,7 @@ export class QuizzesService {
         },
         answers: { where: { userId: user.id } },
       },
-      orderBy: [{ updatedAt: 'desc' }, { id: 'asc' }],
+      orderBy: [{ finishedAt: 'desc' }, { id: 'asc' }],
     });
 
     return {
@@ -311,7 +313,10 @@ export class QuizzesService {
     });
     const updated = await this.prisma.quizRun.update({
       where: { id },
-      data: { status: 'REVEALED' },
+      data: {
+        status: 'REVEALED',
+        revealedAt: run.revealedAt ?? new Date(),
+      },
     });
 
     this.realtime.emitReveal(id, {
@@ -332,9 +337,24 @@ export class QuizzesService {
     const run = await this.findRunWithQuizSessionOrThrow(id);
     this.coursesService.ensureCanManage(run.session.course, actor);
 
+    if (run.status === 'FINISHED') {
+      return this.prisma.quizRun.findUniqueOrThrow({ where: { id } });
+    }
+
+    if (run.status !== 'REVEALED') {
+      throw new AppError(
+        'CONFLICT',
+        'Chi ket thuc quiz run sau khi reveal dap an',
+        HttpStatus.CONFLICT,
+      );
+    }
+
     const updated = await this.prisma.quizRun.update({
       where: { id },
-      data: { status: 'FINISHED' },
+      data: {
+        status: 'FINISHED',
+        finishedAt: run.finishedAt ?? new Date(),
+      },
     });
     const countKeys = await this.redis.getClient().keys(`quiz-run:${id}:q:*:count`);
     await this.redis.getClient().del(`quiz-run:${id}:leaderboard`, ...countKeys);
@@ -472,7 +492,7 @@ export class QuizzesService {
       lessonTitle: run.quiz.lesson.title,
       status: run.status as QuizRunStatus,
       startedAt: run.createdAt.toISOString(),
-      finishedAt: run.status === 'FINISHED' ? run.updatedAt.toISOString() : null,
+      finishedAt: run.finishedAt?.toISOString() ?? null,
       totalScore: run.answers.reduce((sum, answer) => sum + answer.score, 0),
       questionCount: questions.length,
       correctCount: run.answers.filter((answer) => answer.isCorrect).length,

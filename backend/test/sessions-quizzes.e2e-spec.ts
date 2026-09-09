@@ -316,7 +316,20 @@ describe('Sessions and quizzes (e2e)', () => {
       .post(`/api/quiz-runs/${fixture.run.id}/finish`)
       .set('Authorization', `Bearer ${fixture.instructor.accessToken}`)
       .expect(201);
-    expect(finishRes.body.data).toMatchObject({ status: 'FINISHED' });
+    expect(finishRes.body.data).toMatchObject({
+      status: 'FINISHED',
+      revealedAt: expect.any(String),
+      finishedAt: expect.any(String),
+    });
+  });
+
+  it('rejects finishing a quiz run before answers are revealed', async () => {
+    const fixture = await createSessionQuizFixture();
+
+    await request(app.getHttpServer())
+      .post(`/api/quiz-runs/${fixture.run.id}/finish`)
+      .set('Authorization', `Bearer ${fixture.instructor.accessToken}`)
+      .expect(409);
   });
 
   async function createCourse(accessToken: string) {
