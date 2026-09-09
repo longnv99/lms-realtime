@@ -100,6 +100,54 @@ export const seedTranscriptCues = [
       },
     ],
   },
+  {
+    lessonOrder: 2,
+    cues: [
+      { startSeconds: 0, endSeconds: 30, text: 'Welcome to realtime room basics.' },
+      {
+        startSeconds: 30,
+        endSeconds: 90,
+        text: 'Learners join a live session and receive instructor updates in realtime.',
+      },
+      {
+        startSeconds: 90,
+        endSeconds: 150,
+        text: 'Presence, chat, and session status updates keep everyone aligned during class.',
+      },
+    ],
+  },
+  {
+    lessonOrder: 3,
+    cues: [
+      { startSeconds: 0, endSeconds: 25, text: 'Welcome to quiz orchestration.' },
+      {
+        startSeconds: 25,
+        endSeconds: 85,
+        text: 'Instructors open questions, collect answers, and reveal results during live sessions.',
+      },
+      {
+        startSeconds: 85,
+        endSeconds: 145,
+        text: 'Learners can review their answers after the quiz run has finished.',
+      },
+    ],
+  },
+  {
+    lessonOrder: 4,
+    cues: [
+      { startSeconds: 0, endSeconds: 30, text: 'Welcome to the progress heartbeat flow.' },
+      {
+        startSeconds: 30,
+        endSeconds: 95,
+        text: 'Playback heartbeats save each learner position without interrupting the lesson.',
+      },
+      {
+        startSeconds: 95,
+        endSeconds: 160,
+        text: 'Instructor dashboards use progress signals to understand course engagement.',
+      },
+    ],
+  },
 ];
 
 export const seedSession = {
