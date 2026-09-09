@@ -5,6 +5,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { CoursesModule } from './modules/courses/courses.module';
 import { EnrollmentsModule } from './modules/enrollments/enrollments.module';
 import { LessonsModule } from './modules/lessons/lessons.module';
+import { LearningModule } from './modules/learning/learning.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { ProgressModule } from './modules/progress/progress.module';
 import { QuizzesModule } from './modules/quizzes/quizzes.module';
@@ -29,6 +30,7 @@ import { MediaModule } from './media/media.module';
     CoursesModule,
     EnrollmentsModule,
     LessonsModule,
+    LearningModule,
     SessionsModule,
     QuizzesModule,
     NotificationsModule,
