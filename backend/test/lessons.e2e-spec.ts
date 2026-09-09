@@ -51,10 +51,7 @@ describe('Lessons (e2e)', () => {
       .expect(200);
 
     expect(res.body.success).toBe(true);
-    expect(res.body.data.map((lesson: { id: string }) => lesson.id)).toEqual([
-      first.id,
-      second.id,
-    ]);
+    expect(res.body.data.map((lesson: { id: string }) => lesson.id)).toEqual([first.id, second.id]);
   });
 
   it('reorders lessons atomically', async () => {
@@ -74,10 +71,7 @@ describe('Lessons (e2e)', () => {
       })
       .expect(200);
 
-    expect(res.body.data.map((lesson: { id: string }) => lesson.id)).toEqual([
-      second.id,
-      first.id,
-    ]);
+    expect(res.body.data.map((lesson: { id: string }) => lesson.id)).toEqual([second.id, first.id]);
     expect(res.body.data.map((lesson: { order: number }) => lesson.order)).toEqual([1, 2]);
   });
 

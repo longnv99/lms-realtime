@@ -1,10 +1,5 @@
 import type { NotificationResponse } from '@lms/shared';
-import {
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '../../components/ui/sheet';
+import { SheetContent, SheetDescription, SheetHeader, SheetTitle } from '../../components/ui/sheet';
 
 type NotificationsDrawerProps = {
   isLoading: boolean;

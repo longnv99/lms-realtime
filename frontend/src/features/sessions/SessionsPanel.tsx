@@ -3,12 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CalendarClock, Play, Plus, Square } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { SessionResponse, SessionStatus } from '@lms/shared';
-import {
-  createSession,
-  endSession,
-  listSessions,
-  startSession,
-} from '../../api/sessions';
+import { createSession, endSession, listSessions, startSession } from '../../api/sessions';
 import { Button } from '../../components/Button';
 import { EmptyState } from '../../components/EmptyState';
 import { Field } from '../../components/Field';

@@ -20,7 +20,10 @@ const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
         role="progressbar"
         {...props}
       >
-        <div className="progress-indicator" style={{ transform: `translateX(-${100 - normalizedValue}%)` }} />
+        <div
+          className="progress-indicator"
+          style={{ transform: `translateX(-${100 - normalizedValue}%)` }}
+        />
       </div>
     );
   },

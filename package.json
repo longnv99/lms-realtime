@@ -20,16 +20,23 @@
     "build": "npm run build:backend && npm run build:frontend",
     "db:seed": "npm run db:seed --workspace=backend",
     "db:seed:reset": "npm run db:seed:reset --workspace=backend",
+    "db:seed:prod": "cross-env DATABASE_URL=postgresql://lms:lms_prod_password@localhost:15432/lms?schema=public JWT_ACCESS_SECRET=replace_with_at_least_16_chars_access_secret JWT_REFRESH_SECRET=replace_with_at_least_16_chars_refresh_secret npm run db:generate --workspace=backend && cross-env DATABASE_URL=postgresql://lms:lms_prod_password@localhost:15432/lms?schema=public JWT_ACCESS_SECRET=replace_with_at_least_16_chars_access_secret JWT_REFRESH_SECRET=replace_with_at_least_16_chars_refresh_secret npm run db:seed",
     "test:e2e:ui": "playwright test",
     "test:e2e:ui:headed": "playwright test --headed",
     "test:e2e:ui:report": "playwright show-report",
+    "test:e2e:prod": "cross-env E2E_SKIP_WEBSERVER=1 E2E_BASE_URL=http://localhost:8080 E2E_API_URL=http://localhost:8080/api E2E_BACKEND_HEALTH_URL=http://localhost:8080/api/health playwright test tests/e2e/p5-production-stack.spec.ts",
     "test:backend": "npm run test --workspace=backend",
     "test:frontend": "npm run test --workspace=frontend",
     "test": "npm run test:backend && npm run test:frontend",
+    "typecheck:shared": "npm run typecheck --workspace=shared",
+    "typecheck:backend": "npm run build:shared && cross-env DATABASE_URL=postgresql://lms:lms@localhost:5432/lms?schema=public npm run db:generate --workspace=backend && npm run typecheck --workspace=backend",
+    "typecheck:frontend": "npm run build:shared && npm run typecheck --workspace=frontend",
+    "typecheck": "npm run typecheck:shared && npm run typecheck:backend && npm run typecheck:frontend",
     "lint": "npm run lint --workspaces --if-present"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
+    "cross-env": "^7.0.3",
     "npm-run-all": "^4.1.5"
   },
   "engines": {

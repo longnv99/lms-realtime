@@ -3,9 +3,11 @@ import { cn } from '@/lib/utils';
 
 export type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 
-const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, ...props }, ref) => (
-  <textarea className={cn('chat-input', className)} ref={ref} {...props} />
-));
+const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
+  ({ className, ...props }, ref) => (
+    <textarea className={cn('chat-input', className)} ref={ref} {...props} />
+  ),
+);
 Textarea.displayName = 'Textarea';
 
 export { Textarea };

@@ -26,8 +26,7 @@ export function CourseDetailPage() {
     queryFn: () => getCourse(courseId ?? ''),
   });
   const course = courseQuery.data ?? null;
-  const canManage =
-    Boolean(course && (user?.role === 'ADMIN' || course.instructorId === user?.id));
+  const canManage = Boolean(course && (user?.role === 'ADMIN' || course.instructorId === user?.id));
   const sessionsQuery = useQuery({
     enabled: Boolean(courseId && canManage && accessToken),
     queryKey: ['sessions', courseId],

@@ -1,4 +1,9 @@
-import { AxiosError, type AxiosAdapter, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
+import {
+  AxiosError,
+  type AxiosAdapter,
+  type AxiosResponse,
+  type InternalAxiosRequestConfig,
+} from 'axios';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { AuthTokensResponse } from '@lms/shared';
 import {
@@ -146,7 +151,10 @@ describe('unwrapEnvelope', () => {
       currentAccessToken = tokens.accessToken;
     });
     const refreshFailure = vi.fn();
-    const refreshedTokens = authTokens({ accessToken: 'fresh-access', refreshToken: 'fresh-refresh' });
+    const refreshedTokens = authTokens({
+      accessToken: 'fresh-access',
+      refreshToken: 'fresh-refresh',
+    });
     const adapter = vi.fn(async (config: InternalAxiosRequestConfig) => {
       if (config.url === '/auth/refresh') {
         return jsonResponse(config, 201, {
@@ -260,7 +268,8 @@ function unauthorizedError(config: InternalAxiosRequestConfig): AxiosError {
 
 function getAuthorizationHeader(config: InternalAxiosRequestConfig): string | undefined {
   const headers = config.headers;
-  const value = typeof headers.get === 'function' ? headers.get('Authorization') : headers.Authorization;
+  const value =
+    typeof headers.get === 'function' ? headers.get('Authorization') : headers.Authorization;
   return typeof value === 'string' ? value : undefined;
 }
 

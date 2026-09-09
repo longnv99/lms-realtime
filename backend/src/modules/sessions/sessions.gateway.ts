@@ -111,7 +111,11 @@ export class SessionsGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     @MessageBody() dto: ProgressHeartbeatDto,
   ): Promise<void> {
     const user = client.data.user as AuthenticatedUser;
-    const { lesson, session } = await this.findJoinedLiveSessionForLesson(client, user, dto.lessonId);
+    const { lesson, session } = await this.findJoinedLiveSessionForLesson(
+      client,
+      user,
+      dto.lessonId,
+    );
     const key = this.progressKey(user.id, dto.lessonId);
     const redisClient = this.redis.getClient();
     const existingProgress = await redisClient.hgetall(key);
@@ -215,7 +219,11 @@ export class SessionsGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     });
 
     if (!enrollment) {
-      throw new AppError('AUTH_FORBIDDEN', 'You are not enrolled in this course', HttpStatus.FORBIDDEN);
+      throw new AppError(
+        'AUTH_FORBIDDEN',
+        'You are not enrolled in this course',
+        HttpStatus.FORBIDDEN,
+      );
     }
 
     return { lesson, session };
@@ -227,7 +235,11 @@ export class SessionsGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     positionSeconds: number,
     completionEmittedAt?: string,
   ): Promise<void> {
-    if (lesson.durationSeconds <= 0 || positionSeconds < lesson.durationSeconds || completionEmittedAt) {
+    if (
+      lesson.durationSeconds <= 0 ||
+      positionSeconds < lesson.durationSeconds ||
+      completionEmittedAt
+    ) {
       return;
     }
 
@@ -253,7 +265,8 @@ export class SessionsGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     ]);
     const completedLessonIds = new Set(completedRows.map((progress) => progress.lessonId));
     completedLessonIds.add(lesson.id);
-    const percent = totalLessons === 0 ? 0 : Math.round((completedLessonIds.size / totalLessons) * 100);
+    const percent =
+      totalLessons === 0 ? 0 : Math.round((completedLessonIds.size / totalLessons) * 100);
 
     await this.redis.getClient().hset(this.progressKey(user.id, lesson.id), {
       completionEmittedAt: new Date().toISOString(),

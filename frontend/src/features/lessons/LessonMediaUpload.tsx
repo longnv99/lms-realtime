@@ -29,7 +29,8 @@ export function LessonMediaUpload({ courseId, lesson }: LessonMediaUploadProps) 
     },
   });
   const inputId = `lesson-video-upload-${lesson.id}`;
-  const error = validationError ?? (uploadMutation.error ? getErrorMessage(uploadMutation.error) : null);
+  const error =
+    validationError ?? (uploadMutation.error ? getErrorMessage(uploadMutation.error) : null);
 
   async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];

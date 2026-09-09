@@ -106,12 +106,16 @@ export function QuizPanel({ sessionId }: QuizPanelProps) {
   }, [accessToken, quizRun?.id]);
 
   const status = useMemo<QuizRunStatus>(
-    () => (finishedSummaryUrl ? 'FINISHED' : stateQuery.data?.status ?? quizRun?.status ?? 'PENDING'),
+    () =>
+      finishedSummaryUrl ? 'FINISHED' : (stateQuery.data?.status ?? quizRun?.status ?? 'PENDING'),
     [finishedSummaryUrl, quizRun?.status, stateQuery.data?.status],
   );
   const canManage = user?.role === 'ADMIN' || user?.role === 'INSTRUCTOR';
   const isQuestionLocked =
-    Boolean(selectedOptionId) || status === 'CLOSED' || status === 'REVEALED' || status === 'FINISHED';
+    Boolean(selectedOptionId) ||
+    status === 'CLOSED' ||
+    status === 'REVEALED' ||
+    status === 'FINISHED';
 
   function handleAnswer(optionId: string) {
     if (!socket || !quizRun || !questionState || selectedOptionId) {
@@ -180,9 +184,13 @@ export function QuizPanel({ sessionId }: QuizPanelProps) {
           <h3 className="panel-title" id="quiz-panel-title">
             {quizRun.quiz.title}
           </h3>
-          <p className="panel-subtitle">{socketStatus === 'connected' ? 'Quiz connected' : 'Quiz offline'}</p>
+          <p className="panel-subtitle">
+            {socketStatus === 'connected' ? 'Quiz connected' : 'Quiz offline'}
+          </p>
         </div>
-        <StatusBadge tone={status === 'OPEN' ? 'live' : status === 'FINISHED' ? 'success' : 'muted'}>
+        <StatusBadge
+          tone={status === 'OPEN' ? 'live' : status === 'FINISHED' ? 'success' : 'muted'}
+        >
           {status}
         </StatusBadge>
       </div>

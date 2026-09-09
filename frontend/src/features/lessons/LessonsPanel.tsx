@@ -78,7 +78,12 @@ export function LessonsPanel({ canManage, courseId }: LessonsPanelProps) {
         {sortedLessons.length > 0 && (
           <div className="lesson-list">
             {sortedLessons.map((lesson) => (
-              <LessonRow canManage={canManage} courseId={courseId} key={lesson.id} lesson={lesson} />
+              <LessonRow
+                canManage={canManage}
+                courseId={courseId}
+                key={lesson.id}
+                lesson={lesson}
+              />
             ))}
           </div>
         )}

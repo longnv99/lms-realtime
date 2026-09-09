@@ -47,7 +47,9 @@ describe('Progress realtime (e2e)', () => {
     });
 
     await waitFor(async () => {
-      const progress = await redis.getClient().hgetall(progressKey(fixture.student.userId, fixture.lessons[0].id));
+      const progress = await redis
+        .getClient()
+        .hgetall(progressKey(fixture.student.userId, fixture.lessons[0].id));
       expect(progress).toMatchObject({
         courseId: fixture.course.id,
         sessionId: fixture.session.id,
@@ -68,7 +70,9 @@ describe('Progress realtime (e2e)', () => {
     });
     await waitFor(async () => {
       await expect(
-        redis.getClient().hget(progressKey(fixture.student.userId, fixture.lessons[0].id), 'positionSeconds'),
+        redis
+          .getClient()
+          .hget(progressKey(fixture.student.userId, fixture.lessons[0].id), 'positionSeconds'),
       ).resolves.toBe('90');
     });
 
@@ -79,7 +83,9 @@ describe('Progress realtime (e2e)', () => {
 
     await new Promise((resolve) => setTimeout(resolve, 100));
     await expect(
-      redis.getClient().hget(progressKey(fixture.student.userId, fixture.lessons[0].id), 'positionSeconds'),
+      redis
+        .getClient()
+        .hget(progressKey(fixture.student.userId, fixture.lessons[0].id), 'positionSeconds'),
     ).resolves.toBe('90');
   });
 

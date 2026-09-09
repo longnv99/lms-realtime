@@ -116,9 +116,7 @@ describe('Course detail panels', () => {
 
     renderCourseDetail();
 
-    await userEvent.click(
-      await screen.findByRole('button', { name: /start scheduled workshop/i }),
-    );
+    await userEvent.click(await screen.findByRole('button', { name: /start scheduled workshop/i }));
 
     expect(mockedStartSession).toHaveBeenCalledWith('session-scheduled');
   });
