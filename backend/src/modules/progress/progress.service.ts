@@ -143,7 +143,7 @@ export class ProgressService {
     lessonId: string,
     input: UpdateLessonProgressInput,
   ): Promise<LessonProgressResponse> {
-    const lesson = await this.requireAccessibleLesson(user, lessonId);
+    const lesson = await this.requireEnrolledLesson(user, lessonId);
     const completedAt =
       input.completed === undefined ? undefined : input.completed ? new Date() : null;
     const positionSeconds = Math.min(
@@ -212,12 +212,29 @@ export class ProgressService {
     return lesson;
   }
 
-  private async requireAccessibleLesson(
+  private async requireEnrolledLesson(
     user: AuthenticatedUser,
     lessonId: string,
   ): Promise<LessonForProgress & { courseId: string }> {
     const lesson = await this.findLessonWithCourseOrThrow(lessonId);
-    await this.ensureCanViewOwnCourseProgress(lesson.courseId, user);
+    const enrollment = await this.prisma.enrollment.findUnique({
+      where: {
+        userId_courseId: {
+          userId: user.id,
+          courseId: lesson.courseId,
+        },
+      },
+      select: { id: true },
+    });
+
+    if (!enrollment) {
+      throw new AppError(
+        'AUTH_FORBIDDEN',
+        'You are not enrolled in this course',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     return lesson;
   }
 

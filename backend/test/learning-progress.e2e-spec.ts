@@ -44,6 +44,26 @@ describe('Manual lesson progress (e2e)', () => {
       .expect(403);
   });
 
+  it('rejects progress updates from non-enrolled instructors', async () => {
+    const { instructorToken, lessonId } = await createLearningProgressFixture();
+
+    await request(app.getHttpServer())
+      .patch(`/api/me/lessons/${lessonId}/progress`)
+      .set('Authorization', `Bearer ${instructorToken}`)
+      .send({ completed: true })
+      .expect(403);
+  });
+
+  it('rejects invalid progress payloads before persistence', async () => {
+    const { lessonId, studentToken } = await createLearningProgressFixture();
+
+    await request(app.getHttpServer())
+      .patch(`/api/me/lessons/${lessonId}/progress`)
+      .set('Authorization', `Bearer ${studentToken}`)
+      .send({ completed: 'yes', positionSeconds: 'near the end' })
+      .expect(400);
+  });
+
   async function createLearningProgressFixture() {
     const instructor = await registerAndLogin(app, 'INSTRUCTOR');
     const student = await registerAndLogin(app, 'STUDENT');
@@ -96,6 +116,7 @@ describe('Manual lesson progress (e2e)', () => {
     });
 
     return {
+      instructorToken: instructor.accessToken,
       lessonId: lesson.id,
       studentToken: student.accessToken,
       unavailableLessonId: unavailableLesson.id,
