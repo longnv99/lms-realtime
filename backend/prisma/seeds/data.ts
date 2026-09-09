@@ -83,6 +83,25 @@ export const seedLessons = {
   },
 } as const;
 
+export const seedTranscriptCues = [
+  {
+    lessonOrder: 1,
+    cues: [
+      { startSeconds: 0, endSeconds: 20, text: 'Welcome to the realtime LMS foundations course.' },
+      {
+        startSeconds: 20,
+        endSeconds: 55,
+        text: 'This lesson introduces the learner, instructor, and admin workflows.',
+      },
+      {
+        startSeconds: 55,
+        endSeconds: 95,
+        text: 'By the end, you will understand how course sessions connect with progress tracking.',
+      },
+    ],
+  },
+];
+
 export const seedSession = {
   title: 'Live intro session',
   startsInHours: 24,
