@@ -38,3 +38,35 @@ export interface QuizWithQuestionsResponse extends QuizResponse {
 export interface QuizRunListItemResponse extends QuizRunResponse {
   quiz: Pick<QuizResponse, 'id' | 'title'>;
 }
+
+export interface QuizReviewQuestionResponse {
+  questionId: string;
+  text: string;
+  options: QuizOption[];
+  correctOptionId: string;
+  selectedOptionId: string | null;
+  isCorrect: boolean | null;
+  score: number;
+  explanation: string | null;
+  order: number;
+}
+
+export interface QuizReviewResponse {
+  quizRunId: string;
+  quizId: string;
+  quizTitle: string;
+  lessonId: string;
+  lessonTitle: string;
+  status: QuizRunStatus;
+  startedAt: string;
+  finishedAt: string | null;
+  totalScore: number;
+  questionCount: number;
+  correctCount: number;
+  questions: QuizReviewQuestionResponse[];
+}
+
+export interface CourseQuizReviewResponse {
+  courseId: string;
+  reviews: QuizReviewResponse[];
+}

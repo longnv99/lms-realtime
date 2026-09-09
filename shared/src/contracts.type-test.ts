@@ -3,8 +3,17 @@ import type {
   AuthTokensResponse,
   CourseResponse,
   LessonResponse,
+  LessonTranscriptResponse,
+  ReplaceLessonTranscriptInput,
+  LessonNoteResponse,
   NotificationPayload,
+  UpdateLessonProgressInput,
+  CreateLessonNoteInput,
+  UpdateLessonNoteInput,
   QuizRunResponse,
+  QuizReviewResponse,
+  QuizReviewQuestionResponse,
+  CourseQuizReviewResponse,
   QuizQuestionPayload,
   SessionResponse,
   SessionStatePayload,
@@ -50,6 +59,57 @@ const lesson: LessonResponse = {
   updatedAt: new Date(0).toISOString(),
 };
 
+const lessonTranscript: LessonTranscriptResponse = {
+  lessonId: lesson.id,
+  cues: [
+    {
+      id: 'cue-1',
+      lessonId: lesson.id,
+      startSeconds: 0,
+      endSeconds: 10,
+      text: 'Welcome to the lesson',
+      order: 1,
+      createdAt: new Date(0).toISOString(),
+      updatedAt: new Date(0).toISOString(),
+    },
+  ],
+};
+
+const replaceLessonTranscript: ReplaceLessonTranscriptInput = {
+  cues: [
+    {
+      startSeconds: 0,
+      endSeconds: 10,
+      text: 'Welcome to the lesson',
+    },
+  ],
+};
+
+const lessonNote: LessonNoteResponse = {
+  id: 'note-1',
+  userId: 'user-1',
+  lessonId: lesson.id,
+  body: 'Review this section',
+  positionSeconds: 42,
+  createdAt: new Date(0).toISOString(),
+  updatedAt: new Date(0).toISOString(),
+};
+
+const createLessonNote: CreateLessonNoteInput = {
+  body: lessonNote.body,
+  positionSeconds: lessonNote.positionSeconds,
+};
+
+const updateLessonNote: UpdateLessonNoteInput = {
+  body: 'Updated note',
+  positionSeconds: null,
+};
+
+const updateLessonProgress: UpdateLessonProgressInput = {
+  positionSeconds: 120,
+  completed: true,
+};
+
 const session: SessionResponse = {
   id: 'session-1',
   courseId: course.id,
@@ -70,6 +130,38 @@ const quizRun: QuizRunResponse = {
   questionOpenedAt: null,
   createdAt: new Date(0).toISOString(),
   updatedAt: new Date(0).toISOString(),
+};
+
+const quizReviewQuestion: QuizReviewQuestionResponse = {
+  questionId: 'question-1',
+  text: 'Which store is relational?',
+  options: [{ id: 'a', text: 'PostgreSQL' }],
+  correctOptionId: 'a',
+  selectedOptionId: 'a',
+  isCorrect: true,
+  score: 1,
+  explanation: 'PostgreSQL is a relational database.',
+  order: 1,
+};
+
+const quizReview: QuizReviewResponse = {
+  quizRunId: quizRun.id,
+  quizId: quizRun.quizId,
+  quizTitle: 'Check your understanding',
+  lessonId: lesson.id,
+  lessonTitle: lesson.title,
+  status: 'FINISHED',
+  startedAt: new Date(0).toISOString(),
+  finishedAt: new Date(0).toISOString(),
+  totalScore: 1,
+  questionCount: 1,
+  correctCount: 1,
+  questions: [quizReviewQuestion],
+};
+
+const courseQuizReview: CourseQuizReviewResponse = {
+  courseId: course.id,
+  reviews: [quizReview],
 };
 
 const envelope: ApiEnvelope<AuthTokensResponse> = {
@@ -114,7 +206,16 @@ const notification: NotificationPayload = {
 };
 
 void lesson;
+void lessonTranscript;
+void replaceLessonTranscript;
+void lessonNote;
+void createLessonNote;
+void updateLessonNote;
+void updateLessonProgress;
 void quizRun;
+void quizReviewQuestion;
+void quizReview;
+void courseQuizReview;
 void envelope;
 void authErrorCode;
 void sessionState;
