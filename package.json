@@ -20,7 +20,7 @@
     "build": "npm run build:backend && npm run build:frontend",
     "db:seed": "npm run db:seed --workspace=backend",
     "db:seed:reset": "npm run db:seed:reset --workspace=backend",
-    "db:seed:prod": "cross-env DATABASE_URL=postgresql://lms:lms_prod_password@localhost:15432/lms?schema=public JWT_ACCESS_SECRET=replace_with_at_least_16_chars_access_secret JWT_REFRESH_SECRET=replace_with_at_least_16_chars_refresh_secret npm run db:seed",
+    "db:seed:prod": "cross-env DATABASE_URL=postgresql://lms:lms_prod_password@localhost:15432/lms?schema=public JWT_ACCESS_SECRET=replace_with_at_least_16_chars_access_secret JWT_REFRESH_SECRET=replace_with_at_least_16_chars_refresh_secret npm run db:generate --workspace=backend && cross-env DATABASE_URL=postgresql://lms:lms_prod_password@localhost:15432/lms?schema=public JWT_ACCESS_SECRET=replace_with_at_least_16_chars_access_secret JWT_REFRESH_SECRET=replace_with_at_least_16_chars_refresh_secret npm run db:seed",
     "test:e2e:ui": "playwright test",
     "test:e2e:ui:headed": "playwright test --headed",
     "test:e2e:ui:report": "playwright show-report",
