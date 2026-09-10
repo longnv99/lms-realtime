@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, BookOpenCheck } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useParams } from 'react-router-dom';
 import { listLessons } from '../../api/lessons';
@@ -10,12 +10,17 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { getErrorMessage } from '../../lib/errors';
 import { LearningLessonNav } from './LearningLessonNav';
+import { LessonNotesPanel } from './LessonNotesPanel';
+import { LessonTranscriptPanel } from './LessonTranscriptPanel';
 import { LearningPlayer } from './LearningPlayer';
+
+type LearningRailTab = 'notes' | 'transcript';
 
 export function LearningPage() {
   const { courseId } = useParams<{ courseId: string }>();
   const queryClient = useQueryClient();
   const playerHeadingRef = useRef<HTMLHeadingElement>(null);
+  const [activeRailTab, setActiveRailTab] = useState<LearningRailTab>('notes');
   const [selectedLessonId, setSelectedLessonId] = useState('');
 
   const lessonsQuery = useQuery({
@@ -52,7 +57,7 @@ export function LearningPage() {
       lessonId,
       positionSeconds,
     }: {
-      completed: boolean;
+      completed?: boolean;
       lessonId: string;
       positionSeconds: number;
     }) => updateLessonProgress(lessonId, { completed, positionSeconds }),
@@ -91,6 +96,17 @@ export function LearningPage() {
       completed: false,
       lessonId: selectedLesson.id,
       positionSeconds: 0,
+    });
+  }
+
+  function handleSeek(seconds: number) {
+    if (!selectedLesson) {
+      return;
+    }
+
+    progressMutation.mutate({
+      lessonId: selectedLesson.id,
+      positionSeconds: Math.min(selectedLesson.durationSeconds, Math.max(0, Math.floor(seconds))),
     });
   }
 
@@ -163,14 +179,47 @@ export function LearningPage() {
         </div>
         <Card className="learning-rail">
           <CardHeader>
-            <CardTitle>Review rail</CardTitle>
+            <CardTitle>Study tools</CardTitle>
           </CardHeader>
-          <CardContent className="learning-rail-placeholder">
-            <BookOpenCheck size={22} aria-hidden="true" />
-            <p>Notes, transcript, and quiz review will appear here.</p>
+          <CardContent className="learning-rail-body">
+            <div aria-label="Study tool tabs" className="learning-tabs" role="tablist">
+              {learningRailTabs.map((tab) => (
+                <button
+                  aria-selected={activeRailTab === tab.id}
+                  className="learning-tab"
+                  key={tab.id}
+                  onClick={() => setActiveRailTab(tab.id)}
+                  role="tab"
+                  type="button"
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            {selectedLesson ? (
+              <div className="learning-tab-panel" role="tabpanel">
+                {activeRailTab === 'notes' ? (
+                  <LessonNotesPanel
+                    currentPositionSeconds={selectedProgress?.positionSeconds ?? 0}
+                    lessonId={selectedLesson.id}
+                  />
+                ) : (
+                  <LessonTranscriptPanel
+                    activeSecond={selectedProgress?.positionSeconds ?? 0}
+                    lessonId={selectedLesson.id}
+                    onSeek={handleSeek}
+                  />
+                )}
+              </div>
+            ) : null}
           </CardContent>
         </Card>
       </section>
     </div>
   );
 }
+
+const learningRailTabs: Array<{ id: LearningRailTab; label: string }> = [
+  { id: 'notes', label: 'Notes' },
+  { id: 'transcript', label: 'Transcript' },
+];
