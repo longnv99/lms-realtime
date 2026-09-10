@@ -14,9 +14,10 @@ import { LessonMediaUpload } from './LessonMediaUpload';
 type LessonsPanelProps = {
   canManage: boolean;
   courseId: string;
+  isEnrolled?: boolean;
 };
 
-export function LessonsPanel({ canManage, courseId }: LessonsPanelProps) {
+export function LessonsPanel({ canManage, courseId, isEnrolled = false }: LessonsPanelProps) {
   const queryClient = useQueryClient();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -61,7 +62,9 @@ export function LessonsPanel({ canManage, courseId }: LessonsPanelProps) {
           <h3 className="panel-title" id="lessons-panel-title">
             Lessons
           </h3>
-          <p className="panel-subtitle">Curriculum order</p>
+          <p className="panel-subtitle">
+            {canManage ? 'Curriculum order' : isEnrolled ? 'Ready to learn' : 'Preview curriculum'}
+          </p>
         </div>
         <StatusBadge>{sortedLessons.length}</StatusBadge>
       </div>
@@ -81,6 +84,7 @@ export function LessonsPanel({ canManage, courseId }: LessonsPanelProps) {
               <LessonRow
                 canManage={canManage}
                 courseId={courseId}
+                isEnrolled={isEnrolled}
                 key={lesson.id}
                 lesson={lesson}
               />
@@ -131,10 +135,12 @@ export function LessonsPanel({ canManage, courseId }: LessonsPanelProps) {
 function LessonRow({
   canManage,
   courseId,
+  isEnrolled,
   lesson,
 }: {
   canManage: boolean;
   courseId: string;
+  isEnrolled: boolean;
   lesson: LessonResponse;
 }) {
   return (
@@ -148,6 +154,11 @@ function LessonRow({
         <StatusBadge tone={lesson.mediaAssetId ? 'success' : 'muted'}>
           {lesson.mediaAssetId ? 'Video attached' : 'No video'}
         </StatusBadge>
+        {!canManage && (
+          <StatusBadge tone={isEnrolled ? 'success' : 'muted'}>
+            {isEnrolled ? 'Enrolled' : 'Preview'}
+          </StatusBadge>
+        )}
         <span className="lesson-duration">
           <Clock size={15} aria-hidden="true" />
           {formatDuration(lesson.durationSeconds)}

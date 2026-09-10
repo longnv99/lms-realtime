@@ -10,6 +10,7 @@ import type {
   SessionResponse,
 } from '@lms/shared';
 import { getCourse } from '../../api/courses';
+import { listMyEnrollments } from '../../api/enrollments';
 import { getCourseProgress, getMyCourseProgress } from '../../api/progress';
 import { listSessions } from '../../api/sessions';
 import { createNamespaceSocket } from '../../lib/realtime';
@@ -17,7 +18,12 @@ import { useAuthStore } from '../auth/auth.store';
 import { CourseDetailPage } from './CourseDetailPage';
 
 vi.mock('../../api/courses', () => ({
+  enrollCourse: vi.fn(),
   getCourse: vi.fn(),
+}));
+
+vi.mock('../../api/enrollments', () => ({
+  listMyEnrollments: vi.fn(),
 }));
 
 vi.mock('../../api/progress', () => ({
@@ -80,6 +86,7 @@ const mockedCreateNamespaceSocket = vi.mocked(createNamespaceSocket);
 const mockedGetCourse = vi.mocked(getCourse);
 const mockedGetCourseProgress = vi.mocked(getCourseProgress);
 const mockedGetMyCourseProgress = vi.mocked(getMyCourseProgress);
+const mockedListMyEnrollments = vi.mocked(listMyEnrollments);
 const mockedListSessions = vi.mocked(listSessions);
 
 describe('CourseDetailPage progress surfaces', () => {
@@ -94,10 +101,12 @@ describe('CourseDetailPage progress surfaces', () => {
     mockedGetCourse.mockReset();
     mockedGetCourseProgress.mockReset();
     mockedGetMyCourseProgress.mockReset();
+    mockedListMyEnrollments.mockReset();
     mockedListSessions.mockReset();
     mockedGetCourse.mockResolvedValue(courseFixture());
     mockedGetMyCourseProgress.mockResolvedValue(studentProgressFixture());
     mockedGetCourseProgress.mockResolvedValue(instructorProgressFixture());
+    mockedListMyEnrollments.mockResolvedValue([enrollmentFixture()]);
     mockedListSessions.mockResolvedValue([]);
     useAuthStore.setState({
       accessToken: 'access-token',
@@ -123,6 +132,19 @@ describe('CourseDetailPage progress surfaces', () => {
     expect(screen.getByText('67% watched')).toBeInTheDocument();
     expect(mockedGetMyCourseProgress).toHaveBeenCalledWith('course-1');
     expect(mockedGetCourseProgress).not.toHaveBeenCalled();
+  });
+
+  it('does not load learner-only panels when a student has not enrolled', async () => {
+    mockedListMyEnrollments.mockResolvedValue([]);
+
+    renderCourseDetail();
+
+    expect(await screen.findByText('Enroll to start learning')).toBeInTheDocument();
+    expect(screen.getAllByText('Preview').length).toBeGreaterThan(0);
+    expect(screen.queryByText('Learning progress')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Sessions panel')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /continue learning/i })).not.toBeInTheDocument();
+    expect(mockedGetMyCourseProgress).not.toHaveBeenCalled();
   });
 
   it('renders instructor per-student progress rows', async () => {
@@ -226,6 +248,18 @@ function courseFixture(overrides: Partial<CourseResponse> = {}): CourseResponse 
     title: 'Realtime LMS Foundations',
     updatedAt: '2026-08-28T00:00:00.000Z',
     ...overrides,
+  };
+}
+
+function enrollmentFixture(overrides: Partial<{ courseId: string }> = {}) {
+  const enrollmentCourse = courseFixture({ id: overrides.courseId ?? 'course-1' });
+
+  return {
+    course: enrollmentCourse,
+    courseId: enrollmentCourse.id,
+    createdAt: '2026-08-28T00:00:00.000Z',
+    id: 'enrollment-1',
+    userId: 'student-1',
   };
 }
 

@@ -691,11 +691,20 @@ a {
   font-size: 13px;
 }
 
-.course-row > .badge {
+.course-row > .badge,
+.course-state-cell > .badge {
   width: fit-content;
   max-width: 100%;
   justify-self: start;
   white-space: nowrap;
+}
+
+.course-state-cell {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .course-slug {
@@ -732,6 +741,10 @@ a {
   gap: 4px;
 }
 
+.course-table-alert {
+  margin: 12px 16px 0;
+}
+
 .course-action {
   position: relative;
   display: inline-grid;
@@ -763,6 +776,10 @@ a {
   opacity: 0.45;
 }
 
+.course-action-static {
+  color: var(--success);
+}
+
 .course-action svg {
   width: 17px;
   height: 17px;
@@ -792,7 +809,9 @@ a {
 }
 
 .course-action:hover .tooltip-label,
-.course-action:focus-visible .tooltip-label {
+.course-action:focus-visible .tooltip-label,
+.course-action-static:hover .tooltip-label,
+.course-action-static:focus-visible .tooltip-label {
   opacity: 1;
   transform: translateY(0);
 }
@@ -859,6 +878,13 @@ a {
   font-weight: 720;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.course-access-description {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.65;
 }
 
 .panel {
@@ -2698,8 +2724,9 @@ a {
     grid-area: course;
   }
 
-  .course-row > .badge {
+  .course-state-cell {
     grid-area: state;
+    justify-self: end;
   }
 
   .course-updated-cell {

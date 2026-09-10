@@ -2,8 +2,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { CourseResponse } from '@lms/shared';
+import type { CourseResponse, MyEnrollmentResponse } from '@lms/shared';
 import { listCourses } from '../../api/courses';
+import { listMyEnrollments } from '../../api/enrollments';
 import { useAuthStore } from '../auth/auth.store';
 import { CoursesPage } from './CoursesPage';
 
@@ -14,7 +15,12 @@ vi.mock('../../api/courses', () => ({
   publishCourse: vi.fn(),
 }));
 
+vi.mock('../../api/enrollments', () => ({
+  listMyEnrollments: vi.fn(),
+}));
+
 const mockedListCourses = vi.mocked(listCourses);
+const mockedListMyEnrollments = vi.mocked(listMyEnrollments);
 
 describe('CoursesPage', () => {
   beforeEach(() => {
@@ -30,6 +36,8 @@ describe('CoursesPage', () => {
       },
     });
     mockedListCourses.mockReset();
+    mockedListMyEnrollments.mockReset();
+    mockedListMyEnrollments.mockResolvedValue([]);
   });
 
   it('renders published courses and student enrollment action', async () => {
@@ -41,6 +49,19 @@ describe('CoursesPage', () => {
     expect(screen.getAllByText('Published').length).toBeGreaterThan(0);
     expect(screen.getByRole('button', { name: /enroll/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /create course/i })).not.toBeInTheDocument();
+  });
+
+  it('marks enrolled courses and hides duplicate enrollment action', async () => {
+    mockedListCourses.mockResolvedValue([course({ id: 'course-1' })]);
+    mockedListMyEnrollments.mockResolvedValue([enrollment({ courseId: 'course-1' })]);
+
+    renderCoursesPage();
+
+    expect(await screen.findByText('Realtime LMS Foundations')).toBeInTheDocument();
+    expect(screen.getAllByText('Enrolled').length).toBeGreaterThan(0);
+    expect(
+      screen.queryByRole('button', { name: /enroll in realtime lms foundations/i }),
+    ).not.toBeInTheDocument();
   });
 
   it('renders instructor create and publish tools', async () => {
@@ -95,6 +116,19 @@ function course(overrides: Partial<CourseResponse> = {}): CourseResponse {
     status: 'PUBLISHED',
     title: 'Realtime LMS Foundations',
     updatedAt: '2026-08-28T00:00:00.000Z',
+    ...overrides,
+  };
+}
+
+function enrollment(overrides: Partial<MyEnrollmentResponse> = {}): MyEnrollmentResponse {
+  const enrollmentCourse = course({ id: overrides.courseId ?? 'course-1' });
+
+  return {
+    course: enrollmentCourse,
+    courseId: enrollmentCourse.id,
+    createdAt: '2026-08-28T00:00:00.000Z',
+    id: 'enrollment-1',
+    userId: 'student-1',
     ...overrides,
   };
 }

@@ -1,14 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, UserPlus } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useParams } from 'react-router-dom';
+import { enrollCourse } from '../../api/courses';
 import { listLessons } from '../../api/lessons';
 import { getMyCourseProgress, updateLessonProgress } from '../../api/progress';
+import { Button } from '../../components/Button';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadingBlock } from '../../components/LoadingBlock';
 import { StatusBadge } from '../../components/StatusBadge';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { getErrorMessage } from '../../lib/errors';
+import { useAuthStore } from '../auth/auth.store';
+import { myEnrollmentsQueryKey, useMyEnrollmentIds } from '../enrollments/useMyEnrollmentIds';
 import { LearningLessonNav } from './LearningLessonNav';
 import { LessonNotesPanel } from './LessonNotesPanel';
 import { LessonTranscriptPanel } from './LessonTranscriptPanel';
@@ -20,17 +24,23 @@ type LearningRailTab = 'notes' | 'transcript' | 'quizReview';
 export function LearningPage() {
   const { courseId } = useParams<{ courseId: string }>();
   const queryClient = useQueryClient();
+  const user = useAuthStore((state) => state.user);
   const playerHeadingRef = useRef<HTMLHeadingElement>(null);
   const [activeRailTab, setActiveRailTab] = useState<LearningRailTab>('notes');
   const [selectedLessonId, setSelectedLessonId] = useState('');
+  const isStudent = user?.role === 'STUDENT';
+  const { enrolledCourseIds, enrollmentsQuery } = useMyEnrollmentIds(
+    Boolean(courseId && isStudent),
+  );
+  const canUseLearningWorkspace = Boolean(courseId && isStudent && enrolledCourseIds.has(courseId));
 
   const lessonsQuery = useQuery({
-    enabled: Boolean(courseId),
+    enabled: canUseLearningWorkspace,
     queryKey: ['lessons', courseId],
     queryFn: () => listLessons(courseId ?? ''),
   });
   const progressQuery = useQuery({
-    enabled: Boolean(courseId),
+    enabled: canUseLearningWorkspace,
     queryKey: ['my-course-progress', courseId],
     queryFn: () => getMyCourseProgress(courseId ?? ''),
   });
@@ -64,6 +74,16 @@ export function LearningPage() {
     }) => updateLessonProgress(lessonId, { completed, positionSeconds }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['my-course-progress', courseId] });
+    },
+  });
+  const enrollMutation = useMutation({
+    mutationFn: enrollCourse,
+    onSuccess: async (_, enrolledCourseId) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: myEnrollmentsQueryKey }),
+        queryClient.invalidateQueries({ queryKey: ['courses'] }),
+        queryClient.invalidateQueries({ queryKey: ['my-course-progress', enrolledCourseId] }),
+      ]);
     },
   });
 
@@ -109,6 +129,50 @@ export function LearningPage() {
       lessonId: selectedLesson.id,
       positionSeconds: Math.min(selectedLesson.durationSeconds, Math.max(0, Math.floor(seconds))),
     });
+  }
+
+  if (!isStudent) {
+    return (
+      <div className="page learning-page">
+        <LearningAccessPanel
+          courseId={courseId}
+          description="Use the course detail page to manage lessons, sessions, and learner progress."
+          title="Learning workspace is for enrolled students"
+        />
+      </div>
+    );
+  }
+
+  if (enrollmentsQuery.isLoading) {
+    return (
+      <div className="page learning-page">
+        <LoadingBlock height={420} label="Checking enrollment" />
+      </div>
+    );
+  }
+
+  if (enrollmentsQuery.isError) {
+    return (
+      <div className="page learning-page">
+        <p className="error-banner" role="alert">
+          {getErrorMessage(enrollmentsQuery.error)}
+        </p>
+      </div>
+    );
+  }
+
+  if (!canUseLearningWorkspace) {
+    return (
+      <div className="page learning-page">
+        <LearningAccessPanel
+          courseId={courseId}
+          description="Enrollment unlocks lessons, progress tracking, notes, transcripts, and quiz review."
+          enrollmentPending={enrollMutation.isPending}
+          onEnroll={courseId ? () => enrollMutation.mutate(courseId) : undefined}
+          title="Enroll to unlock this workspace"
+        />
+      </div>
+    );
   }
 
   if (lessonsQuery.isLoading || progressQuery.isLoading) {
@@ -231,3 +295,49 @@ const learningRailTabs: Array<{ id: LearningRailTab; label: string }> = [
   { id: 'transcript', label: 'Transcript' },
   { id: 'quizReview', label: 'Quiz review' },
 ];
+
+function LearningAccessPanel({
+  courseId,
+  description,
+  enrollmentPending = false,
+  onEnroll,
+  title,
+}: {
+  courseId?: string;
+  description: string;
+  enrollmentPending?: boolean;
+  onEnroll?: () => void;
+  title: string;
+}) {
+  return (
+    <>
+      {courseId && (
+        <Link className="button button-ghost detail-back" to={`/courses/${courseId}`}>
+          <ArrowLeft size={18} aria-hidden="true" />
+          Course detail
+        </Link>
+      )}
+      <section className="panel course-access-panel">
+        <div className="panel-header">
+          <div>
+            <h2 className="panel-title">{title}</h2>
+            <p className="panel-subtitle">Enrollment required</p>
+          </div>
+          <StatusBadge tone="muted">Preview</StatusBadge>
+        </div>
+        <div className="panel-body panel-stack">
+          <p className="course-access-description">{description}</p>
+          {onEnroll && (
+            <Button
+              disabled={enrollmentPending}
+              icon={<UserPlus size={16} aria-hidden="true" />}
+              onClick={onEnroll}
+            >
+              Enroll now
+            </Button>
+          )}
+        </div>
+      </section>
+    </>
+  );
+}
