@@ -230,14 +230,14 @@ git commit -m "feat(frontend): play lesson videos in learning workspace"
 - Produces:
   - live session video playback implemented through the shared player
 
-- [ ] **Step 1: Update live session tests**
+- [x] **Step 1: Update live session tests**
 
 Keep existing tests asserting:
 - attached media renders `<video src="...">`;
 - a lesson without media shows `No video attached`;
 - socket heartbeats emit at 10-second intervals.
 
-- [ ] **Step 2: Refactor `LessonPlaybackPanel`**
+- [x] **Step 2: Refactor `LessonPlaybackPanel`**
 
 Remove duplicated playback query and `handleTimeUpdate`. Keep the lesson selector and pass an `onProgress` callback to `LessonVideoPlayer`:
 
@@ -249,7 +249,7 @@ emitProgressHeartbeat(socket, {
 });
 ```
 
-- [ ] **Step 3: Verify**
+- [x] **Step 3: Verify**
 
 Run:
 
@@ -261,7 +261,7 @@ npm run build:frontend
 
 Expected: PASS.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add frontend/src/features/sessions frontend/src/features/media frontend/src/styles/global.css

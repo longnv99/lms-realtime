@@ -1,14 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useEffect, useMemo, useState } from 'react';
 import { Film, PlayCircle } from 'lucide-react';
 import type { LessonResponse } from '@lms/shared';
 import type { Socket } from 'socket.io-client';
-import { getMediaPlayback } from '../../api/media';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadingBlock } from '../../components/LoadingBlock';
 import { StatusBadge } from '../../components/StatusBadge';
 import { getErrorMessage } from '../../lib/errors';
 import { emitProgressHeartbeat, type SocketStatus } from '../../lib/realtime';
+import { LessonVideoPlayer, type LessonVideoProgressPayload } from '../media/LessonVideoPlayer';
 
 type LessonPlaybackPanelProps = {
   lessons: LessonResponse[];
@@ -28,41 +27,22 @@ export function LessonPlaybackPanel({
   socketStatus,
 }: LessonPlaybackPanelProps) {
   const [selectedLessonId, setSelectedLessonId] = useState('');
-  const lastHeartbeatByLesson = useRef<Record<string, number>>({});
   const sortedLessons = useMemo(() => [...lessons].sort((a, b) => a.order - b.order), [lessons]);
   const selectedLesson = sortedLessons.find((lesson) => lesson.id === selectedLessonId) ?? null;
   const mediaAssetId = selectedLesson?.mediaAssetId ?? null;
-  const playbackQuery = useQuery({
-    enabled: Boolean(mediaAssetId),
-    queryKey: ['media-playback', mediaAssetId],
-    queryFn: () => getMediaPlayback(mediaAssetId ?? ''),
-  });
 
   useEffect(() => {
     setSelectedLessonId((current) => current || sortedLessons[0]?.id || '');
   }, [sortedLessons]);
 
-  function handleTimeUpdate(event: React.SyntheticEvent<HTMLVideoElement>) {
-    if (!socket || socketStatus !== 'connected' || !selectedLesson) {
+  function handleVideoProgress(payload: LessonVideoProgressPayload) {
+    if (!socket || socketStatus !== 'connected') {
       return;
     }
 
-    const positionSeconds = Math.floor(event.currentTarget.currentTime);
-    const previousPosition = lastHeartbeatByLesson.current[selectedLesson.id] ?? 0;
-    const reachedCompletion =
-      selectedLesson.durationSeconds > 0 && positionSeconds >= selectedLesson.durationSeconds;
-
-    if (
-      positionSeconds <= previousPosition ||
-      (positionSeconds - previousPosition < heartbeatIntervalSeconds && !reachedCompletion)
-    ) {
-      return;
-    }
-
-    lastHeartbeatByLesson.current[selectedLesson.id] = positionSeconds;
     emitProgressHeartbeat(socket, {
-      lessonId: selectedLesson.id,
-      positionSeconds,
+      lessonId: payload.lessonId,
+      positionSeconds: payload.positionSeconds,
     });
   }
 
@@ -110,26 +90,7 @@ export function LessonPlaybackPanel({
           {mediaAssetId ? 'Video ready' : 'No video'}
         </StatusBadge>
       </div>
-      <div className="video-frame">
-        {!mediaAssetId && <EmptyState description="No video attached" title="Media unavailable" />}
-        {mediaAssetId && playbackQuery.isLoading && (
-          <LoadingBlock height={320} label="Preparing playback" />
-        )}
-        {mediaAssetId && playbackQuery.isError && (
-          <p className="error-banner" role="alert">
-            {getErrorMessage(playbackQuery.error)}
-          </p>
-        )}
-        {mediaAssetId && playbackQuery.data && selectedLesson && (
-          <video
-            aria-label={`Video player for ${selectedLesson.title}`}
-            className="lesson-video-player"
-            controls
-            onTimeUpdate={handleTimeUpdate}
-            src={playbackQuery.data.playbackUrl}
-          />
-        )}
-      </div>
+      <LessonVideoPlayer lesson={selectedLesson} onProgress={handleVideoProgress} />
       {selectedLesson && (
         <div className="playback-meta">
           <span>
