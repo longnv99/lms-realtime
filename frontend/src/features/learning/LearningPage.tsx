@@ -13,8 +13,9 @@ import { LearningLessonNav } from './LearningLessonNav';
 import { LessonNotesPanel } from './LessonNotesPanel';
 import { LessonTranscriptPanel } from './LessonTranscriptPanel';
 import { LearningPlayer } from './LearningPlayer';
+import { QuizReviewPanel } from './QuizReviewPanel';
 
-type LearningRailTab = 'notes' | 'transcript';
+type LearningRailTab = 'notes' | 'transcript' | 'quizReview';
 
 export function LearningPage() {
   const { courseId } = useParams<{ courseId: string }>();
@@ -203,11 +204,17 @@ export function LearningPage() {
                     currentPositionSeconds={selectedProgress?.positionSeconds ?? 0}
                     lessonId={selectedLesson.id}
                   />
-                ) : (
+                ) : activeRailTab === 'transcript' ? (
                   <LessonTranscriptPanel
                     activeSecond={selectedProgress?.positionSeconds ?? 0}
                     lessonId={selectedLesson.id}
                     onSeek={handleSeek}
+                  />
+                ) : (
+                  <QuizReviewPanel
+                    activeLessonId={selectedLesson.id}
+                    courseId={courseId ?? ''}
+                    onSelectLesson={handleSelectLesson}
                   />
                 )}
               </div>
@@ -222,4 +229,5 @@ export function LearningPage() {
 const learningRailTabs: Array<{ id: LearningRailTab; label: string }> = [
   { id: 'notes', label: 'Notes' },
   { id: 'transcript', label: 'Transcript' },
+  { id: 'quizReview', label: 'Quiz review' },
 ];

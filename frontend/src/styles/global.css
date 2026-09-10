@@ -1547,7 +1547,7 @@ a {
 
 .learning-tabs {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 4px;
   border: 1px solid color-mix(in srgb, var(--line) 86%, transparent);
   border-radius: var(--radius-sm);
@@ -1713,6 +1713,109 @@ a {
   font-weight: 700;
   line-height: 1;
   padding: 5px 7px;
+}
+
+.quiz-review-panel,
+.quiz-review-list {
+  display: grid;
+  gap: 12px;
+}
+
+.quiz-review-panel h4 {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.quiz-review-card {
+  display: grid;
+  gap: 12px;
+  border: 1px solid color-mix(in srgb, var(--line) 86%, transparent);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-inset) 40%, transparent);
+  padding: 12px;
+}
+
+.quiz-review-card[aria-current='true'] {
+  border-color: color-mix(in srgb, var(--accent) 38%, var(--line));
+  background: color-mix(in srgb, var(--accent-soft) 28%, var(--surface));
+}
+
+.quiz-review-card-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: start;
+}
+
+.quiz-review-card-header > div {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.quiz-review-card-header span {
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quiz-review-card-header strong {
+  overflow: hidden;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quiz-review-questions {
+  display: grid;
+  gap: 9px;
+}
+
+.quiz-review-question {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+
+.quiz-review-icon {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--accent-strong);
+}
+
+.quiz-review-question > div {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.quiz-review-question strong {
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.quiz-review-question span,
+.quiz-review-question p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.quiz-review-question p {
+  color: var(--text);
+}
+
+.quiz-review-action {
+  justify-self: start;
 }
 
 .live-room-banner {

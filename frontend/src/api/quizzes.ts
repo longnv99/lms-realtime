@@ -1,5 +1,6 @@
 import type {
   QuizOption,
+  CourseQuizReviewResponse,
   QuizQuestionPayload,
   QuizRunListItemResponse,
   QuizRunResponse,
@@ -80,4 +81,10 @@ export async function revealQuestion(
 
 export async function finishQuizRun(id: string): Promise<QuizRunResponse> {
   return postEnvelope<QuizRunResponse>(`/quiz-runs/${id}/finish`);
+}
+
+export async function getMyCourseQuizReviews(
+  courseId: string,
+): Promise<CourseQuizReviewResponse> {
+  return getEnvelope<CourseQuizReviewResponse>(`/me/courses/${courseId}/quiz-reviews`);
 }
