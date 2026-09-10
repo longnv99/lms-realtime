@@ -9,3 +9,27 @@ export interface LessonResponse {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface LessonTranscriptCueResponse {
+  id: string;
+  lessonId: string;
+  startSeconds: number;
+  endSeconds: number;
+  text: string;
+  order: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LessonTranscriptResponse {
+  lessonId: string;
+  cues: LessonTranscriptCueResponse[];
+}
+
+export interface ReplaceLessonTranscriptInput {
+  cues: Array<{
+    startSeconds: number;
+    endSeconds: number;
+    text: string;
+  }>;
+}

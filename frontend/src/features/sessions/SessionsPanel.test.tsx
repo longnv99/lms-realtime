@@ -5,6 +5,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CourseResponse, LessonResponse, SessionResponse } from '@lms/shared';
 import { getCourse } from '../../api/courses';
+import { listMyEnrollments } from '../../api/enrollments';
 import { listLessons } from '../../api/lessons';
 import { getCourseProgress, getMyCourseProgress } from '../../api/progress';
 import { listSessions, startSession } from '../../api/sessions';
@@ -12,7 +13,12 @@ import { CourseDetailPage } from '../courses/CourseDetailPage';
 import { useAuthStore } from '../auth/auth.store';
 
 vi.mock('../../api/courses', () => ({
+  enrollCourse: vi.fn(),
   getCourse: vi.fn(),
+}));
+
+vi.mock('../../api/enrollments', () => ({
+  listMyEnrollments: vi.fn(),
 }));
 
 vi.mock('../../api/lessons', () => ({
@@ -35,6 +41,7 @@ vi.mock('../../api/sessions', () => ({
 const mockedGetCourse = vi.mocked(getCourse);
 const mockedGetCourseProgress = vi.mocked(getCourseProgress);
 const mockedGetMyCourseProgress = vi.mocked(getMyCourseProgress);
+const mockedListMyEnrollments = vi.mocked(listMyEnrollments);
 const mockedListLessons = vi.mocked(listLessons);
 const mockedListSessions = vi.mocked(listSessions);
 const mockedStartSession = vi.mocked(startSession);
@@ -55,6 +62,7 @@ describe('Course detail panels', () => {
     mockedGetCourse.mockReset();
     mockedGetCourseProgress.mockReset();
     mockedGetMyCourseProgress.mockReset();
+    mockedListMyEnrollments.mockReset();
     mockedListLessons.mockReset();
     mockedListSessions.mockReset();
     mockedStartSession.mockReset();
@@ -71,6 +79,15 @@ describe('Course detail panels', () => {
       percent: 0,
       totalLessons: 0,
     });
+    mockedListMyEnrollments.mockResolvedValue([
+      {
+        course: course(),
+        courseId: 'course-1',
+        createdAt: '2026-08-28T00:00:00.000Z',
+        id: 'enrollment-1',
+        userId: 'student-1',
+      },
+    ]);
   });
 
   it('sorts lessons and shows live entry only for live sessions', async () => {
@@ -88,7 +105,7 @@ describe('Course detail panels', () => {
 
     const titles = await screen.findAllByTestId('lesson-row-title');
     expect(titles.map((title) => title.textContent)).toEqual(['First lesson', 'Second lesson']);
-    expect(screen.getByRole('link', { name: /enter live room live room/i })).toHaveAttribute(
+    expect(await screen.findByRole('link', { name: /enter live room live room/i })).toHaveAttribute(
       'href',
       '/courses/course-1/sessions/session-live/live',
     );

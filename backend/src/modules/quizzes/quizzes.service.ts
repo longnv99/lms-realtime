@@ -1,5 +1,10 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import type { QuizOption, QuizRunStatus } from '@lms/shared';
+import type {
+  CourseQuizReviewResponse,
+  QuizOption,
+  QuizReviewResponse,
+  QuizRunStatus,
+} from '@lms/shared';
 import { Prisma } from '../../generated/prisma/client';
 import { AppError } from '../../common/errors/app-error';
 import type { AuthenticatedUser } from '../../common/types/authenticated-request';
@@ -197,6 +202,44 @@ export class QuizzesService {
     };
   }
 
+  async getMyCourseQuizReviews(
+    courseId: string,
+    user: AuthenticatedUser,
+  ): Promise<CourseQuizReviewResponse> {
+    const course = await this.coursesService.findCourseOrThrow(courseId);
+    await this.ensureCanViewCourse(
+      courseId,
+      course.instructorId,
+      user,
+      'You are not enrolled in this course',
+    );
+
+    const runs = await this.prisma.quizRun.findMany({
+      where: {
+        status: 'FINISHED',
+        revealedAt: { not: null },
+        finishedAt: { not: null },
+        quiz: { lesson: { courseId } },
+        answers: { some: { userId: user.id } },
+      },
+      include: {
+        quiz: {
+          include: {
+            lesson: true,
+            questions: { orderBy: { order: 'asc' } },
+          },
+        },
+        answers: { where: { userId: user.id } },
+      },
+      orderBy: [{ finishedAt: 'desc' }, { id: 'asc' }],
+    });
+
+    return {
+      courseId,
+      reviews: runs.map((run) => this.toQuizReviewResponse(run, user.id)),
+    };
+  }
+
   async openNextQuestion(id: string, actor: AuthenticatedUser) {
     const run = await this.findRunWithQuizSessionOrThrow(id);
     this.coursesService.ensureCanManage(run.session.course, actor);
@@ -270,7 +313,10 @@ export class QuizzesService {
     });
     const updated = await this.prisma.quizRun.update({
       where: { id },
-      data: { status: 'REVEALED' },
+      data: {
+        status: 'REVEALED',
+        revealedAt: run.revealedAt ?? new Date(),
+      },
     });
 
     this.realtime.emitReveal(id, {
@@ -291,9 +337,24 @@ export class QuizzesService {
     const run = await this.findRunWithQuizSessionOrThrow(id);
     this.coursesService.ensureCanManage(run.session.course, actor);
 
+    if (run.status === 'FINISHED') {
+      return this.prisma.quizRun.findUniqueOrThrow({ where: { id } });
+    }
+
+    if (run.status !== 'REVEALED') {
+      throw new AppError(
+        'CONFLICT',
+        'Chi ket thuc quiz run sau khi reveal dap an',
+        HttpStatus.CONFLICT,
+      );
+    }
+
     const updated = await this.prisma.quizRun.update({
       where: { id },
-      data: { status: 'FINISHED' },
+      data: {
+        status: 'FINISHED',
+        finishedAt: run.finishedAt ?? new Date(),
+      },
     });
     const countKeys = await this.redis.getClient().keys(`quiz-run:${id}:q:*:count`);
     await this.redis.getClient().del(`quiz-run:${id}:leaderboard`, ...countKeys);
@@ -399,6 +460,44 @@ export class QuizzesService {
         );
       }
     }
+  }
+
+  private toQuizReviewResponse(run: QuizReviewRun, userId: string): QuizReviewResponse {
+    const answersByQuestionId = new Map(
+      run.answers
+        .filter((answer) => answer.userId === userId)
+        .map((answer) => [answer.questionId, answer]),
+    );
+    const questions = run.quiz.questions.map((question) => {
+      const answer = answersByQuestionId.get(question.id);
+
+      return {
+        questionId: question.id,
+        text: question.text,
+        options: question.options as unknown as QuizOption[],
+        correctOptionId: question.correctOptionId,
+        selectedOptionId: answer?.selectedOptionId ?? null,
+        isCorrect: answer?.isCorrect ?? null,
+        score: answer?.score ?? 0,
+        explanation: question.explanation ?? null,
+        order: question.order,
+      };
+    });
+
+    return {
+      quizRunId: run.id,
+      quizId: run.quizId,
+      quizTitle: run.quiz.title,
+      lessonId: run.quiz.lessonId,
+      lessonTitle: run.quiz.lesson.title,
+      status: run.status as QuizRunStatus,
+      startedAt: run.createdAt.toISOString(),
+      finishedAt: run.finishedAt?.toISOString() ?? null,
+      totalScore: run.answers.reduce((sum, answer) => sum + answer.score, 0),
+      questionCount: questions.length,
+      correctCount: run.answers.filter((answer) => answer.isCorrect).length,
+      questions,
+    };
   }
 
   private async ensureCanViewSession(
@@ -514,3 +613,15 @@ export class QuizzesService {
     return run;
   }
 }
+
+type QuizReviewRun = Prisma.QuizRunGetPayload<{
+  include: {
+    quiz: {
+      include: {
+        lesson: true;
+        questions: true;
+      };
+    };
+    answers: true;
+  };
+}>;

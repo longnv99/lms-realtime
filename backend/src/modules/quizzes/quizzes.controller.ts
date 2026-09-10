@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -70,6 +70,15 @@ export class QuizzesController {
   @Get('quiz-runs/:id/state')
   getQuizRunState(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.quizzesService.getQuizRunState(id, user);
+  }
+
+  @Get('me/courses/:courseId/quiz-reviews')
+  @ApiOperation({ summary: 'List my completed quiz reviews for a course' })
+  getMyCourseQuizReviews(
+    @Param('courseId') courseId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.quizzesService.getMyCourseQuizReviews(courseId, user);
   }
 
   @UseGuards(RolesGuard)

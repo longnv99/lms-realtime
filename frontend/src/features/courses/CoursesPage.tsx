@@ -1,4 +1,4 @@
-import { BookOpenCheck, CheckCircle2, Eye, FileClock, Filter, Send } from 'lucide-react';
+import { BookOpenCheck, CheckCircle2, Eye, FileClock, Filter, Send, UserPlus } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
@@ -17,6 +17,7 @@ import {
 } from '../../components/ui/select';
 import { getErrorMessage } from '../../lib/errors';
 import { useAuthStore } from '../auth/auth.store';
+import { myEnrollmentsQueryKey, useMyEnrollmentIds } from '../enrollments/useMyEnrollmentIds';
 import { CourseEditorPanel } from './CourseEditorPanel';
 
 export function CoursesPage() {
@@ -33,6 +34,8 @@ export function CoursesPage() {
   });
 
   const isInstructor = user?.role === 'ADMIN' || user?.role === 'INSTRUCTOR';
+  const isStudent = user?.role === 'STUDENT';
+  const { enrolledCourseIds, enrollmentsQuery } = useMyEnrollmentIds(Boolean(isStudent));
   const courses = coursesQuery.data ?? [];
 
   return (
@@ -54,6 +57,9 @@ export function CoursesPage() {
         <div className="course-main">
           <CourseList
             courses={courses}
+            enrolledCourseIds={enrolledCourseIds}
+            enrollmentError={isStudent ? enrollmentsQuery.error : null}
+            enrollmentLoading={Boolean(isStudent && enrollmentsQuery.isLoading)}
             error={coursesQuery.error}
             isInstructor={isInstructor}
             isLoading={coursesQuery.isLoading}
@@ -154,11 +160,17 @@ function CourseOverviewCards({
 
 function CourseList({
   courses,
+  enrolledCourseIds,
+  enrollmentError,
+  enrollmentLoading,
   error,
   isInstructor,
   isLoading,
 }: {
   courses: CourseResponse[];
+  enrolledCourseIds: Set<string>;
+  enrollmentError: Error | null;
+  enrollmentLoading: boolean;
   error: Error | null;
   isInstructor: boolean;
   isLoading: boolean;
@@ -166,7 +178,12 @@ function CourseList({
   const queryClient = useQueryClient();
   const enrollMutation = useMutation({
     mutationFn: enrollCourse,
-    onSuccess: async () => queryClient.invalidateQueries({ queryKey: ['courses'] }),
+    onSettled: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['courses'] }),
+        queryClient.invalidateQueries({ queryKey: myEnrollmentsQueryKey }),
+      ]);
+    },
   });
   const publishMutation = useMutation({
     mutationFn: publishCourse,
@@ -210,6 +227,11 @@ function CourseList({
         <StatusBadge>{isInstructor ? 'Instructor view' : 'Student view'}</StatusBadge>
       </div>
       <div className="course-table-body">
+        {enrollmentError && !isInstructor && (
+          <p className="error-banner course-table-alert" role="alert">
+            {getErrorMessage(enrollmentError)}
+          </p>
+        )}
         <div className="course-row course-row-head">
           <span>Course</span>
           <span>State</span>
@@ -219,7 +241,9 @@ function CourseList({
         {courses.map((course) => (
           <CourseRow
             course={course}
-            enrollPending={enrollMutation.isPending}
+            enrollmentPending={enrollMutation.isPending || enrollmentLoading}
+            enrollmentUnavailable={Boolean(enrollmentError)}
+            isEnrolled={enrolledCourseIds.has(course.id)}
             isInstructor={isInstructor}
             key={course.id}
             onEnroll={() => enrollMutation.mutate(course.id)}
@@ -234,14 +258,18 @@ function CourseList({
 
 function CourseRow({
   course,
-  enrollPending,
+  enrollmentPending,
+  enrollmentUnavailable,
+  isEnrolled,
   isInstructor,
   onEnroll,
   onPublish,
   publishPending,
 }: {
   course: CourseResponse;
-  enrollPending: boolean;
+  enrollmentPending: boolean;
+  enrollmentUnavailable: boolean;
+  isEnrolled: boolean;
   isInstructor: boolean;
   onEnroll: () => void;
   onPublish: () => void;
@@ -254,9 +282,16 @@ function CourseRow({
         {course.description && <span className="course-description">{course.description}</span>}
         <code className="course-slug">{course.slug}</code>
       </div>
-      <StatusBadge tone={getCourseStatusTone(course.status)}>
-        {formatCourseStatus(course.status)}
-      </StatusBadge>
+      <div className="course-state-cell">
+        <StatusBadge tone={getCourseStatusTone(course.status)}>
+          {formatCourseStatus(course.status)}
+        </StatusBadge>
+        {!isInstructor && course.status === 'PUBLISHED' && (
+          <StatusBadge tone={isEnrolled ? 'success' : 'muted'}>
+            {isEnrolled ? 'Enrolled' : 'Open enrollment'}
+          </StatusBadge>
+        )}
+      </div>
       <div className="course-updated-cell">
         <time dateTime={course.updatedAt}>{formatCourseDate(course.updatedAt)}</time>
         <span>{getCourseStateDescription(course.status)}</span>
@@ -278,19 +313,33 @@ function CourseRow({
             </span>
           </button>
         )}
-        {!isInstructor && course.status === 'PUBLISHED' && (
+        {!isInstructor && course.status === 'PUBLISHED' && isEnrolled && (
+          <span
+            aria-label={`Enrolled in ${course.title}`}
+            className="course-action course-action-static"
+            role="status"
+            title="Enrolled"
+          >
+            <CheckCircle2 size={18} aria-hidden="true" />
+            <span className="sr-only">Enrolled</span>
+            <span className="tooltip-label" role="tooltip">
+              Enrolled
+            </span>
+          </span>
+        )}
+        {!isInstructor && course.status === 'PUBLISHED' && !isEnrolled && (
           <button
             aria-label={`Enroll in ${course.title}`}
             className="course-action"
-            disabled={enrollPending}
+            disabled={enrollmentPending || enrollmentUnavailable}
             onClick={onEnroll}
-            title="Enroll"
+            title={enrollmentUnavailable ? 'Enrollment unavailable' : 'Enroll'}
             type="button"
           >
-            <CheckCircle2 size={18} aria-hidden="true" />
+            <UserPlus size={18} aria-hidden="true" />
             <span className="sr-only">Enroll</span>
             <span className="tooltip-label" role="tooltip">
-              Enroll
+              {enrollmentUnavailable ? 'Enrollment unavailable' : 'Enroll'}
             </span>
           </button>
         )}

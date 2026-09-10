@@ -32,3 +32,6 @@ backend/prisma/migrations/dev.db*
 
 # Skills Agents
 .agents/*
+
+# Git worktrees
+.worktrees/

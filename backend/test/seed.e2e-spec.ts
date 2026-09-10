@@ -1,3 +1,4 @@
+import { seedLessons, seedTranscriptCues } from '../prisma/seeds/data';
 import { getSeedModuleNames, parseSeedOptions } from '../prisma/seeds';
 import { resolveProgressSeedRow } from '../prisma/seeds/progress.seed';
 
@@ -44,5 +45,15 @@ describe('seed configuration', () => {
       completedAt,
       lastWatchedAt,
     });
+  });
+
+  it('defines transcript cues for every seeded lesson', () => {
+    const lessonOrders = Object.values(seedLessons).map((lesson) => lesson.order);
+    const transcriptLessonOrders = seedTranscriptCues.map((transcript) => transcript.lessonOrder);
+
+    expect(transcriptLessonOrders.sort((a, b) => a - b)).toEqual(
+      lessonOrders.sort((a, b) => a - b),
+    );
+    expect(seedTranscriptCues.every((transcript) => transcript.cues.length > 0)).toBe(true);
   });
 });

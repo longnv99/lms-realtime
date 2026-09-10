@@ -3,6 +3,7 @@ import type {
   CourseProgressResponse,
   InstructorCourseProgressResponse,
   LessonProgressResponse,
+  UpdateLessonProgressInput,
 } from '@lms/shared';
 import { AppError } from '../../common/errors/app-error';
 import type { AuthenticatedUser } from '../../common/types/authenticated-request';
@@ -137,6 +138,44 @@ export class ProgressService {
     return mapLessonProgress(lesson, progress);
   }
 
+  async updateLessonProgress(
+    user: AuthenticatedUser,
+    lessonId: string,
+    input: UpdateLessonProgressInput,
+  ): Promise<LessonProgressResponse> {
+    const lesson = await this.requireEnrolledLesson(user, lessonId);
+    const completedAt =
+      input.completed === undefined ? undefined : input.completed ? new Date() : null;
+    const positionSeconds = Math.min(
+      Math.max(input.positionSeconds ?? 0, 0),
+      lesson.durationSeconds,
+    );
+    const lastWatchedAt = new Date();
+
+    const progress = await this.prisma.lessonProgress.upsert({
+      where: {
+        userId_lessonId: {
+          userId: user.id,
+          lessonId,
+        },
+      },
+      create: {
+        userId: user.id,
+        lessonId,
+        positionSeconds,
+        completedAt: completedAt === undefined ? null : completedAt,
+        lastWatchedAt,
+      },
+      update: {
+        positionSeconds,
+        ...(completedAt !== undefined ? { completedAt } : {}),
+        lastWatchedAt,
+      },
+    });
+
+    return mapLessonProgress(lesson, progress);
+  }
+
   private async findCourseWithLessonsOrThrow(courseId: string) {
     const course = await this.prisma.course.findUnique({
       where: { id: courseId },
@@ -168,6 +207,32 @@ export class ProgressService {
 
     if (!lesson) {
       throw new AppError('NOT_FOUND', 'Lesson not found', HttpStatus.NOT_FOUND);
+    }
+
+    return lesson;
+  }
+
+  private async requireEnrolledLesson(
+    user: AuthenticatedUser,
+    lessonId: string,
+  ): Promise<LessonForProgress & { courseId: string }> {
+    const lesson = await this.findLessonWithCourseOrThrow(lessonId);
+    const enrollment = await this.prisma.enrollment.findUnique({
+      where: {
+        userId_courseId: {
+          userId: user.id,
+          courseId: lesson.courseId,
+        },
+      },
+      select: { id: true },
+    });
+
+    if (!enrollment) {
+      throw new AppError(
+        'AUTH_FORBIDDEN',
+        'You are not enrolled in this course',
+        HttpStatus.FORBIDDEN,
+      );
     }
 
     return lesson;

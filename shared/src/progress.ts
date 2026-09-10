@@ -29,3 +29,8 @@ export interface InstructorCourseProgressResponse {
   totalLessons: number;
   students: InstructorCourseProgressStudentResponse[];
 }
+
+export interface UpdateLessonProgressInput {
+  positionSeconds?: number;
+  completed?: boolean;
+}

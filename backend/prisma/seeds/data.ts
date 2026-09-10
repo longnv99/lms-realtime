@@ -83,6 +83,73 @@ export const seedLessons = {
   },
 } as const;
 
+export const seedTranscriptCues = [
+  {
+    lessonOrder: 1,
+    cues: [
+      { startSeconds: 0, endSeconds: 20, text: 'Welcome to the realtime LMS foundations course.' },
+      {
+        startSeconds: 20,
+        endSeconds: 55,
+        text: 'This lesson introduces the learner, instructor, and admin workflows.',
+      },
+      {
+        startSeconds: 55,
+        endSeconds: 95,
+        text: 'By the end, you will understand how course sessions connect with progress tracking.',
+      },
+    ],
+  },
+  {
+    lessonOrder: 2,
+    cues: [
+      { startSeconds: 0, endSeconds: 30, text: 'Welcome to realtime room basics.' },
+      {
+        startSeconds: 30,
+        endSeconds: 90,
+        text: 'Learners join a live session and receive instructor updates in realtime.',
+      },
+      {
+        startSeconds: 90,
+        endSeconds: 150,
+        text: 'Presence, chat, and session status updates keep everyone aligned during class.',
+      },
+    ],
+  },
+  {
+    lessonOrder: 3,
+    cues: [
+      { startSeconds: 0, endSeconds: 25, text: 'Welcome to quiz orchestration.' },
+      {
+        startSeconds: 25,
+        endSeconds: 85,
+        text: 'Instructors open questions, collect answers, and reveal results during live sessions.',
+      },
+      {
+        startSeconds: 85,
+        endSeconds: 145,
+        text: 'Learners can review their answers after the quiz run has finished.',
+      },
+    ],
+  },
+  {
+    lessonOrder: 4,
+    cues: [
+      { startSeconds: 0, endSeconds: 30, text: 'Welcome to the progress heartbeat flow.' },
+      {
+        startSeconds: 30,
+        endSeconds: 95,
+        text: 'Playback heartbeats save each learner position without interrupting the lesson.',
+      },
+      {
+        startSeconds: 95,
+        endSeconds: 160,
+        text: 'Instructor dashboards use progress signals to understand course engagement.',
+      },
+    ],
+  },
+];
+
 export const seedSession = {
   title: 'Live intro session',
   startsInHours: 24,
@@ -97,6 +164,8 @@ export const seedQuestions = [
       { id: 'b', text: 'Redis' },
     ] as Prisma.InputJsonValue,
     correctOptionId: 'a',
+    explanation:
+      'PostgreSQL stores relational LMS records such as users, courses, lessons, quizzes, and answers.',
     order: 1,
   },
   {
@@ -106,6 +175,8 @@ export const seedQuestions = [
       { id: 'b', text: 'SMTP' },
     ] as Prisma.InputJsonValue,
     correctOptionId: 'a',
+    explanation:
+      'Socket.IO powers bidirectional realtime classroom events between the server and connected clients.',
     order: 2,
   },
   {
@@ -115,6 +186,8 @@ export const seedQuestions = [
       { id: 'b', text: 'MinIO' },
     ] as Prisma.InputJsonValue,
     correctOptionId: 'a',
+    explanation:
+      'Redis backs BullMQ queues and also supports fast realtime counters and leaderboard state.',
     order: 3,
   },
   {
@@ -124,6 +197,8 @@ export const seedQuestions = [
       { id: 'b', text: 'course:' },
     ] as Prisma.InputJsonValue,
     correctOptionId: 'a',
+    explanation:
+      'The quiz-run: prefix scopes realtime rooms and cache keys to one active quiz run.',
     order: 4,
   },
   {
@@ -133,6 +208,8 @@ export const seedQuestions = [
       { id: 'b', text: 'Yes' },
     ] as Prisma.InputJsonValue,
     correctOptionId: 'a',
+    explanation:
+      'Live question events hide correctOptionId so learners cannot see the answer before reveal or review.',
     order: 5,
   },
 ];

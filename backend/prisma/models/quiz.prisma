@@ -26,6 +26,7 @@ model Question {
   text            String
   options         Json
   correctOptionId String
+  explanation     String?
   order           Int
 
   quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
@@ -41,6 +42,8 @@ model QuizRun {
   currentQuestionIndex Int?
   status               QuizRunStatus @default(PENDING)
   questionOpenedAt     DateTime?
+  revealedAt           DateTime?
+  finishedAt           DateTime?
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
 
