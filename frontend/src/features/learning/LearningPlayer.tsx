@@ -1,4 +1,4 @@
-import { BookmarkCheck, CheckCircle2, Clock3, PlayCircle, RotateCcw } from 'lucide-react';
+import { BookmarkCheck, CheckCircle2, Clock3, RotateCcw } from 'lucide-react';
 import type { LessonProgressResponse, LessonResponse } from '@lms/shared';
 import { LoadingBlock } from '../../components/LoadingBlock';
 import { StatusBadge } from '../../components/StatusBadge';
@@ -11,20 +11,23 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '../../components/ui/tooltip';
+import { LessonVideoPlayer, type LessonVideoProgressPayload } from '../media/LessonVideoPlayer';
 import { formatDuration, getLessonPercent } from './LearningLessonNav';
 
 type LearningPlayerProps = {
   lesson: LessonResponse | null;
-  progress: LessonProgressResponse | undefined;
-  progressPending: boolean;
   onMarkComplete: () => void;
   onResetProgress: () => void;
+  onVideoProgress: (payload: LessonVideoProgressPayload) => void;
+  progress: LessonProgressResponse | undefined;
+  progressPending: boolean;
 };
 
 export function LearningPlayer({
   lesson,
   onMarkComplete,
   onResetProgress,
+  onVideoProgress,
   progress,
   progressPending,
 }: LearningPlayerProps) {
@@ -58,15 +61,12 @@ export function LearningPlayer({
         </StatusBadge>
       </CardHeader>
       <CardContent className="learning-player-body">
-        <div className="learning-video-stage">
-          <div className="learning-video-symbol">
-            <PlayCircle size={42} aria-hidden="true" />
-          </div>
-          <div className="learning-video-copy">
-            <strong>{lesson.mediaAssetId ? 'Lesson media ready' : 'Media not attached'}</strong>
-            <span>{resumeCopy}</span>
-          </div>
-        </div>
+        <LessonVideoPlayer
+          initialPositionSeconds={progress?.positionSeconds ?? 0}
+          lesson={lesson}
+          onProgress={onVideoProgress}
+        />
+        <p className="learning-video-resume">{resumeCopy}</p>
         <div className="learning-player-meta" aria-label="Lesson progress">
           <span>
             <Clock3 size={15} aria-hidden="true" />

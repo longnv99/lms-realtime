@@ -146,7 +146,7 @@ git commit -m "feat(frontend): add shared lesson video player"
   - real video playback in `/courses/:courseId/learn`
   - automatic REST progress saves while students watch lesson videos
 
-- [ ] **Step 1: Write failing learner playback test**
+- [x] **Step 1: Write failing learner playback test**
 
 Add a test that renders an enrolled learner, waits for the video player, sends `timeupdate`, and asserts `updateLessonProgress` receives:
 
@@ -165,7 +165,7 @@ expect(mockedUpdateLessonProgress).toHaveBeenCalledWith('lesson-1', {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run:
 
@@ -175,14 +175,14 @@ npm run test --workspace=frontend -- LearningPage.test.tsx
 
 Expected: FAIL because `LearningPlayer` still renders a placeholder.
 
-- [ ] **Step 3: Wire `LessonVideoPlayer` into `LearningPlayer`**
+- [x] **Step 3: Wire `LessonVideoPlayer` into `LearningPlayer`**
 
 Replace the placeholder `learning-video-stage` content with `LessonVideoPlayer`, passing:
 - `lesson`;
 - `initialPositionSeconds={progress?.positionSeconds ?? 0}`;
 - `onProgress={onVideoProgress}`.
 
-- [ ] **Step 4: Save progress in `LearningPage`**
+- [x] **Step 4: Save progress in `LearningPage`**
 
 Add a `handleVideoProgress(payload)` callback that calls:
 
@@ -195,7 +195,7 @@ updateLessonProgress(payload.lessonId, {
 
 Invalidate `['my-course-progress', courseId]` after success.
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Run:
 
@@ -207,7 +207,7 @@ npm run build:frontend
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add frontend/src/features/learning

@@ -1496,6 +1496,12 @@ a {
   gap: 16px;
 }
 
+.learning-video-resume {
+  margin: -4px 0 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
 .learning-video-stage {
   display: grid;
   min-height: 360px;
