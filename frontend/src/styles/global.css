@@ -1294,13 +1294,19 @@ a {
 
 .learning-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(220px, 300px);
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 240px);
+  gap: 16px;
   align-items: stretch;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--surface) 88%, var(--bg));
-  padding: 20px;
+  background:
+    radial-gradient(
+      circle at 94% 12%,
+      color-mix(in srgb, var(--accent-soft) 30%, transparent),
+      transparent 34%
+    ),
+    color-mix(in srgb, var(--surface) 88%, var(--bg));
+  padding: 18px;
 }
 
 .learning-hero-copy {
@@ -1314,15 +1320,25 @@ a {
   justify-self: start;
 }
 
+.learning-hero .page-title {
+  font-size: 34px;
+}
+
+.learning-hero .page-description {
+  max-width: 58ch;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
 .learning-summary {
   display: grid;
   min-width: 0;
   align-content: center;
-  gap: 7px;
+  gap: 6px;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--surface-inset) 72%, var(--surface));
-  padding: 16px;
+  padding: 14px;
 }
 
 .learning-summary span,
@@ -1350,8 +1366,11 @@ a {
 
 .learning-workspace {
   display: grid;
-  grid-template-columns: minmax(240px, 280px) minmax(420px, 1fr) minmax(300px, 360px);
-  gap: 16px;
+  grid-template-areas:
+    'nav stage'
+    'nav rail';
+  grid-template-columns: minmax(230px, 270px) minmax(0, 1fr);
+  gap: 14px;
   align-items: start;
 }
 
@@ -1365,6 +1384,19 @@ a {
 .learning-rail {
   position: sticky;
   top: 80px;
+}
+
+.learning-nav {
+  grid-area: nav;
+}
+
+.learning-stage {
+  grid-area: stage;
+}
+
+.learning-rail {
+  grid-area: rail;
+  position: static;
 }
 
 .learning-nav {
@@ -1476,7 +1508,7 @@ a {
 }
 
 .learning-player {
-  min-height: 560px;
+  min-height: auto;
 }
 
 .learning-player-header {
@@ -1497,7 +1529,7 @@ a {
 }
 
 .learning-video-resume {
-  margin: -4px 0 0;
+  margin-right: auto;
   color: var(--text-muted);
   font-size: 13px;
 }
@@ -1552,7 +1584,8 @@ a {
 .learning-player-meta {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  flex-wrap: wrap;
   gap: 12px;
   color: var(--text-muted);
   font-size: 13px;
@@ -1580,6 +1613,7 @@ a {
 .learning-tabs {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: min(100%, 420px);
   gap: 4px;
   border: 1px solid color-mix(in srgb, var(--line) 86%, transparent);
   border-radius: var(--radius-sm);
@@ -1618,6 +1652,11 @@ a {
 .lesson-transcript-panel {
   display: grid;
   gap: 12px;
+}
+
+.lesson-notes-panel {
+  grid-template-columns: minmax(280px, 0.72fr) minmax(320px, 1fr);
+  align-items: start;
 }
 
 .lesson-note-composer {
@@ -1970,7 +2009,6 @@ a {
   display: grid;
   width: 100%;
   aspect-ratio: 16 / 9;
-  min-height: 300px;
   place-items: center;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--line) 86%, transparent);
@@ -2781,6 +2819,17 @@ a {
     grid-template-columns: 1fr;
   }
 
+  .learning-workspace {
+    grid-template-areas:
+      'nav'
+      'stage'
+      'rail';
+  }
+
+  .learning-hero .page-title {
+    font-size: 28px;
+  }
+
   .learning-nav,
   .learning-rail {
     position: static;
@@ -2806,6 +2855,10 @@ a {
   .learning-player-meta {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .lesson-notes-panel {
+    grid-template-columns: 1fr;
   }
 
   .live-stage-body {

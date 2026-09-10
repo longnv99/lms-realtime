@@ -66,8 +66,8 @@ export function LearningPlayer({
           lesson={lesson}
           onProgress={onVideoProgress}
         />
-        <p className="learning-video-resume">{resumeCopy}</p>
         <div className="learning-player-meta" aria-label="Lesson progress">
+          <span className="learning-video-resume">{resumeCopy}</span>
           <span>
             <Clock3 size={15} aria-hidden="true" />
             {formatDuration(lesson.durationSeconds)}
