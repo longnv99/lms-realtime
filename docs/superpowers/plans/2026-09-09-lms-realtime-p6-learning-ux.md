@@ -1,6 +1,6 @@
 # LMS Realtime P6 Learning UX Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Build a polished learner workspace with lesson resume/completion, personal notes, transcripts/captions, and quiz review links back to the relevant lesson.
 
@@ -97,7 +97,7 @@
   - `QuizReviewResponse`
   - `CourseQuizReviewResponse`
 
-- [ ] **Step 1: Add the shared notes contract**
+- [x] **Step 1: Add the shared notes contract**
 
 Create `shared/src/learning.ts`:
 
@@ -123,7 +123,7 @@ export interface UpdateLessonNoteInput {
 }
 ```
 
-- [ ] **Step 2: Add transcript contracts**
+- [x] **Step 2: Add transcript contracts**
 
 Append to `shared/src/lessons.ts`:
 
@@ -153,7 +153,7 @@ export interface ReplaceLessonTranscriptInput {
 }
 ```
 
-- [ ] **Step 3: Add manual progress contract**
+- [x] **Step 3: Add manual progress contract**
 
 Append to `shared/src/progress.ts`:
 
@@ -164,7 +164,7 @@ export interface UpdateLessonProgressInput {
 }
 ```
 
-- [ ] **Step 4: Add quiz review contracts**
+- [x] **Step 4: Add quiz review contracts**
 
 Append to `shared/src/quizzes.ts`:
 
@@ -202,7 +202,7 @@ export interface CourseQuizReviewResponse {
 }
 ```
 
-- [ ] **Step 5: Export contracts**
+- [x] **Step 5: Export contracts**
 
 Update `shared/src/index.ts`:
 
@@ -210,7 +210,7 @@ Update `shared/src/index.ts`:
 export * from './learning';
 ```
 
-- [ ] **Step 6: Verify and commit**
+- [x] **Step 6: Verify and commit**
 
 Run:
 
@@ -245,7 +245,7 @@ git commit -m "feat(shared): add learning ux contracts"
   - Prisma model `LessonTranscriptCue`
   - nullable field `Question.explanation`
 
-- [ ] **Step 1: Add relations to existing models**
+- [x] **Step 1: Add relations to existing models**
 
 Add to `Lesson` in `backend/prisma/models/course.prisma`:
 
@@ -266,7 +266,7 @@ Add to `Question` in `backend/prisma/models/quiz.prisma`:
   explanation String?
 ```
 
-- [ ] **Step 2: Add learning models**
+- [x] **Step 2: Add learning models**
 
 Create `backend/prisma/models/learning.prisma`:
 
@@ -304,7 +304,7 @@ model LessonTranscriptCue {
 }
 ```
 
-- [ ] **Step 3: Generate the migration without resetting data**
+- [x] **Step 3: Generate the migration without resetting data**
 
 Run:
 
@@ -314,7 +314,7 @@ npm run db:migrate --workspace=backend -- --name p6_learning_ux
 
 Expected: Prisma creates a migration and keeps existing data.
 
-- [ ] **Step 4: Verify Prisma client and backend typecheck**
+- [x] **Step 4: Verify Prisma client and backend typecheck**
 
 Run:
 
@@ -324,7 +324,7 @@ npm run typecheck:backend
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/prisma
@@ -346,7 +346,7 @@ git commit -m "feat(backend): add learning ux schema"
   - `ProgressService.updateLessonProgress(user: AuthUser, lessonId: string, input: UpdateLessonProgressInput): Promise<LessonProgressResponse>`
   - `PATCH /api/me/lessons/:lessonId/progress`
 
-- [ ] **Step 1: Write e2e coverage**
+- [x] **Step 1: Write e2e coverage**
 
 Create `backend/test/learning-progress.e2e-spec.ts` with tests for:
 
@@ -372,7 +372,7 @@ it('rejects progress updates for lessons outside the learner enrollment', async 
 });
 ```
 
-- [ ] **Step 2: Run failing e2e**
+- [x] **Step 2: Run failing e2e**
 
 Run:
 
@@ -382,7 +382,7 @@ npm run test:e2e --workspace=backend -- learning-progress.e2e-spec.ts
 
 Expected: FAIL because the route does not exist.
 
-- [ ] **Step 3: Implement service method**
+- [x] **Step 3: Implement service method**
 
 Add this method shape to `ProgressService`:
 
@@ -424,7 +424,7 @@ async updateLessonProgress(
 }
 ```
 
-- [ ] **Step 4: Add controller route and Swagger metadata**
+- [x] **Step 4: Add controller route and Swagger metadata**
 
 Add to `ProgressController`:
 
@@ -440,7 +440,7 @@ async updateMyLessonProgress(
 }
 ```
 
-- [ ] **Step 5: Verify and commit**
+- [x] **Step 5: Verify and commit**
 
 Run:
 
@@ -477,7 +477,7 @@ git commit -m "feat(backend): add learner progress controls"
   - `PATCH /api/me/lesson-notes/:noteId`
   - `DELETE /api/me/lesson-notes/:noteId`
 
-- [ ] **Step 1: Write e2e coverage**
+- [x] **Step 1: Write e2e coverage**
 
 Create tests that assert:
 
@@ -513,7 +513,7 @@ it('creates, updates, lists, and deletes learner-owned notes', async () => {
 });
 ```
 
-- [ ] **Step 2: Run failing e2e**
+- [x] **Step 2: Run failing e2e**
 
 Run:
 
@@ -523,7 +523,7 @@ npm run test:e2e --workspace=backend -- lesson-notes.e2e-spec.ts
 
 Expected: FAIL because `LearningModule` does not exist.
 
-- [ ] **Step 3: Implement `LessonNotesService`**
+- [x] **Step 3: Implement `LessonNotesService`**
 
 Implement methods with these exact signatures:
 
@@ -541,11 +541,11 @@ Rules:
 - Instructors and admins can create their own notes for any course lesson they can access.
 - Users can only update or delete their own notes.
 
-- [ ] **Step 4: Implement controller and module**
+- [x] **Step 4: Implement controller and module**
 
 Use `@ApiTags('learning')`, `@UseGuards(JwtAuthGuard)`, and the same auth decorators as existing modules.
 
-- [ ] **Step 5: Verify and commit**
+- [x] **Step 5: Verify and commit**
 
 Run:
 
@@ -581,7 +581,7 @@ git commit -m "feat(backend): add lesson notes"
   - `GET /api/lessons/:lessonId/transcript`
   - `PUT /api/lessons/:lessonId/transcript`
 
-- [ ] **Step 1: Write e2e coverage**
+- [x] **Step 1: Write e2e coverage**
 
 Create tests that assert:
 
@@ -620,7 +620,7 @@ it('lets an instructor replace transcript cues for their lesson', async () => {
 });
 ```
 
-- [ ] **Step 2: Run failing e2e**
+- [x] **Step 2: Run failing e2e**
 
 Run:
 
@@ -630,7 +630,7 @@ npm run test:e2e --workspace=backend -- lesson-transcripts.e2e-spec.ts
 
 Expected: FAIL because the transcript routes do not exist.
 
-- [ ] **Step 3: Implement transcript service**
+- [x] **Step 3: Implement transcript service**
 
 Implement methods:
 
@@ -650,7 +650,7 @@ Rules:
 - `startSeconds` and `endSeconds` must be integers with `0 <= startSeconds < endSeconds <= lesson.durationSeconds`.
 - Replacement deletes the previous cues for that lesson and inserts new cues with `order` starting at 1.
 
-- [ ] **Step 4: Add seed transcript cues without clearing data**
+- [x] **Step 4: Add seed transcript cues without clearing data**
 
 Update `backend/prisma/seeds/data.ts` to add transcript cues for each existing lesson:
 
@@ -669,7 +669,7 @@ export const seedTranscriptCues = [
 
 Update `backend/prisma/seed.ts` to upsert transcript cues by `lessonId` and `order`, without deleting users, enrollments, sessions, or progress.
 
-- [ ] **Step 5: Verify and commit**
+- [x] **Step 5: Verify and commit**
 
 Run:
 
@@ -705,7 +705,7 @@ git commit -m "feat(backend): add lesson transcripts"
   - `QuizzesService.getMyCourseQuizReviews(courseId: string, user: AuthUser): Promise<CourseQuizReviewResponse>`
   - `GET /api/me/courses/:courseId/quiz-reviews`
 
-- [ ] **Step 1: Write e2e coverage**
+- [x] **Step 1: Write e2e coverage**
 
 Create a test that creates a finished run with one answer, then asserts:
 
@@ -731,7 +731,7 @@ await request(app.getHttpServer())
   });
 ```
 
-- [ ] **Step 2: Run failing e2e**
+- [x] **Step 2: Run failing e2e**
 
 Run:
 
@@ -741,7 +741,7 @@ npm run test:e2e --workspace=backend -- quiz-review.e2e-spec.ts
 
 Expected: FAIL because the review endpoint does not exist.
 
-- [ ] **Step 3: Add question explanations to seed data**
+- [x] **Step 3: Add question explanations to seed data**
 
 Add `explanation` to each seeded question in `backend/prisma/seeds/data.ts`, for example:
 
@@ -751,7 +751,7 @@ explanation: 'Heartbeat events keep learner progress current without waiting for
 
 Update the seed upsert logic to write `explanation` along with question text, options, correct option, and order.
 
-- [ ] **Step 4: Implement review query**
+- [x] **Step 4: Implement review query**
 
 In `QuizzesService`, query finished and revealed quiz runs in the course, scoped to the current user answers:
 
@@ -781,7 +781,7 @@ async getMyCourseQuizReviews(
 }
 ```
 
-- [ ] **Step 5: Add controller route**
+- [x] **Step 5: Add controller route**
 
 Add to `QuizzesController`:
 
@@ -796,7 +796,7 @@ getMyCourseQuizReviews(
 }
 ```
 
-- [ ] **Step 6: Verify and commit**
+- [x] **Step 6: Verify and commit**
 
 Run:
 
@@ -838,7 +838,7 @@ git commit -m "feat(backend): add learner quiz reviews"
   - Route `/courses/:courseId/learn`
   - `updateLessonProgress(lessonId: string, input: UpdateLessonProgressInput): Promise<LessonProgressResponse>`
 
-- [ ] **Step 1: Add API helper**
+- [x] **Step 1: Add API helper**
 
 Add to `frontend/src/api/progress.ts`:
 
@@ -855,7 +855,7 @@ export async function updateLessonProgress(
 }
 ```
 
-- [ ] **Step 2: Write component test for learning route shell**
+- [x] **Step 2: Write component test for learning route shell**
 
 Create `frontend/src/features/learning/LearningPage.test.tsx` and assert:
 
@@ -865,7 +865,7 @@ expect(screen.getByRole('button', { name: /Mark complete/i })).toBeInTheDocument
 expect(screen.getByText(/Lesson 1/i)).toBeInTheDocument();
 ```
 
-- [ ] **Step 3: Run failing frontend test**
+- [x] **Step 3: Run failing frontend test**
 
 Run:
 
@@ -875,7 +875,7 @@ npm run test --workspace=frontend -- LearningPage.test.tsx
 
 Expected: FAIL because `LearningPage` does not exist.
 
-- [ ] **Step 4: Implement page and route**
+- [x] **Step 4: Implement page and route**
 
 Build `LearningPage` with:
 - left lesson navigation on desktop, top segmented lesson selector on mobile.
@@ -897,11 +897,11 @@ Add route in `frontend/src/app/routes.tsx`:
 />
 ```
 
-- [ ] **Step 5: Add course CTA**
+- [x] **Step 5: Add course CTA**
 
 In `CourseDetailPage`, add a student-facing `Continue learning` action linking to `/courses/${courseId}/learn`. Keep instructor/admin management actions unchanged.
 
-- [ ] **Step 6: Verify and commit**
+- [x] **Step 6: Verify and commit**
 
 Run:
 
@@ -946,7 +946,7 @@ git commit -m "feat(frontend): add learning workspace"
   - `deleteLessonNote(noteId: string): Promise<void>`
   - `getLessonTranscript(lessonId: string): Promise<LessonTranscriptResponse>`
 
-- [ ] **Step 1: Add API helpers**
+- [x] **Step 1: Add API helpers**
 
 Create `frontend/src/api/learning.ts`:
 
@@ -982,11 +982,11 @@ export async function getLessonTranscript(lessonId: string): Promise<LessonTrans
 }
 ```
 
-- [ ] **Step 2: Write panel tests**
+- [x] **Step 2: Write panel tests**
 
 Assert that notes can render, enter edit mode, and call delete. Assert that transcript cues render as compact timestamp rows and clicking a cue calls `onSeek(startSeconds)`.
 
-- [ ] **Step 3: Run failing frontend tests**
+- [x] **Step 3: Run failing frontend tests**
 
 Run:
 
@@ -996,7 +996,7 @@ npm run test --workspace=frontend -- LessonNotesPanel.test.tsx LessonTranscriptP
 
 Expected: FAIL because the panels do not exist.
 
-- [ ] **Step 4: Implement notes panel**
+- [x] **Step 4: Implement notes panel**
 
 `LessonNotesPanel` props:
 
@@ -1013,7 +1013,7 @@ Behavior:
 - notes sorted newest first.
 - note actions use icon buttons only with hover tooltips.
 
-- [ ] **Step 5: Implement transcript panel**
+- [x] **Step 5: Implement transcript panel**
 
 `LessonTranscriptPanel` props:
 
@@ -1030,11 +1030,11 @@ Behavior:
 - active cue has a subtle shadcn accent border.
 - empty transcript uses concise English copy: `No transcript available`.
 
-- [ ] **Step 6: Wire panels into `LearningPage`**
+- [x] **Step 6: Wire panels into `LearningPage`**
 
 Render notes and transcript in a tabbed right rail with labels `Notes` and `Transcript`. On mobile, render the same tabs below the player.
 
-- [ ] **Step 7: Verify and commit**
+- [x] **Step 7: Verify and commit**
 
 Run:
 
@@ -1070,7 +1070,7 @@ git commit -m "feat(frontend): add notes and transcript panels"
   - `getMyCourseQuizReviews(courseId: string): Promise<CourseQuizReviewResponse>`
   - `QuizReviewPanel`
 
-- [ ] **Step 1: Add quiz review API helper**
+- [x] **Step 1: Add quiz review API helper**
 
 Add to `frontend/src/api/quizzes.ts`:
 
@@ -1085,7 +1085,7 @@ export async function getMyCourseQuizReviews(
 }
 ```
 
-- [ ] **Step 2: Write panel test**
+- [x] **Step 2: Write panel test**
 
 Create `QuizReviewPanel.test.tsx` with assertions:
 
@@ -1096,7 +1096,7 @@ expect(screen.getByRole('button', { name: /Review lesson/i })).toBeInTheDocument
 expect(screen.getByText('Heartbeat events keep learner progress current')).toBeInTheDocument();
 ```
 
-- [ ] **Step 3: Run failing frontend test**
+- [x] **Step 3: Run failing frontend test**
 
 Run:
 
@@ -1106,7 +1106,7 @@ npm run test --workspace=frontend -- QuizReviewPanel.test.tsx
 
 Expected: FAIL because `QuizReviewPanel` does not exist.
 
-- [ ] **Step 4: Implement `QuizReviewPanel`**
+- [x] **Step 4: Implement `QuizReviewPanel`**
 
 Props:
 
@@ -1125,11 +1125,11 @@ Behavior:
 - `Review lesson` action calls `onSelectLesson(review.lessonId)`.
 - empty state copy: `Completed quiz reviews will appear here.`
 
-- [ ] **Step 5: Wire into `LearningPage`**
+- [x] **Step 5: Wire into `LearningPage`**
 
 Add the third tab `Quiz review` to the learning right rail. Selecting `Review lesson` changes the active lesson and scrolls the player heading into view.
 
-- [ ] **Step 6: Verify and commit**
+- [x] **Step 6: Verify and commit**
 
 Run:
 
@@ -1160,7 +1160,7 @@ git commit -m "feat(frontend): add quiz review flow"
 - Consumes: completed backend and frontend from Tasks 1-9.
 - Produces: repeatable smoke coverage for `/courses/:courseId/learn`.
 
-- [ ] **Step 1: Write Playwright test**
+- [x] **Step 1: Write Playwright test**
 
 Create `tests/e2e/p6-learning-ux.spec.ts`:
 
@@ -1183,7 +1183,7 @@ test('student can use the learning workspace', async ({ page }) => {
 });
 ```
 
-- [ ] **Step 2: Add README smoke steps**
+- [x] **Step 2: Add README smoke steps**
 
 Add:
 
@@ -1197,7 +1197,7 @@ Add:
 5. Verify lesson progress, notes, transcript, and quiz review panels render.
 ```
 
-- [ ] **Step 3: Verify and commit**
+- [x] **Step 3: Verify and commit**
 
 Run:
 
@@ -1227,7 +1227,7 @@ git commit -m "test(e2e): cover learning workspace"
 - Consumes: all previous tasks.
 - Produces: checked plan boxes and a ready-to-review branch.
 
-- [ ] **Step 1: Run full verification**
+- [x] **Step 1: Run full verification**
 
 Run:
 
@@ -1240,11 +1240,11 @@ npm run test:e2e:ui
 
 Expected: PASS.
 
-- [ ] **Step 2: Update the plan checklist**
+- [x] **Step 2: Update the plan checklist**
 
-Mark all completed task checkboxes in this file from `- [ ]` to `- [x]` for implemented steps only.
+Mark all completed task checkboxes in this file from `- [x]` to `- [x]` for implemented steps only.
 
-- [ ] **Step 3: Inspect git status**
+- [x] **Step 3: Inspect git status**
 
 Run:
 
@@ -1254,14 +1254,14 @@ git status --short --branch
 
 Expected: only the plan checklist file is modified before the final commit.
 
-- [ ] **Step 4: Commit plan checklist**
+- [x] **Step 4: Commit plan checklist**
 
 ```bash
 git add docs/superpowers/plans/2026-09-09-lms-realtime-p6-learning-ux.md
 git commit -m "docs(plan): complete p6 learning ux checklist"
 ```
 
-- [ ] **Step 5: Push branch**
+- [x] **Step 5: Push branch**
 
 ```bash
 git push -u github p6-learning-ux
