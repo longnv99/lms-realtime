@@ -22,7 +22,9 @@ describe('LessonTranscriptPanel', () => {
     renderPanel(onSeek);
 
     expect(await screen.findByText('Welcome to the realtime classroom.')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: /00:15 Welcome to the realtime classroom/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /00:15 Welcome to the realtime classroom/i }),
+    );
 
     expect(onSeek).toHaveBeenCalledWith(15);
   });

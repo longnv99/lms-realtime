@@ -36,8 +36,7 @@ export function QuizReviewPanel({
   }
 
   const reviews = [...(reviewsQuery.data?.reviews ?? [])].sort(
-    (a, b) =>
-      Date.parse(b.finishedAt ?? b.startedAt) - Date.parse(a.finishedAt ?? a.startedAt),
+    (a, b) => Date.parse(b.finishedAt ?? b.startedAt) - Date.parse(a.finishedAt ?? a.startedAt),
   );
 
   if (reviews.length === 0) {

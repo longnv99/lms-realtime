@@ -93,7 +93,10 @@ export function CourseDetailPage() {
           <h2 className="page-title">{course.title}</h2>
           <p className="page-description">{course.description ?? course.slug}</p>
           {!canManage && (
-            <Link className="button button-primary detail-hero-action" to={`/courses/${course.id}/learn`}>
+            <Link
+              className="button button-primary detail-hero-action"
+              to={`/courses/${course.id}/learn`}
+            >
               Continue learning
             </Link>
           )}
