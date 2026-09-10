@@ -250,7 +250,9 @@ npm.cmd run test:e2e:ui
 2. Seed without reset when preserving data: `npm.cmd run db:seed`.
 3. Sign in as `student@example.com` with `Password123!`.
 4. Open `/courses`, select `Realtime LMS Foundations`, then choose `Continue learning`.
-5. Verify lesson progress, notes, transcript, and quiz review panels render.
+5. Verify the selected lesson shows the real video player, or `No video attached` if that lesson has no media asset.
+6. Play or seek the lesson video and confirm learner progress updates from video playback events.
+7. Verify lesson progress, notes, transcript, and quiz review panels render.
 
 Run the production-stack smoke test after `docker-compose.prod.yml` is up:
 

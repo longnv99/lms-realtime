@@ -281,17 +281,17 @@ git commit -m "refactor(frontend): share lesson playback player"
 - Consumes: completed P7 playback and progress autosave.
 - Produces: documented learner playback smoke path.
 
-- [ ] **Step 1: Update Playwright smoke**
+- [x] **Step 1: Update Playwright smoke**
 
 Add assertions that the learning workspace shows either:
 - a `Video player for ...` element when seeded media exists; or
 - the `No video attached` state when local MinIO has no uploaded object.
 
-- [ ] **Step 2: Update README smoke notes**
+- [x] **Step 2: Update README smoke notes**
 
 Document that `/courses/:courseId/learn` now uses real lesson playback and saves progress from video events.
 
-- [ ] **Step 3: Run full verification**
+- [x] **Step 3: Run full verification**
 
 Run:
 
@@ -303,7 +303,7 @@ npm run build
 
 Expected: PASS.
 
-- [ ] **Step 4: Mark plan complete and commit**
+- [x] **Step 4: Mark plan complete and commit**
 
 Mark completed boxes in this plan and commit:
 
