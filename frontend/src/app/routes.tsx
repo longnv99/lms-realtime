@@ -12,6 +12,7 @@ import { RegisterPage } from '../features/auth/RegisterPage';
 import { useAuthStore } from '../features/auth/auth.store';
 import { CourseDetailPage } from '../features/courses/CourseDetailPage';
 import { CoursesPage } from '../features/courses/CoursesPage';
+import { LearningPage } from '../features/learning/LearningPage';
 import { NotificationsButton } from '../features/notifications/NotificationsButton';
 import { LiveSessionPage } from '../features/sessions/LiveSessionPage';
 
@@ -53,6 +54,14 @@ export function AppRoutes() {
           element={
             <ProtectedRoute>
               <CoursesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/courses/:courseId/learn"
+          element={
+            <ProtectedRoute>
+              <LearningPage />
             </ProtectedRoute>
           }
         />
@@ -181,6 +190,10 @@ export function ProductShell() {
 function getPageLabel(pathname: string) {
   if (pathname.includes('/sessions/')) {
     return 'Live room';
+  }
+
+  if (pathname.endsWith('/learn')) {
+    return 'Learning workspace';
   }
 
   if (/^\/courses\/[^/]+/.test(pathname)) {
