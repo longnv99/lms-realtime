@@ -54,7 +54,7 @@
   - `LessonVideoPlayer`
   - `LessonVideoProgressPayload`
 
-- [ ] **Step 1: Write failing playback tests**
+- [x] **Step 1: Write failing playback tests**
 
 Add tests asserting:
 
@@ -72,7 +72,7 @@ Also assert:
 - `initialPositionSeconds={42}` seeks the video to 42 once metadata loads;
 - `timeupdate` calls `onProgress` at 10-second intervals and on completion.
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run:
 
@@ -82,7 +82,7 @@ npm run test --workspace=frontend -- LessonVideoPlayer.test.tsx
 
 Expected: FAIL because `LessonVideoPlayer` does not exist.
 
-- [ ] **Step 3: Implement the component**
+- [x] **Step 3: Implement the component**
 
 Create `LessonVideoPlayer` with this interface:
 
@@ -110,7 +110,7 @@ Behavior:
 - call `onProgress` from `timeupdate`, `pause`, `seeked`, `ended`, and unmount;
 - throttle normal `timeupdate` events to `progressIntervalSeconds`, default `10`.
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify**
 
 Run:
 
@@ -122,7 +122,7 @@ npm run build:frontend
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add frontend/src/features/media frontend/src/styles/global.css

@@ -1954,6 +1954,12 @@ a {
   width: min(100%, 440px);
 }
 
+.lesson-video-shell {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
 .video-frame {
   display: grid;
   width: 100%;
@@ -1973,6 +1979,7 @@ a {
   object-fit: contain;
 }
 
+.lesson-video-meta,
 .playback-meta {
   display: flex;
   align-items: center;
@@ -1982,6 +1989,12 @@ a {
   font-size: 13px;
 }
 
+.lesson-video-meta {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.lesson-video-meta span:not(.badge),
 .playback-meta span {
   display: inline-flex;
   min-width: 0;
