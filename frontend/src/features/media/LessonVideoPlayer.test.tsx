@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { LessonResponse } from '@lms/shared';
 import { getMediaPlayback } from '../../api/media';
-import { LessonVideoPlayer } from './LessonVideoPlayer';
+import { LessonVideoPlayer, type LessonVideoProgressPayload } from './LessonVideoPlayer';
 
 vi.mock('../../api/media', () => ({
   getMediaPlayback: vi.fn(),
@@ -104,11 +104,7 @@ function renderLessonVideoPlayer({
 }: {
   initialPositionSeconds?: number;
   lesson?: LessonResponse | null;
-  onProgress?: (payload: {
-    completed: boolean;
-    lessonId: string;
-    positionSeconds: number;
-  }) => void;
+  onProgress?: (payload: LessonVideoProgressPayload) => void;
 } = {}) {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
