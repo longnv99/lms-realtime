@@ -756,7 +756,7 @@ git commit -m "feat(frontend): add lesson media library"
   - repeatable instructor media management smoke coverage
   - documented manual P8 smoke path
 
-- [ ] **Step 1: Add Playwright E2E media management smoke**
+- [x] **Step 1: Add Playwright E2E media management smoke**
 
 Create `tests/e2e/p8-media-management.spec.ts`:
 
@@ -776,11 +776,11 @@ test('instructor manages lesson media from the course detail page', async ({ bro
 });
 ```
 
-- [ ] **Step 2: Add backend authorization smoke to E2E or backend tests**
+- [x] **Step 2: Add backend authorization smoke to E2E or backend tests**
 
 Ensure one automated test proves a non-enrolled student cannot get playback for another course's attached video. The backend e2e from Task 3 is enough if it remains in CI; do not duplicate the same assertion in Playwright.
 
-- [ ] **Step 3: Update README**
+- [x] **Step 3: Update README**
 
 Add `### P8 Content & Media Management Smoke Test`:
 
@@ -794,7 +794,7 @@ Add `### P8 Content & Media Management Smoke Test`:
 7. Detach a lesson video, reattach it from the media library, then sign in as `student@example.com` and confirm `/courses/:courseId/learn` still plays only enrolled course media.
 ```
 
-- [ ] **Step 4: Run full verification**
+- [x] **Step 4: Run full verification**
 
 Run:
 
@@ -808,11 +808,11 @@ npm run test:e2e:ui -- tests/e2e/p8-media-management.spec.ts
 
 Expected: PASS.
 
-- [ ] **Step 5: Mark plan complete**
+- [x] **Step 5: Mark plan complete**
 
 Check every completed box in this file and ensure no unchecked implementation tasks remain.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add README.md tests/e2e docs/superpowers/plans/2026-09-11-lms-realtime-p8-content-media-management.md
@@ -823,16 +823,16 @@ git commit -m "docs(plan): complete p8 content media management"
 
 ## P8 Acceptance Checklist
 
-- [ ] Instructor-created media assets are owned by the uploading user.
-- [ ] Admin can see all media assets; instructor sees only their own media assets.
-- [ ] Instructor/admin can list, search, filter, and delete unused media assets.
-- [ ] Attached media cannot be deleted until detached.
-- [ ] Instructor/admin can attach, replace, and detach lesson video media.
-- [ ] Students can create playback URLs only for videos attached to enrolled courses.
-- [ ] Unattached media is not playable by students.
-- [ ] Lesson media management UI uses English copy and shadcn-style dark UI primitives.
-- [ ] Playwright screenshots verify desktop/mobile layout quality for media management UI.
-- [ ] Backend tests, frontend tests, typecheck, build, and P8 E2E pass.
+- [x] Instructor-created media assets are owned by the uploading user.
+- [x] Admin can see all media assets; instructor sees only their own media assets.
+- [x] Instructor/admin can list, search, filter, and delete unused media assets.
+- [x] Attached media cannot be deleted until detached.
+- [x] Instructor/admin can attach, replace, and detach lesson video media.
+- [x] Students can create playback URLs only for videos attached to enrolled courses.
+- [x] Unattached media is not playable by students.
+- [x] Lesson media management UI uses English copy and shadcn-style dark UI primitives.
+- [x] Playwright screenshots verify desktop/mobile layout quality for media management UI.
+- [x] Backend tests, frontend tests, typecheck, build, and P8 E2E pass.
 
 ## Out of Scope for P8
 
