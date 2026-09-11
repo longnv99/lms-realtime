@@ -19,5 +19,5 @@ export class UpdateLessonDto {
 
   @IsOptional()
   @IsString()
-  mediaAssetId?: string;
+  mediaAssetId?: string | null;
 }

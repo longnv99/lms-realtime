@@ -162,19 +162,20 @@ describe('Media uploads (e2e)', () => {
   });
 
   it('returns playback URLs only for uploaded media assets', async () => {
-    const student = await registerAndLogin(app, 'STUDENT');
+    const instructor = await registerAndLogin(app, 'INSTRUCTOR');
     const pending = await prisma.mediaAsset.create({
       data: {
         key: 'videos/pending.mp4',
         fileName: 'pending.mp4',
         contentType: 'video/mp4',
         sizeBytes: 15_000,
+        uploadedById: instructor.userId,
       },
     });
 
     await request(app.getHttpServer())
       .get(`/api/media/assets/${pending.id}/playback`)
-      .set('Authorization', `Bearer ${student.accessToken}`)
+      .set('Authorization', `Bearer ${instructor.accessToken}`)
       .expect(400)
       .expect((res) => {
         expect(res.body.error.code).toBe('LESSON_MEDIA_NOT_READY');
@@ -187,7 +188,7 @@ describe('Media uploads (e2e)', () => {
 
     const res = await request(app.getHttpServer())
       .get(`/api/media/assets/${uploaded.id}/playback`)
-      .set('Authorization', `Bearer ${student.accessToken}`)
+      .set('Authorization', `Bearer ${instructor.accessToken}`)
       .expect(200);
 
     expect(res.body.data).toEqual({
@@ -312,5 +313,44 @@ describe('Media uploads (e2e)', () => {
       id: asset.id,
     });
     expect(s3Storage.deleteObject).not.toHaveBeenCalled();
+  });
+
+  it('forbids playback when a student is not enrolled in the attached lesson course', async () => {
+    const instructor = await registerAndLogin(app, 'INSTRUCTOR');
+    const student = await registerAndLogin(app, 'STUDENT');
+    const course = await prisma.course.create({
+      data: {
+        instructorId: instructor.userId,
+        slug: `playback-course-${Date.now()}`,
+        status: 'PUBLISHED',
+        title: 'Playback Course',
+      },
+    });
+    const asset = await prisma.mediaAsset.create({
+      data: {
+        contentType: 'video/mp4',
+        fileName: 'restricted.mp4',
+        key: 'videos/restricted.mp4',
+        sizeBytes: 2000,
+        status: 'UPLOADED',
+        uploadedById: instructor.userId,
+      },
+    });
+    await prisma.lesson.create({
+      data: {
+        courseId: course.id,
+        mediaAssetId: asset.id,
+        order: 1,
+        title: 'Restricted lesson',
+      },
+    });
+
+    await request(app.getHttpServer())
+      .get(`/api/media/assets/${asset.id}/playback`)
+      .set('Authorization', `Bearer ${student.accessToken}`)
+      .expect(403)
+      .expect((res) => {
+        expect(res.body.error.code).toBe('AUTH_FORBIDDEN');
+      });
   });
 });

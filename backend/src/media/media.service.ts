@@ -190,8 +190,29 @@ export class MediaService {
     });
   }
 
-  async createPlayback(id: string): Promise<MediaPlaybackResponse> {
-    const asset = await this.findAssetOrThrow(id);
+  async createPlayback(actor: AuthenticatedUser, id: string): Promise<MediaPlaybackResponse> {
+    const asset = await this.prisma.mediaAsset.findUnique({
+      where: { id },
+      include: {
+        lesson: {
+          select: {
+            course: {
+              select: {
+                enrollments: {
+                  where: { userId: actor.id },
+                  select: { id: true },
+                },
+                instructorId: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!asset) {
+      throw new AppError('NOT_FOUND', 'Media asset not found', HttpStatus.NOT_FOUND);
+    }
 
     if (asset.status !== 'UPLOADED') {
       throw new AppError(
@@ -200,6 +221,8 @@ export class MediaService {
         HttpStatus.BAD_REQUEST,
       );
     }
+
+    this.ensureCanCreatePlayback(actor, asset);
 
     return {
       assetId: asset.id,
@@ -275,5 +298,41 @@ export class MediaService {
       createdAt: asset.createdAt.toISOString(),
       updatedAt: asset.updatedAt.toISOString(),
     };
+  }
+
+  private ensureCanCreatePlayback(
+    actor: AuthenticatedUser,
+    asset: Prisma.MediaAssetGetPayload<{
+      include: {
+        lesson: {
+          select: {
+            course: {
+              select: {
+                enrollments: { where: { userId: string }; select: { id: true } };
+                instructorId: true;
+              };
+            };
+          };
+        };
+      };
+    }>,
+  ): void {
+    if (actor.role === 'ADMIN') {
+      return;
+    }
+
+    if (actor.role === 'INSTRUCTOR') {
+      if (asset.uploadedById === actor.id || asset.lesson?.course.instructorId === actor.id) {
+        return;
+      }
+
+      throw new AppError('AUTH_FORBIDDEN', 'You cannot play this media asset', HttpStatus.FORBIDDEN);
+    }
+
+    if (asset.lesson?.course.enrollments.length) {
+      return;
+    }
+
+    throw new AppError('AUTH_FORBIDDEN', 'You cannot play this media asset', HttpStatus.FORBIDDEN);
   }
 }

@@ -8,6 +8,7 @@ import type { AuthenticatedUser } from '../../common/types/authenticated-request
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { ReorderLessonsDto } from './dto/reorder-lessons.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
+import { UpdateLessonMediaDto } from './dto/update-lesson-media.dto';
 import { LessonsService } from './lessons.service';
 
 @ApiTags('Lessons')
@@ -42,6 +43,18 @@ export class LessonsController {
     @Body() dto: ReorderLessonsDto,
   ) {
     return this.lessonsService.reorder(courseId, user, dto);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @Roles('ADMIN', 'INSTRUCTOR')
+  @Patch('lessons/:id/media')
+  updateMedia(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: UpdateLessonMediaDto,
+  ) {
+    return this.lessonsService.updateMedia(id, user, dto);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

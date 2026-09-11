@@ -50,7 +50,7 @@ export class MediaController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @Get('assets/:id/playback')
-  createPlayback(@Param('id') id: string) {
-    return this.mediaService.createPlayback(id);
+  createPlayback(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
+    return this.mediaService.createPlayback(user, id);
   }
 }

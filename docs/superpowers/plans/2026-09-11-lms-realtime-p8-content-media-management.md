@@ -466,7 +466,7 @@ git commit -m "feat(backend): add instructor media library"
   - `UpdateLessonMediaDto { mediaAssetId: string | null }`
   - lesson-level authorization inside `GET /api/media/assets/:id/playback`
 
-- [ ] **Step 1: Write failing lesson attach/detach tests**
+- [x] **Step 1: Write failing lesson attach/detach tests**
 
 Add tests to `backend/test/lessons.e2e-spec.ts`:
 
@@ -514,7 +514,7 @@ npm run test:e2e --workspace=backend -- lessons.e2e-spec.ts
 
 Expected: FAIL because `/lessons/:id/media` does not exist.
 
-- [ ] **Step 2: Implement dedicated lesson media DTO and endpoint**
+- [x] **Step 2: Implement dedicated lesson media DTO and endpoint**
 
 Create:
 
@@ -544,7 +544,7 @@ updateMedia(
 
 Implement `updateMedia(id, actor, dto)` by loading lesson+course, checking manager permission, validating asset is `UPLOADED`, validating instructor owns the asset unless admin, then updating `mediaAssetId`.
 
-- [ ] **Step 3: Allow null media detach in validation**
+- [x] **Step 3: Allow null media detach in validation**
 
 Update `UpdateLessonDto` so normal lesson edits do not reject `mediaAssetId: null` if existing callers keep using `PATCH /lessons/:id`:
 
@@ -556,7 +556,7 @@ mediaAssetId?: string | null;
 
 In service code, treat `undefined` as no media change and `null` as detach.
 
-- [ ] **Step 4: Write failing playback authorization tests**
+- [x] **Step 4: Write failing playback authorization tests**
 
 Add to `backend/test/media.e2e-spec.ts`:
 
@@ -580,7 +580,7 @@ it('forbids playback when a student is not enrolled in the attached lesson cours
 
 Expected: FAIL because current playback allows any authenticated user.
 
-- [ ] **Step 5: Implement playback authorization**
+- [x] **Step 5: Implement playback authorization**
 
 Change controller signature:
 
@@ -598,7 +598,7 @@ In `MediaService.createPlayback(actor, id)`:
 - deny unattached media playback to students;
 - return current presigned playback response only after authorization.
 
-- [ ] **Step 6: Verify**
+- [x] **Step 6: Verify**
 
 Run:
 
@@ -610,7 +610,7 @@ npm run build:backend
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add backend/src/modules/lessons backend/src/media backend/test/lessons.e2e-spec.ts backend/test/media.e2e-spec.ts

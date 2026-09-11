@@ -5,6 +5,7 @@ import type {
   LessonResponse,
   LessonTranscriptResponse,
   ReplaceLessonTranscriptInput,
+  UpdateLessonMediaInput,
   ListMediaAssetsResponse,
   MediaAssetListItemResponse,
   LessonNoteResponse,
@@ -110,6 +111,10 @@ const updateLessonNote: UpdateLessonNoteInput = {
 const updateLessonProgress: UpdateLessonProgressInput = {
   positionSeconds: 120,
   completed: true,
+};
+
+const updateLessonMedia: UpdateLessonMediaInput = {
+  mediaAssetId: 'asset-1',
 };
 
 const mediaAsset: MediaAssetListItemResponse = {
@@ -239,6 +244,7 @@ const notification: NotificationPayload = {
 void lesson;
 void lessonTranscript;
 void replaceLessonTranscript;
+void updateLessonMedia;
 void lessonNote;
 void createLessonNote;
 void updateLessonNote;
