@@ -640,7 +640,7 @@ git commit -m "feat(backend): authorize lesson media assignment"
   - `MediaLibraryPanel`
   - instructor UI to upload, attach existing media, replace attached media, detach media, and delete unused media
 
-- [ ] **Step 1: Write failing media library component tests**
+- [x] **Step 1: Write failing media library component tests**
 
 Create `frontend/src/features/media/MediaLibraryPanel.test.tsx` with assertions:
 
@@ -665,7 +665,7 @@ npm run test --workspace=frontend -- MediaLibraryPanel.test.tsx
 
 Expected: FAIL because `MediaLibraryPanel` does not exist.
 
-- [ ] **Step 2: Implement `MediaLibraryPanel`**
+- [x] **Step 2: Implement `MediaLibraryPanel`**
 
 Build a compact dark panel:
 - header title `Media library`;
@@ -679,7 +679,7 @@ Build a compact dark panel:
 
 Use existing shadcn-style primitives and no visible instructional copy.
 
-- [ ] **Step 3: Upgrade lesson media control**
+- [x] **Step 3: Upgrade lesson media control**
 
 In `LessonMediaUpload.tsx`, keep direct upload but add:
 - icon action to open library panel;
@@ -694,7 +694,7 @@ Visible labels:
 - `Attach media`
 - `Detach video`
 
-- [ ] **Step 4: Update lessons tests**
+- [x] **Step 4: Update lessons tests**
 
 Extend `LessonsPanel.test.tsx`:
 
@@ -704,7 +704,7 @@ await user.click(screen.getByRole('button', { name: /detach video for practice/i
 expect(mockedUpdateLesson).toHaveBeenCalledWith('lesson-2', { mediaAssetId: null });
 ```
 
-- [ ] **Step 5: Run Playwright visual audit**
+- [x] **Step 5: Run Playwright visual audit**
 
 Start local BE/FE without clearing DB. Use an instructor login and capture:
 - desktop course detail with lesson media controls;
@@ -719,7 +719,7 @@ Pass criteria:
 - icon actions have readable hover/focus target;
 - lesson rows remain balanced at desktop and mobile.
 
-- [ ] **Step 6: Verify**
+- [x] **Step 6: Verify**
 
 Run:
 
@@ -731,7 +731,7 @@ npm run build:frontend
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add frontend/src/api frontend/src/features/media frontend/src/features/lessons frontend/src/styles/global.css
