@@ -50,15 +50,53 @@ export function LearningPlayer({
   return (
     <Card className="learning-player">
       <CardHeader className="learning-player-header">
-        <div>
+        <div className="learning-player-heading">
           <CardTitle>{lesson.title}</CardTitle>
           <p className="learning-player-description">
             {lesson.description ?? 'Work through the lesson and save your progress.'}
           </p>
         </div>
-        <StatusBadge tone={isCompleted ? 'success' : 'muted'}>
-          {isCompleted ? 'Completed' : 'In progress'}
-        </StatusBadge>
+        <TooltipProvider>
+          <div className="learning-player-controls">
+            <StatusBadge tone={isCompleted ? 'success' : 'muted'}>
+              {isCompleted ? 'Completed' : 'In progress'}
+            </StatusBadge>
+            <div className="learning-player-action-group" aria-label="Lesson actions">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    aria-label="Mark complete"
+                    className="learning-player-action"
+                    disabled={progressPending || isCompleted}
+                    onClick={onMarkComplete}
+                    size="icon"
+                    type="button"
+                    variant={isCompleted ? 'secondary' : 'default'}
+                  >
+                    <CheckCircle2 aria-hidden="true" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Mark complete</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    aria-label="Reset progress"
+                    className="learning-player-action"
+                    disabled={progressPending || percent === 0}
+                    onClick={onResetProgress}
+                    size="icon"
+                    type="button"
+                    variant="ghost"
+                  >
+                    <RotateCcw aria-hidden="true" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Reset progress</TooltipContent>
+              </Tooltip>
+            </div>
+          </div>
+        </TooltipProvider>
       </CardHeader>
       <CardContent className="learning-player-body">
         <LessonVideoPlayer
@@ -78,39 +116,6 @@ export function LearningPlayer({
           </span>
         </div>
         <Progress value={percent} />
-        <TooltipProvider>
-          <div className="learning-player-actions">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  aria-label="Mark complete"
-                  disabled={progressPending || isCompleted}
-                  onClick={onMarkComplete}
-                  size="icon"
-                  type="button"
-                >
-                  <CheckCircle2 aria-hidden="true" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Mark complete</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  aria-label="Reset progress"
-                  disabled={progressPending || percent === 0}
-                  onClick={onResetProgress}
-                  size="icon"
-                  type="button"
-                  variant="secondary"
-                >
-                  <RotateCcw aria-hidden="true" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Reset progress</TooltipContent>
-            </Tooltip>
-          </div>
-        </TooltipProvider>
       </CardContent>
     </Card>
   );
