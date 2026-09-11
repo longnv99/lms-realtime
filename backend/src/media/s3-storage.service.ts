@@ -1,4 +1,5 @@
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   HeadObjectCommand,
   NotFound,
@@ -69,6 +70,15 @@ export class S3StorageService {
 
       throw error;
     }
+  }
+
+  async deleteObject(key: string): Promise<void> {
+    await this.client.send(
+      new DeleteObjectCommand({
+        Bucket: env.S3_BUCKET,
+        Key: key,
+      }),
+    );
   }
 }
 

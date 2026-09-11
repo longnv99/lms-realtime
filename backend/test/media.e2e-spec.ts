@@ -15,6 +15,7 @@ describe('Media uploads (e2e)', () => {
   const s3Storage = {
     createUploadUrl: jest.fn(),
     createPlaybackUrl: jest.fn(),
+    deleteObject: jest.fn(),
     headObject: jest.fn(),
   };
 
@@ -195,5 +196,121 @@ describe('Media uploads (e2e)', () => {
       expiresInSeconds: 1800,
     });
     expect(s3Storage.createPlaybackUrl).toHaveBeenCalledWith(uploaded.key);
+  });
+
+  it('lists only instructor-owned media assets for instructors', async () => {
+    const owner = await registerAndLogin(app, 'INSTRUCTOR');
+    const other = await registerAndLogin(app, 'INSTRUCTOR');
+    const owned = await prisma.mediaAsset.create({
+      data: {
+        contentType: 'video/mp4',
+        fileName: 'owned.mp4',
+        key: 'videos/owned.mp4',
+        sizeBytes: 1000,
+        status: 'UPLOADED',
+        uploadedById: owner.userId,
+      },
+    });
+    await prisma.mediaAsset.create({
+      data: {
+        contentType: 'video/mp4',
+        fileName: 'other.mp4',
+        key: 'videos/other.mp4',
+        sizeBytes: 1000,
+        status: 'UPLOADED',
+        uploadedById: other.userId,
+      },
+    });
+
+    const res = await request(app.getHttpServer())
+      .get('/api/media/assets')
+      .set('Authorization', `Bearer ${owner.accessToken}`)
+      .expect(200);
+
+    expect(res.body.data).toMatchObject({
+      limit: 20,
+      page: 1,
+      total: 1,
+    });
+    expect(res.body.data.items.map((item: { id: string }) => item.id)).toEqual([owned.id]);
+  });
+
+  it('forbids students from listing media assets', async () => {
+    const student = await registerAndLogin(app, 'STUDENT');
+
+    await request(app.getHttpServer())
+      .get('/api/media/assets')
+      .set('Authorization', `Bearer ${student.accessToken}`)
+      .expect(403)
+      .expect((res) => {
+        expect(res.body.error.code).toBe('AUTH_FORBIDDEN');
+      });
+  });
+
+  it('deletes only unused owned media assets and removes the object', async () => {
+    const instructor = await registerAndLogin(app, 'INSTRUCTOR');
+    const asset = await prisma.mediaAsset.create({
+      data: {
+        contentType: 'video/webm',
+        fileName: 'unused.webm',
+        key: 'videos/unused.webm',
+        sizeBytes: 2000,
+        status: 'UPLOADED',
+        uploadedById: instructor.userId,
+      },
+    });
+
+    await request(app.getHttpServer())
+      .delete(`/api/media/assets/${asset.id}`)
+      .set('Authorization', `Bearer ${instructor.accessToken}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.data).toEqual({ deleted: true });
+      });
+
+    await expect(prisma.mediaAsset.findUnique({ where: { id: asset.id } })).resolves.toBeNull();
+    expect(s3Storage.deleteObject).toHaveBeenCalledWith('videos/unused.webm');
+  });
+
+  it('does not delete media assets that are attached to lessons', async () => {
+    const instructor = await registerAndLogin(app, 'INSTRUCTOR');
+    const course = await prisma.course.create({
+      data: {
+        instructorId: instructor.userId,
+        slug: `media-course-${Date.now()}`,
+        title: 'Media Course',
+      },
+    });
+    const asset = await prisma.mediaAsset.create({
+      data: {
+        contentType: 'video/mp4',
+        fileName: 'attached.mp4',
+        key: 'videos/attached.mp4',
+        sizeBytes: 2000,
+        status: 'UPLOADED',
+        uploadedById: instructor.userId,
+      },
+    });
+    await prisma.lesson.create({
+      data: {
+        courseId: course.id,
+        mediaAssetId: asset.id,
+        order: 1,
+        title: 'Attached lesson',
+      },
+    });
+
+    await request(app.getHttpServer())
+      .delete(`/api/media/assets/${asset.id}`)
+      .set('Authorization', `Bearer ${instructor.accessToken}`)
+      .expect(409)
+      .expect((res) => {
+        expect(res.body.error.code).toBe('MEDIA_ASSET_IN_USE');
+      });
+
+    await expect(prisma.mediaAsset.findUnique({ where: { id: asset.id } })).resolves.toMatchObject({
+      id: asset.id,
+    });
+    expect(s3Storage.deleteObject).not.toHaveBeenCalled();
   });
 });

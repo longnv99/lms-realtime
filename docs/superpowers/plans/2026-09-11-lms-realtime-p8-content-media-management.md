@@ -242,7 +242,7 @@ git commit -m "feat(shared): add media library contracts"
   - `DELETE /api/media/assets/:id`
   - `S3StorageService.deleteObject(key: string): Promise<void>`
 
-- [ ] **Step 1: Write failing backend e2e tests**
+- [x] **Step 1: Write failing backend e2e tests**
 
 Add tests to `backend/test/media.e2e-spec.ts`:
 
@@ -312,7 +312,7 @@ npm run test:e2e --workspace=backend -- media.e2e-spec.ts
 
 Expected: FAIL because `uploadedById`, list route, and delete route do not exist.
 
-- [ ] **Step 2: Add Prisma ownership**
+- [x] **Step 2: Add Prisma ownership**
 
 Update `backend/prisma/models/media.prisma`:
 
@@ -354,7 +354,7 @@ ALTER TABLE "MediaAsset"
   ON DELETE SET NULL ON UPDATE CASCADE;
 ```
 
-- [ ] **Step 3: Track upload owner**
+- [x] **Step 3: Track upload owner**
 
 Change controller signature:
 
@@ -372,7 +372,7 @@ async createUpload(actor: AuthenticatedUser, dto: CreateUploadDto): Promise<Crea
 
 Set `uploadedById: actor.id` when creating `MediaAsset`.
 
-- [ ] **Step 4: Implement list media assets**
+- [x] **Step 4: Implement list media assets**
 
 Create `ListMediaAssetsQueryDto` with `attached`, `status`, `q`, `page`, and `limit`. In `MediaService.listAssets(actor, query)`, use:
 
@@ -395,7 +395,7 @@ const where: Prisma.MediaAssetWhereInput = {
 
 Return `{ items, page, limit, total }`, mapping `BigInt` `sizeBytes` to `number`.
 
-- [ ] **Step 5: Implement delete unused asset**
+- [x] **Step 5: Implement delete unused asset**
 
 Add to `S3StorageService`:
 
@@ -413,7 +413,7 @@ In `MediaService.deleteAsset(actor, id)`:
 - delete the DB row;
 - return `{ deleted: true }`.
 
-- [ ] **Step 6: Update seed media ownership**
+- [x] **Step 6: Update seed media ownership**
 
 In `backend/prisma/seeds/lessons.seed.ts`, set:
 
@@ -423,7 +423,7 @@ uploadedById: course.instructorId,
 
 for create and update when upserting seeded media assets.
 
-- [ ] **Step 7: Verify**
+- [x] **Step 7: Verify**
 
 Run:
 
@@ -436,7 +436,7 @@ npm run build:backend
 
 Expected: PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add backend/prisma backend/src/media backend/test/media.e2e-spec.ts

@@ -11,7 +11,7 @@ export type SeedLessonKey = 'intro' | 'realtimeRoom' | 'quiz' | 'progress';
 
 export type SeedContext = {
   users: Record<SeedUserKey, { id: string; email: string }>;
-  course: { id: string; slug: string };
+  course: { id: string; instructorId: string; slug: string };
   lessons: Record<SeedLessonKey, { id: string; durationSeconds: number; title: string }>;
   session: { id: string; title: string };
   quiz?: { id: string; title: string };

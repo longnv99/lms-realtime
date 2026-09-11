@@ -21,6 +21,7 @@ model User {
   chatMessages    ChatMessage[]
   quizAnswers     QuizAnswer[]
   notifications   Notification[]
+  uploadedMediaAssets MediaAsset[] @relation("UploadedMediaAssets")
 }
 
 model RefreshToken {
