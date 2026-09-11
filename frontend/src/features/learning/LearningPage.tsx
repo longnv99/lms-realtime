@@ -18,6 +18,7 @@ import { LessonNotesPanel } from './LessonNotesPanel';
 import { LessonTranscriptPanel } from './LessonTranscriptPanel';
 import { LearningPlayer } from './LearningPlayer';
 import { QuizReviewPanel } from './QuizReviewPanel';
+import type { LessonVideoProgressPayload } from '../media/LessonVideoPlayer';
 
 type LearningRailTab = 'notes' | 'transcript' | 'quizReview';
 
@@ -117,6 +118,14 @@ export function LearningPage() {
       completed: false,
       lessonId: selectedLesson.id,
       positionSeconds: 0,
+    });
+  }
+
+  function handleVideoProgress(payload: LessonVideoProgressPayload) {
+    progressMutation.mutate({
+      completed: payload.completed ? true : undefined,
+      lessonId: payload.lessonId,
+      positionSeconds: payload.positionSeconds,
     });
   }
 
@@ -238,6 +247,7 @@ export function LearningPage() {
             lesson={selectedLesson}
             onMarkComplete={handleMarkComplete}
             onResetProgress={handleResetProgress}
+            onVideoProgress={handleVideoProgress}
             progress={selectedProgress}
             progressPending={progressMutation.isPending}
           />

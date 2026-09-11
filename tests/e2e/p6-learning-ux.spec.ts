@@ -21,6 +21,9 @@ test.describe('P6 learning UX', () => {
     await page.getByRole('link', { name: /Continue learning/i }).click();
     await expect(page).toHaveURL(new RegExp(`/courses/${demoData.courseId}/learn$`));
     await expect(page.getByRole('heading', { name: /Learning workspace/i })).toBeVisible();
+    await expect(
+      page.getByLabel(/Video player for/i).or(page.getByText('No video attached')).first(),
+    ).toBeVisible();
     const markCompleteButton = page.getByRole('button', { name: /Mark complete/i });
     await expect(markCompleteButton).toBeVisible();
 
@@ -38,7 +41,7 @@ test.describe('P6 learning UX', () => {
     await expect(page.getByText(noteText)).toBeVisible();
 
     await page.getByRole('tab', { name: /Quiz review/i }).click();
-    await expect(page.getByText(/Quiz review/i)).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Quiz review' })).toBeVisible();
 
     await page.context().close();
   });

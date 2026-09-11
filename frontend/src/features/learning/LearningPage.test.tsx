@@ -1,10 +1,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CourseProgressResponse, LessonResponse, MyEnrollmentResponse } from '@lms/shared';
 import { listMyEnrollments } from '../../api/enrollments';
 import { listLessons } from '../../api/lessons';
+import { getMediaPlayback } from '../../api/media';
 import { getMyCourseProgress, updateLessonProgress } from '../../api/progress';
 import { useAuthStore } from '../auth/auth.store';
 import { LearningPage } from './LearningPage';
@@ -19,6 +20,10 @@ vi.mock('../../api/enrollments', () => ({
 
 vi.mock('../../api/lessons', () => ({
   listLessons: vi.fn(),
+}));
+
+vi.mock('../../api/media', () => ({
+  getMediaPlayback: vi.fn(),
 }));
 
 vi.mock('../../api/progress', () => ({
@@ -40,6 +45,7 @@ vi.mock('./QuizReviewPanel', () => ({
 
 const mockedListMyEnrollments = vi.mocked(listMyEnrollments);
 const mockedListLessons = vi.mocked(listLessons);
+const mockedGetMediaPlayback = vi.mocked(getMediaPlayback);
 const mockedGetMyCourseProgress = vi.mocked(getMyCourseProgress);
 const mockedUpdateLessonProgress = vi.mocked(updateLessonProgress);
 
@@ -58,11 +64,25 @@ describe('LearningPage', () => {
     });
     mockedListMyEnrollments.mockReset();
     mockedListLessons.mockReset();
+    mockedGetMediaPlayback.mockReset();
     mockedGetMyCourseProgress.mockReset();
     mockedUpdateLessonProgress.mockReset();
     mockedListMyEnrollments.mockResolvedValue([enrollmentFixture()]);
     mockedListLessons.mockResolvedValue(lessonsFixture());
+    mockedGetMediaPlayback.mockResolvedValue({
+      assetId: 'media-1',
+      expiresInSeconds: 1800,
+      playbackUrl: 'http://localhost:9000/lesson.mp4',
+    });
     mockedGetMyCourseProgress.mockResolvedValue(progressFixture());
+    mockedUpdateLessonProgress.mockResolvedValue({
+      completedAt: null,
+      durationSeconds: 600,
+      lastWatchedAt: '2026-09-08T00:20:00.000Z',
+      lessonId: 'lesson-1',
+      positionSeconds: 42,
+      title: 'Lesson 1: Intro lesson',
+    });
   });
 
   it('renders the learning route shell, lesson nav, and completion action', async () => {
@@ -71,6 +91,30 @@ describe('LearningPage', () => {
     expect(await screen.findByRole('heading', { name: /Learning workspace/i })).toBeInTheDocument();
     expect(await screen.findByRole('button', { name: /Mark complete/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Lesson 1: Intro lesson/i })).toBeInTheDocument();
+  });
+
+  it('autosaves video progress from the lesson player', async () => {
+    renderLearningPage();
+    const player = await screen.findByLabelText(/video player for lesson 1: intro lesson/i);
+
+    setVideoTime(player, 42);
+    fireEvent.timeUpdate(player);
+
+    await waitFor(() => {
+      expect(mockedUpdateLessonProgress).toHaveBeenCalledWith('lesson-1', {
+        positionSeconds: 42,
+      });
+    });
+
+    setVideoTime(player, 600);
+    fireEvent.ended(player);
+
+    await waitFor(() => {
+      expect(mockedUpdateLessonProgress).toHaveBeenCalledWith('lesson-1', {
+        completed: true,
+        positionSeconds: 600,
+      });
+    });
   });
 
   it('keeps the learning workspace locked until the student enrolls', async () => {
@@ -176,4 +220,12 @@ function enrollmentFixture(overrides: Partial<MyEnrollmentResponse> = {}): MyEnr
     userId: 'student-1',
     ...overrides,
   };
+}
+
+function setVideoTime(element: HTMLElement, currentTime: number): void {
+  Object.defineProperty(element, 'currentTime', {
+    configurable: true,
+    value: currentTime,
+    writable: true,
+  });
 }

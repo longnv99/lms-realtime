@@ -115,6 +115,16 @@ Mỗi feature module backend theo chuẩn: `dto/` (create, update, index), `*.co
 - **BullMQ processor inline** trong process NestJS, đăng ký trong feature module tương ứng.
 - Ports dev: BE **4000**, FE **5173**, MinIO 9000/9001, Postgres 5432, Redis 6379. Port 4000 phải đồng nhất giữa `backend/.env` (`PORT`), `frontend/vite.config.ts` (proxy target), `docker-compose.prod.yml` (Nginx upstream), `frontend/nginx.conf`. Đặt vào `.env.example` ở mỗi app, không hardcode.
 
+### 2.4 UI quality gate
+
+For every frontend UI/layout change, use Playwright before handoff:
+
+- Open the affected page locally with seeded demo data and authenticated roles when needed.
+- Capture desktop, laptop/tablet, and mobile screenshots.
+- Check for console errors, page errors, horizontal overflow, clipped text, overlapping UI, and whether the primary task surface is visible at the expected viewport position.
+- Review the screenshots visually and state the quality assessment before marking the UI work done.
+- Keep Playwright artifacts local and ignored by git unless a task explicitly asks to publish them.
+
 ## 3. Data model (Prisma)
 
 ### 3.1 Các entity chính
