@@ -5,6 +5,8 @@ import type {
   LessonResponse,
   LessonTranscriptResponse,
   ReplaceLessonTranscriptInput,
+  ListMediaAssetsResponse,
+  MediaAssetListItemResponse,
   LessonNoteResponse,
   NotificationPayload,
   UpdateLessonProgressInput,
@@ -110,6 +112,35 @@ const updateLessonProgress: UpdateLessonProgressInput = {
   completed: true,
 };
 
+const mediaAsset: MediaAssetListItemResponse = {
+  contentType: 'video/mp4',
+  createdAt: '2026-09-11T00:00:00.000Z',
+  fileName: 'intro.mp4',
+  id: 'asset-1',
+  key: 'videos/asset-1.mp4',
+  lesson: {
+    courseId: lesson.courseId,
+    courseTitle: 'Realtime LMS Foundations',
+    id: lesson.id,
+    title: lesson.title,
+  },
+  sizeBytes: 1024,
+  status: 'UPLOADED',
+  updatedAt: '2026-09-11T00:00:00.000Z',
+  uploadedBy: {
+    email: 'instructor@example.com',
+    id: 'user-1',
+    name: 'Instructor',
+  },
+};
+
+const mediaAssets: ListMediaAssetsResponse = {
+  items: [mediaAsset],
+  limit: 20,
+  page: 1,
+  total: 1,
+};
+
 const session: SessionResponse = {
   id: 'session-1',
   courseId: course.id,
@@ -212,6 +243,7 @@ void lessonNote;
 void createLessonNote;
 void updateLessonNote;
 void updateLessonProgress;
+void mediaAssets;
 void quizRun;
 void quizReviewQuestion;
 void quizReview;
