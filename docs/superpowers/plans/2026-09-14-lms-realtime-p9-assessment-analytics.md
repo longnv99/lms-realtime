@@ -341,7 +341,7 @@ git commit -m "feat(shared): add analytics contracts"
   - `GET /api/me/courses/:courseId/analytics`
   - `AnalyticsService.getLearnerCourseAnalytics(courseId: string, user: AuthenticatedUser): Promise<LearnerCourseAnalyticsResponse>`
 
-- [ ] **Step 1: Write failing backend e2e tests**
+- [x] **Step 1: Write failing backend e2e tests**
 
 Create `backend/test/analytics.e2e-spec.ts` with these cases:
 
@@ -390,7 +390,7 @@ npm run test:e2e --workspace=backend -- analytics.e2e-spec.ts
 
 Expected: FAIL because the Analytics module and route do not exist.
 
-- [ ] **Step 2: Add Analytics module and controller**
+- [x] **Step 2: Add Analytics module and controller**
 
 Create `backend/src/modules/analytics/analytics.module.ts`:
 
@@ -438,7 +438,7 @@ export class AnalyticsController {
 
 Import `AnalyticsModule` in `backend/src/app.module.ts`.
 
-- [ ] **Step 3: Implement learner analytics aggregation**
+- [x] **Step 3: Implement learner analytics aggregation**
 
 In `backend/src/modules/analytics/analytics.service.ts`, implement:
 
@@ -522,7 +522,7 @@ const rankedTotals = [...totalsByUser.entries()].sort((a, b) => b[1] - a[1]);
 const rank = rankedTotals.findIndex(([candidateId]) => candidateId === userId) + 1;
 ```
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify**
 
 Run:
 
@@ -534,7 +534,7 @@ npm run build:backend
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/src/app.module.ts backend/src/modules/analytics backend/test/analytics.e2e-spec.ts
