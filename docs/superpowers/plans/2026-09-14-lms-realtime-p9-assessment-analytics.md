@@ -562,7 +562,7 @@ git commit -m "feat(backend): add learner analytics"
   - `AnalyticsService.getInstructorCourseAnalytics(courseId, actor)`
   - `AnalyticsService.exportCourseAnalyticsCsv(courseId, actor, kind)`
 
-- [ ] **Step 1: Write failing instructor analytics tests**
+- [x] **Step 1: Write failing instructor analytics tests**
 
 Extend `backend/test/analytics.e2e-spec.ts`:
 
@@ -608,7 +608,7 @@ it('exports student analytics as csv for instructors', async () => {
 
 Expected: FAIL because routes do not exist.
 
-- [ ] **Step 2: Add instructor routes**
+- [x] **Step 2: Add instructor routes**
 
 Update `analytics.controller.ts`:
 
@@ -643,7 +643,7 @@ async exportCourseAnalytics(
 }
 ```
 
-- [ ] **Step 3: Implement instructor aggregation**
+- [x] **Step 3: Implement instructor aggregation**
 
 Compute from existing rows:
 
@@ -680,7 +680,7 @@ Rules:
 - `quizParticipationRate` = rounded percent of enrolled students with at least one quiz answer in the course.
 - `questionPerformance` is one row per finished run question, ordered newest run first and question order ascending.
 
-- [ ] **Step 4: Implement CSV helper**
+- [x] **Step 4: Implement CSV helper**
 
 Create `backend/src/modules/analytics/csv.ts`:
 
@@ -718,7 +718,7 @@ function escapeCsvCell(value: string | number | null): string {
 }
 ```
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Run:
 
@@ -730,7 +730,7 @@ npm run build:backend
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add backend/src/modules/analytics backend/test/analytics.e2e-spec.ts

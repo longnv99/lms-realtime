@@ -68,6 +68,89 @@ describe('Analytics (e2e)', () => {
       });
   });
 
+  it('returns instructor analytics for an owned course', async () => {
+    const fixture = await createAnalyticsFixture();
+
+    const res = await request(app.getHttpServer())
+      .get(`/api/courses/${fixture.course.id}/analytics`)
+      .set('Authorization', `Bearer ${fixture.instructor.accessToken}`)
+      .expect(200);
+
+    expect(res.body.data).toMatchObject({
+      courseId: fixture.course.id,
+      totalStudents: 2,
+      activeStudents: 2,
+      averageCompletionPercent: 25,
+      completedStudents: 0,
+      averageQuizScore: 15,
+      quizParticipationRate: 100,
+    });
+    expect(res.body.data.lessonCompletions).toEqual([
+      expect.objectContaining({
+        lessonId: fixture.lessons[0].id,
+        lessonTitle: 'Intro video',
+        completedStudents: 1,
+        totalStudents: 2,
+        completionPercent: 50,
+        averagePositionSeconds: 60,
+      }),
+      expect.objectContaining({
+        lessonId: fixture.lessons[1].id,
+        lessonTitle: 'Deep dive',
+        completedStudents: 0,
+        totalStudents: 2,
+        completionPercent: 0,
+        averagePositionSeconds: 0,
+      }),
+    ]);
+    expect(res.body.data.questionPerformance).toEqual([
+      expect.objectContaining({
+        questionId: fixture.questions[0].id,
+        answerCount: 2,
+        correctCount: 2,
+        correctPercent: 100,
+      }),
+      expect.objectContaining({
+        questionId: fixture.questions[1].id,
+        answerCount: 2,
+        correctCount: 1,
+        correctPercent: 50,
+      }),
+    ]);
+    expect(res.body.data.studentSummaries).toEqual([
+      expect.objectContaining({
+        userId: fixture.student.userId,
+        completionPercent: 50,
+        completedLessons: 1,
+        quizRunsTaken: 1,
+        averageQuizScore: 10,
+      }),
+      expect.objectContaining({
+        userId: fixture.peer.userId,
+        completionPercent: 0,
+        completedLessons: 0,
+        quizRunsTaken: 1,
+        averageQuizScore: 20,
+      }),
+    ]);
+  });
+
+  it('exports student analytics as csv for instructors', async () => {
+    const fixture = await createAnalyticsFixture();
+
+    const res = await request(app.getHttpServer())
+      .get(`/api/courses/${fixture.course.id}/analytics/export?kind=students`)
+      .set('Authorization', `Bearer ${fixture.instructor.accessToken}`)
+      .expect(200);
+
+    expect(res.headers['content-type']).toContain('text/csv');
+    expect(res.headers['content-disposition']).toContain('course-analytics-students.csv');
+    expect(res.text).toContain(
+      'Name,Email,Completion %,Completed lessons,Quiz runs,Average quiz score,Last activity',
+    );
+    expect(res.text).toContain('STUDENT User');
+  });
+
   async function createAnalyticsFixture() {
     const instructor = await registerAndLogin(app, 'INSTRUCTOR');
     const student = await registerAndLogin(app, 'STUDENT');
@@ -201,6 +284,6 @@ describe('Analytics (e2e)', () => {
       ],
     });
 
-    return { course, lessons, quizRun, student };
+    return { course, instructor, lessons, peer, questions, quizRun, student };
   }
 });
