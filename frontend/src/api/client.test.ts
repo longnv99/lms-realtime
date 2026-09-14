@@ -14,6 +14,11 @@ import {
   unwrapEnvelope,
 } from './client';
 import {
+  downloadCourseAnalyticsCsv,
+  getInstructorCourseAnalytics,
+  getMyCourseAnalytics,
+} from './analytics';
+import {
   completeMediaUpload,
   createMediaUpload,
   deleteMediaAsset,
@@ -193,6 +198,68 @@ describe('unwrapEnvelope', () => {
     });
     expect(getSpy).toHaveBeenNthCalledWith(2, '/courses/course-1/progress', {
       params: undefined,
+    });
+  });
+
+  it('calls analytics endpoints with envelope helpers and blob export', async () => {
+    const analyticsBlob = new Blob(['Name,Email']);
+    const getSpy = vi.spyOn(apiClient, 'get');
+    getSpy.mockResolvedValueOnce({
+      data: {
+        success: true,
+        data: {
+          averageQuizScore: 125,
+          bestQuizScore: 150,
+          completedLessons: 2,
+          completionPercent: 67,
+          courseId: 'course-1',
+          lastActivityAt: '2026-09-14T00:00:00.000Z',
+          quizAttempts: [],
+          quizRunsTaken: 2,
+          totalLessons: 3,
+        },
+        error: null,
+        meta: null,
+      },
+    });
+    getSpy.mockResolvedValueOnce({
+      data: {
+        success: true,
+        data: {
+          activeStudents: 4,
+          averageCompletionPercent: 58,
+          averageQuizScore: 118,
+          completedStudents: 1,
+          courseId: 'course-1',
+          lessonCompletions: [],
+          questionPerformance: [],
+          quizParticipationRate: 80,
+          studentSummaries: [],
+          totalStudents: 5,
+        },
+        error: null,
+        meta: null,
+      },
+    });
+    getSpy.mockResolvedValueOnce({ data: analyticsBlob });
+
+    await expect(getMyCourseAnalytics('course-1')).resolves.toMatchObject({
+      completionPercent: 67,
+    });
+    await expect(getInstructorCourseAnalytics('course-1')).resolves.toMatchObject({
+      totalStudents: 5,
+    });
+    await expect(downloadCourseAnalyticsCsv('course-1', 'students')).resolves.toBe(analyticsBlob);
+
+    expect(getSpy).toHaveBeenNthCalledWith(1, '/me/courses/course-1/analytics', {
+      params: undefined,
+    });
+    expect(getSpy).toHaveBeenNthCalledWith(2, '/courses/course-1/analytics', {
+      params: undefined,
+    });
+    expect(getSpy).toHaveBeenNthCalledWith(3, '/courses/course-1/analytics/export', {
+      params: { kind: 'students' },
+      responseType: 'blob',
     });
   });
 

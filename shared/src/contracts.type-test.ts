@@ -23,6 +23,10 @@ import type {
   UserRole,
   ChatMessagePayload,
 } from './index';
+import type {
+  InstructorCourseAnalyticsResponse,
+  LearnerCourseAnalyticsResponse,
+} from './analytics';
 import { API_ERROR_CODES } from './index';
 
 const role: UserRole = 'STUDENT';
@@ -200,6 +204,76 @@ const courseQuizReview: CourseQuizReviewResponse = {
   reviews: [quizReview],
 };
 
+const learnerAnalytics: LearnerCourseAnalyticsResponse = {
+  courseId: 'course-1',
+  completedLessons: 2,
+  totalLessons: 3,
+  completionPercent: 67,
+  quizRunsTaken: 2,
+  averageQuizScore: 125,
+  bestQuizScore: 150,
+  lastActivityAt: '2026-09-14T00:00:00.000Z',
+  quizAttempts: [
+    {
+      quizRunId: 'run-1',
+      quizTitle: 'Progress checkpoint',
+      lessonId: 'lesson-1',
+      lessonTitle: 'Introduction',
+      finishedAt: '2026-09-14T00:00:00.000Z',
+      totalScore: 150,
+      correctCount: 1,
+      questionCount: 1,
+      percentCorrect: 100,
+      rank: 1,
+      participantCount: 4,
+    },
+  ],
+};
+
+const instructorAnalytics: InstructorCourseAnalyticsResponse = {
+  courseId: 'course-1',
+  totalStudents: 5,
+  activeStudents: 4,
+  averageCompletionPercent: 58,
+  completedStudents: 1,
+  averageQuizScore: 118,
+  quizParticipationRate: 80,
+  lessonCompletions: [
+    {
+      lessonId: 'lesson-1',
+      lessonTitle: 'Introduction',
+      completedStudents: 3,
+      totalStudents: 5,
+      completionPercent: 60,
+      averagePositionSeconds: 420,
+    },
+  ],
+  questionPerformance: [
+    {
+      quizId: 'quiz-1',
+      quizTitle: 'Progress checkpoint',
+      quizRunId: 'run-1',
+      questionId: 'question-1',
+      questionText: 'Which event keeps progress fresh?',
+      correctCount: 3,
+      answerCount: 4,
+      correctPercent: 75,
+    },
+  ],
+  studentSummaries: [
+    {
+      userId: 'student-1',
+      name: 'Student One',
+      email: 'student@example.com',
+      completionPercent: 67,
+      completedLessons: 2,
+      quizRunsTaken: 2,
+      averageQuizScore: 125,
+      lastActivityAt: '2026-09-14T00:00:00.000Z',
+    },
+  ],
+};
+
 const envelope: ApiEnvelope<AuthTokensResponse> = {
   success: true,
   data: authResponse,
@@ -254,6 +328,8 @@ void quizRun;
 void quizReviewQuestion;
 void quizReview;
 void courseQuizReview;
+void learnerAnalytics;
+void instructorAnalytics;
 void envelope;
 void authErrorCode;
 void sessionState;
