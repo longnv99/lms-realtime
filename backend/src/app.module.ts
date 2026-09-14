@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { EnvModule } from './config/env.module';
 import { HealthModule } from './health/health.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { CoursesModule } from './modules/courses/courses.module';
 import { EnrollmentsModule } from './modules/enrollments/enrollments.module';
 import { LessonsModule } from './modules/lessons/lessons.module';
@@ -25,6 +26,7 @@ import { MediaModule } from './media/media.module';
     PrismaModule,
     HealthModule,
     AuthModule,
+    AnalyticsModule,
     UsersModule,
     MediaModule,
     CoursesModule,

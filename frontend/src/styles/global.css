@@ -1113,6 +1113,197 @@ a {
   align-items: center;
 }
 
+.course-detail-grid .analytics-panel {
+  grid-column: 1 / -1;
+}
+
+.analytics-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.analytics-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.analytics-metric-card {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  border: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-inset) 64%, transparent);
+  padding: 13px;
+}
+
+.analytics-metric-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--line));
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-strong);
+}
+
+.analytics-metric-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.analytics-metric-card div {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.analytics-metric-card span,
+.analytics-metric-card small,
+.analytics-attempt-row span,
+.analytics-lesson-row span,
+.analytics-question-row span,
+.analytics-student-row span {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.analytics-metric-card strong {
+  overflow: hidden;
+  color: var(--text);
+  font-size: 24px;
+  font-weight: 760;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.analytics-two-column {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 14px;
+}
+
+.analytics-subpanel {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+  border: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-inset) 42%, transparent);
+  padding: 14px;
+}
+
+.analytics-subpanel h4 {
+  margin: 0;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 730;
+}
+
+.analytics-attempt-list,
+.analytics-lesson-list,
+.analytics-question-list,
+.analytics-student-table {
+  display: grid;
+  min-width: 0;
+}
+
+.analytics-attempt-row,
+.analytics-lesson-row,
+.analytics-question-row,
+.analytics-student-row {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+  align-items: center;
+  border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  padding: 12px 0;
+}
+
+.analytics-attempt-row:first-child,
+.analytics-lesson-row:first-child,
+.analytics-question-row:first-child,
+.analytics-student-row:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.analytics-attempt-row {
+  grid-template-columns:
+    minmax(190px, 1.3fr)
+    minmax(140px, 0.85fr)
+    minmax(96px, 0.5fr)
+    max-content;
+}
+
+.analytics-lesson-row {
+  grid-template-columns: minmax(180px, 1fr) minmax(140px, 0.82fr);
+}
+
+.analytics-question-row {
+  grid-template-columns: minmax(0, 1fr) max-content;
+}
+
+.analytics-student-row {
+  grid-template-columns:
+    minmax(190px, 1.4fr)
+    minmax(94px, 0.58fr)
+    minmax(78px, 0.48fr)
+    minmax(112px, 0.6fr)
+    minmax(136px, 0.82fr);
+}
+
+.analytics-student-head {
+  border-top: 0;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  padding-top: 0;
+}
+
+.analytics-attempt-row > div:first-child,
+.analytics-lesson-row > div:first-child,
+.analytics-question-row > div:first-child,
+.analytics-student-row > div:first-child {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.analytics-attempt-row strong,
+.analytics-lesson-row strong,
+.analytics-question-row strong,
+.analytics-student-row strong {
+  overflow: hidden;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.analytics-inline-progress {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(70px, 1fr) max-content;
+  gap: 8px;
+  align-items: center;
+}
+
+.analytics-attempt-row > .badge,
+.analytics-question-row > .badge,
+.analytics-student-row > .badge {
+  width: fit-content;
+  white-space: nowrap;
+}
+
 .compact-form {
   display: grid;
   gap: 12px;
@@ -1545,8 +1736,7 @@ a {
 
 .learning-workspace {
   display: grid;
-  grid-template-areas:
-    'nav stage rail';
+  grid-template-areas: 'nav stage rail';
   grid-template-columns: minmax(210px, 240px) minmax(420px, 1fr) minmax(270px, 310px);
   gap: 14px;
   align-items: start;
@@ -3201,6 +3391,24 @@ a {
 
   .instructor-progress-head {
     display: none;
+  }
+
+  .analytics-metric-grid,
+  .analytics-two-column,
+  .analytics-attempt-row,
+  .analytics-lesson-row,
+  .analytics-question-row,
+  .analytics-student-row,
+  .analytics-inline-progress {
+    grid-template-columns: 1fr;
+  }
+
+  .analytics-student-head {
+    display: none;
+  }
+
+  .analytics-actions {
+    flex: 0 0 auto;
   }
 
   .last-watched-cell {

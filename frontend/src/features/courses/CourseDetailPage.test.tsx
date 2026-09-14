@@ -5,10 +5,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type {
   CourseProgressResponse,
   CourseResponse,
+  InstructorCourseAnalyticsResponse,
   InstructorCourseProgressResponse,
+  LearnerCourseAnalyticsResponse,
   ProgressUpdatedPayload,
   SessionResponse,
 } from '@lms/shared';
+import { getInstructorCourseAnalytics, getMyCourseAnalytics } from '../../api/analytics';
 import { getCourse } from '../../api/courses';
 import { listMyEnrollments } from '../../api/enrollments';
 import { getCourseProgress, getMyCourseProgress } from '../../api/progress';
@@ -20,6 +23,12 @@ import { CourseDetailPage } from './CourseDetailPage';
 vi.mock('../../api/courses', () => ({
   enrollCourse: vi.fn(),
   getCourse: vi.fn(),
+}));
+
+vi.mock('../../api/analytics', () => ({
+  downloadCourseAnalyticsCsv: vi.fn(),
+  getInstructorCourseAnalytics: vi.fn(),
+  getMyCourseAnalytics: vi.fn(),
 }));
 
 vi.mock('../../api/enrollments', () => ({
@@ -83,6 +92,8 @@ const mockedSocket: MockedCourseSocket = {
 };
 
 const mockedCreateNamespaceSocket = vi.mocked(createNamespaceSocket);
+const mockedGetInstructorCourseAnalytics = vi.mocked(getInstructorCourseAnalytics);
+const mockedGetMyCourseAnalytics = vi.mocked(getMyCourseAnalytics);
 const mockedGetCourse = vi.mocked(getCourse);
 const mockedGetCourseProgress = vi.mocked(getCourseProgress);
 const mockedGetMyCourseProgress = vi.mocked(getMyCourseProgress);
@@ -98,12 +109,16 @@ describe('CourseDetailPage progress surfaces', () => {
     mockedSocket.off.mockClear();
     onMock.mockClear();
     mockedCreateNamespaceSocket.mockClear();
+    mockedGetInstructorCourseAnalytics.mockReset();
+    mockedGetMyCourseAnalytics.mockReset();
     mockedGetCourse.mockReset();
     mockedGetCourseProgress.mockReset();
     mockedGetMyCourseProgress.mockReset();
     mockedListMyEnrollments.mockReset();
     mockedListSessions.mockReset();
     mockedGetCourse.mockResolvedValue(courseFixture());
+    mockedGetInstructorCourseAnalytics.mockResolvedValue(instructorAnalyticsFixture());
+    mockedGetMyCourseAnalytics.mockResolvedValue(learnerAnalyticsFixture());
     mockedGetMyCourseProgress.mockResolvedValue(studentProgressFixture());
     mockedGetCourseProgress.mockResolvedValue(instructorProgressFixture());
     mockedListMyEnrollments.mockResolvedValue([enrollmentFixture()]);
@@ -131,6 +146,7 @@ describe('CourseDetailPage progress surfaces', () => {
     expect(screen.getByText('Completed')).toBeInTheDocument();
     expect(screen.getByText('67% watched')).toBeInTheDocument();
     expect(mockedGetMyCourseProgress).toHaveBeenCalledWith('course-1');
+    expect(mockedGetMyCourseAnalytics).toHaveBeenCalledWith('course-1');
     expect(mockedGetCourseProgress).not.toHaveBeenCalled();
   });
 
@@ -142,9 +158,11 @@ describe('CourseDetailPage progress surfaces', () => {
     expect(await screen.findByText('Enroll to start learning')).toBeInTheDocument();
     expect(screen.getAllByText('Preview').length).toBeGreaterThan(0);
     expect(screen.queryByText('Learning progress')).not.toBeInTheDocument();
+    expect(screen.queryByText('Assessment analytics')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Sessions panel')).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /continue learning/i })).not.toBeInTheDocument();
     expect(mockedGetMyCourseProgress).not.toHaveBeenCalled();
+    expect(mockedGetMyCourseAnalytics).not.toHaveBeenCalled();
   });
 
   it('renders instructor per-student progress rows', async () => {
@@ -163,9 +181,10 @@ describe('CourseDetailPage progress surfaces', () => {
     expect(await screen.findByText('Student One')).toBeInTheDocument();
     expect(screen.getByText('student.one@example.com')).toBeInTheDocument();
     expect(screen.getByText('2 / 3')).toBeInTheDocument();
-    expect(screen.getByText('67%')).toBeInTheDocument();
+    expect(screen.getAllByText('67%').length).toBeGreaterThan(0);
     expect(screen.getByText('No activity')).toBeInTheDocument();
     expect(mockedGetCourseProgress).toHaveBeenCalledWith('course-1');
+    expect(mockedGetInstructorCourseAnalytics).toHaveBeenCalledWith('course-1');
     expect(mockedGetMyCourseProgress).not.toHaveBeenCalled();
   });
 
@@ -318,6 +337,35 @@ function instructorProgressFixture(
     ],
     totalLessons: 3,
     ...overrides,
+  };
+}
+
+function learnerAnalyticsFixture(): LearnerCourseAnalyticsResponse {
+  return {
+    averageQuizScore: 10,
+    bestQuizScore: 12,
+    completedLessons: 1,
+    completionPercent: 50,
+    courseId: 'course-1',
+    lastActivityAt: '2026-09-14T00:00:00.000Z',
+    quizAttempts: [],
+    quizRunsTaken: 1,
+    totalLessons: 2,
+  };
+}
+
+function instructorAnalyticsFixture(): InstructorCourseAnalyticsResponse {
+  return {
+    activeStudents: 1,
+    averageCompletionPercent: 67,
+    averageQuizScore: 12,
+    completedStudents: 0,
+    courseId: 'course-1',
+    lessonCompletions: [],
+    questionPerformance: [],
+    quizParticipationRate: 100,
+    studentSummaries: [],
+    totalStudents: 1,
   };
 }
 
