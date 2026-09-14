@@ -106,7 +106,9 @@ describe('LessonsPanel', () => {
   it('detaches lesson media from attached lessons', async () => {
     renderLessonsPanel({ canManage: true });
 
-    await userEvent.click(await screen.findByRole('button', { name: /detach video for practice/i }));
+    await userEvent.click(
+      await screen.findByRole('button', { name: /detach video for practice/i }),
+    );
 
     expect(mockedUpdateLessonMedia).toHaveBeenCalledWith('lesson-2', { mediaAssetId: null });
   });

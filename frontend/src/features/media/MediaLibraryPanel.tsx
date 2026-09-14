@@ -173,7 +173,9 @@ function MediaAssetRow({
                 <Link2 aria-hidden="true" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>{isCurrent ? 'Attached to this lesson' : 'Attach media'}</TooltipContent>
+            <TooltipContent>
+              {isCurrent ? 'Attached to this lesson' : 'Attach media'}
+            </TooltipContent>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -189,7 +191,9 @@ function MediaAssetRow({
                 <Trash2 aria-hidden="true" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>{isAttached ? 'Detach before deleting' : 'Delete media'}</TooltipContent>
+            <TooltipContent>
+              {isAttached ? 'Detach before deleting' : 'Delete media'}
+            </TooltipContent>
           </Tooltip>
         </div>
       </TooltipProvider>

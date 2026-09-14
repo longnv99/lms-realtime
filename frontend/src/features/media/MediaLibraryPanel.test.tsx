@@ -84,7 +84,9 @@ describe('MediaLibraryPanel', () => {
   });
 });
 
-function renderMediaLibraryPanel({ onAttach = vi.fn() }: { onAttach?: (assetId: string) => void } = {}) {
+function renderMediaLibraryPanel({
+  onAttach = vi.fn(),
+}: { onAttach?: (assetId: string) => void } = {}) {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
@@ -96,7 +98,9 @@ function renderMediaLibraryPanel({ onAttach = vi.fn() }: { onAttach?: (assetId: 
   );
 }
 
-function createAsset(overrides: Partial<MediaAssetListItemResponse> = {}): MediaAssetListItemResponse {
+function createAsset(
+  overrides: Partial<MediaAssetListItemResponse> = {},
+): MediaAssetListItemResponse {
   return {
     contentType: 'video/mp4',
     createdAt: '2026-09-11T00:00:00.000Z',

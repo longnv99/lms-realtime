@@ -94,7 +94,9 @@ export function LessonMediaUpload({ courseId, lesson }: LessonMediaUploadProps) 
                 <span className="sr-only">Upload video for {lesson.title}</span>
               </label>
             </TooltipTrigger>
-            <TooltipContent>{lesson.mediaAssetId ? 'Replace video' : 'Upload video'}</TooltipContent>
+            <TooltipContent>
+              {lesson.mediaAssetId ? 'Replace video' : 'Upload video'}
+            </TooltipContent>
           </Tooltip>
         </TooltipProvider>
         <Sheet open={isLibraryOpen} onOpenChange={setIsLibraryOpen}>

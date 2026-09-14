@@ -146,7 +146,11 @@ export class MediaService {
     }
 
     if (actor.role === 'INSTRUCTOR' && asset.uploadedById !== actor.id) {
-      throw new AppError('AUTH_FORBIDDEN', 'You cannot manage this media asset', HttpStatus.FORBIDDEN);
+      throw new AppError(
+        'AUTH_FORBIDDEN',
+        'You cannot manage this media asset',
+        HttpStatus.FORBIDDEN,
+      );
     }
 
     if (asset.lesson) {
@@ -274,7 +278,9 @@ export class MediaService {
   private toMediaAssetListItem(
     asset: Prisma.MediaAssetGetPayload<{
       include: {
-        lesson: { select: { id: true; title: true; course: { select: { id: true; title: true } } } };
+        lesson: {
+          select: { id: true; title: true; course: { select: { id: true; title: true } } };
+        };
         uploadedBy: { select: { id: true; email: true; name: true } };
       };
     }>,
@@ -326,7 +332,11 @@ export class MediaService {
         return;
       }
 
-      throw new AppError('AUTH_FORBIDDEN', 'You cannot play this media asset', HttpStatus.FORBIDDEN);
+      throw new AppError(
+        'AUTH_FORBIDDEN',
+        'You cannot play this media asset',
+        HttpStatus.FORBIDDEN,
+      );
     }
 
     if (asset.lesson?.course.enrollments.length) {

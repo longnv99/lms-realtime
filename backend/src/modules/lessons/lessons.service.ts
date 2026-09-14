@@ -205,7 +205,11 @@ export class LessonsService {
     }
 
     if (actor.role === 'INSTRUCTOR' && asset.uploadedById !== actor.id) {
-      throw new AppError('AUTH_FORBIDDEN', 'You cannot manage this media asset', HttpStatus.FORBIDDEN);
+      throw new AppError(
+        'AUTH_FORBIDDEN',
+        'You cannot manage this media asset',
+        HttpStatus.FORBIDDEN,
+      );
     }
 
     if (asset.lesson && asset.lesson.id !== lessonId) {
