@@ -855,7 +855,7 @@ git commit -m "chore(seed): add analytics demo data"
   - learner analytics panel in course detail for enrolled students
   - instructor analytics panel in course detail for instructors/admins
 
-- [ ] **Step 1: Write failing panel tests**
+- [x] **Step 1: Write failing panel tests**
 
 `LearnerAnalyticsPanel.test.tsx`:
 
@@ -885,7 +885,7 @@ npm run test --workspace=frontend -- LearnerAnalyticsPanel.test.tsx InstructorAn
 
 Expected: FAIL because components do not exist.
 
-- [ ] **Step 2: Implement formatting helpers**
+- [x] **Step 2: Implement formatting helpers**
 
 Create `analytics-format.ts`:
 
@@ -907,7 +907,7 @@ export function formatActivity(value: string | null): string {
 }
 ```
 
-- [ ] **Step 3: Implement `AnalyticsMetricCard`**
+- [x] **Step 3: Implement `AnalyticsMetricCard`**
 
 Use a compact card-like repeated item, not a nested page section:
 
@@ -931,7 +931,7 @@ export function AnalyticsMetricCard({
 }
 ```
 
-- [ ] **Step 4: Implement learner panel**
+- [x] **Step 4: Implement learner panel**
 
 `LearnerAnalyticsPanel` layout:
 - title `My analytics`;
@@ -941,7 +941,7 @@ export function AnalyticsMetricCard({
 - empty state: `Completed quiz attempts will appear here.`;
 - error banner using `getErrorMessage`.
 
-- [ ] **Step 5: Implement instructor panel**
+- [x] **Step 5: Implement instructor panel**
 
 `InstructorAnalyticsPanel` layout:
 - title `Course analytics`;
@@ -964,7 +964,7 @@ function saveCsv(blob: Blob, fileName: string): void {
 }
 ```
 
-- [ ] **Step 6: Mount panels in course detail**
+- [x] **Step 6: Mount panels in course detail**
 
 In `CourseDetailPage.tsx`:
 - show `InstructorAnalyticsPanel` for `canManage`;
@@ -972,7 +972,7 @@ In `CourseDetailPage.tsx`:
 - keep existing progress panel visible;
 - place analytics below progress and before sessions on desktop so the course detail page reads: progress, lessons, analytics, sessions.
 
-- [ ] **Step 7: Style analytics surfaces**
+- [x] **Step 7: Style analytics surfaces**
 
 Add CSS classes:
 - `.analytics-panel`
@@ -990,7 +990,7 @@ Requirements:
 - labels fit content;
 - do not introduce bright purple/blue gradient dominance.
 
-- [ ] **Step 8: Verify**
+- [x] **Step 8: Verify**
 
 Run:
 
@@ -1002,7 +1002,7 @@ npm run build:frontend
 
 Expected: PASS.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add frontend/src/api/analytics.ts frontend/src/features/analytics frontend/src/features/courses/CourseDetailPage.tsx frontend/src/styles/global.css

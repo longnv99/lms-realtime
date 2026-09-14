@@ -12,6 +12,8 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { getErrorMessage } from '../../lib/errors';
 import { createNamespaceSocket } from '../../lib/realtime';
 import { useAuthStore } from '../auth/auth.store';
+import { InstructorAnalyticsPanel } from '../analytics/InstructorAnalyticsPanel';
+import { LearnerAnalyticsPanel } from '../analytics/LearnerAnalyticsPanel';
 import { myEnrollmentsQueryKey, useMyEnrollmentIds } from '../enrollments/useMyEnrollmentIds';
 import { LessonsPanel } from '../lessons/LessonsPanel';
 import { InstructorProgressPanel } from '../progress/InstructorProgressPanel';
@@ -70,6 +72,8 @@ export function CourseDetailPage() {
 
       void queryClient.invalidateQueries({ queryKey: ['course-progress', courseId] });
       void queryClient.invalidateQueries({ queryKey: ['my-course-progress', courseId] });
+      void queryClient.invalidateQueries({ queryKey: ['course-analytics', courseId] });
+      void queryClient.invalidateQueries({ queryKey: ['my-course-analytics', courseId] });
     };
 
     socket.emit('session:join', { sessionId: liveSessionId });
@@ -157,6 +161,17 @@ export function CourseDetailPage() {
             enrollmentLoading={!studentAccessKnown || enrollmentLoading}
             enrollmentPending={enrollMutation.isPending}
             onEnroll={() => enrollMutation.mutate(course.id)}
+          />
+        )}
+        {canManage ? (
+          <InstructorAnalyticsPanel courseId={course.id} />
+        ) : canStudy ? (
+          <LearnerAnalyticsPanel courseId={course.id} />
+        ) : (
+          <LockedPanel
+            id="locked-analytics"
+            description="Enrollment unlocks assessment analytics after you answer live quizzes."
+            title="Enroll to view analytics"
           />
         )}
         <LessonsPanel
