@@ -1,4 +1,5 @@
 import { seedCoursesModule } from './courses.seed';
+import { seedAnalyticsModule } from './analytics.seed';
 import { seedEnrollmentsModule } from './enrollments.seed';
 import { seedLessonsModule } from './lessons.seed';
 import { seedProgressModule } from './progress.seed';
@@ -16,6 +17,7 @@ export const seedModules: SeedModule[] = [
   { name: 'enrollments', run: seedEnrollmentsModule },
   { name: 'progress', run: seedProgressModule },
   { name: 'quizzes', run: seedQuizzesModule },
+  { name: 'analytics', run: seedAnalyticsModule },
 ];
 
 export function parseSeedOptions(args: string[]): SeedOptions {

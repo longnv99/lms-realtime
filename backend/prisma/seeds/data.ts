@@ -213,3 +213,54 @@ export const seedQuestions = [
     order: 5,
   },
 ];
+
+export const seedQuizAnswerSeeds = [
+  {
+    userKey: 'student',
+    questionOrder: 1,
+    selectedOptionId: 'a',
+    isCorrect: true,
+    score: 150,
+    answeredAt: '2026-09-14T00:01:00.000Z',
+  },
+  {
+    userKey: 'student',
+    questionOrder: 2,
+    selectedOptionId: 'a',
+    isCorrect: true,
+    score: 150,
+    answeredAt: '2026-09-14T00:02:00.000Z',
+  },
+  {
+    userKey: 'student',
+    questionOrder: 3,
+    selectedOptionId: 'b',
+    isCorrect: false,
+    score: 0,
+    answeredAt: '2026-09-14T00:03:00.000Z',
+  },
+  {
+    userKey: 'studentTwo',
+    questionOrder: 1,
+    selectedOptionId: 'b',
+    isCorrect: false,
+    score: 0,
+    answeredAt: '2026-09-14T00:01:30.000Z',
+  },
+  {
+    userKey: 'studentTwo',
+    questionOrder: 2,
+    selectedOptionId: 'a',
+    isCorrect: true,
+    score: 150,
+    answeredAt: '2026-09-14T00:02:30.000Z',
+  },
+  {
+    userKey: 'studentTwo',
+    questionOrder: 3,
+    selectedOptionId: 'a',
+    isCorrect: true,
+    score: 150,
+    answeredAt: '2026-09-14T00:03:30.000Z',
+  },
+] as const;

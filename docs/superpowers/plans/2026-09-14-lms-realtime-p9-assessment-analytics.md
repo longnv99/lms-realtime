@@ -753,7 +753,7 @@ git commit -m "feat(backend): add instructor analytics exports"
 - Produces:
   - repeatable demo data with varied lesson completion, quiz scores, and question performance
 
-- [ ] **Step 1: Extend seed data definitions**
+- [x] **Step 1: Extend seed data definitions**
 
 Add analytics-friendly data while preserving idempotent upsert behavior:
 
@@ -799,7 +799,7 @@ export const quizAnswerSeeds = [
 ];
 ```
 
-- [ ] **Step 2: Upsert progress and quiz answer demo rows**
+- [x] **Step 2: Upsert progress and quiz answer demo rows**
 
 Update seed helpers so `npm run db:seed` creates or updates:
 - `LessonProgress` rows by `(userId, lessonId)`;
@@ -812,7 +812,7 @@ Use stable dates:
 const finishedAt = new Date('2026-09-14T00:00:00.000Z');
 ```
 
-- [ ] **Step 3: Verify seed without clearing data**
+- [x] **Step 3: Verify seed without clearing data**
 
 Run:
 
@@ -825,7 +825,7 @@ npm run build:backend
 
 Expected: PASS. Do not run `db:seed:reset` in this task.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add backend/prisma/seeds README.md

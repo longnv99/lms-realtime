@@ -1,4 +1,4 @@
-import { seedLessons, seedTranscriptCues } from '../prisma/seeds/data';
+import { seedLessons, seedQuizAnswerSeeds, seedTranscriptCues } from '../prisma/seeds/data';
 import { getSeedModuleNames, parseSeedOptions } from '../prisma/seeds';
 import { resolveProgressSeedRow } from '../prisma/seeds/progress.seed';
 
@@ -20,7 +20,16 @@ describe('seed configuration', () => {
       'enrollments',
       'progress',
       'quizzes',
+      'analytics',
     ]);
+  });
+
+  it('defines analytics answer rows for both seed students', () => {
+    expect(seedQuizAnswerSeeds.length).toBeGreaterThanOrEqual(2);
+    expect(new Set(seedQuizAnswerSeeds.map((answer) => answer.userKey))).toEqual(
+      new Set(['student', 'studentTwo']),
+    );
+    expect(seedQuizAnswerSeeds.every((answer) => answer.answeredAt.length > 0)).toBe(true);
   });
 
   it('does not move existing learner progress backward during safe seed', () => {

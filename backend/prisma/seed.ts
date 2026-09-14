@@ -12,7 +12,7 @@ async function main(): Promise<void> {
   const context = await runSeed(prisma, options);
   await seedLessonTranscriptCues(context.course.id);
 
-  const [enrollmentCount, progressRows, explanationCount] = await Promise.all([
+  const [enrollmentCount, progressRows, explanationCount, quizAnswers] = await Promise.all([
     prisma.enrollment.count({ where: { courseId: context.course.id } }),
     prisma.lessonProgress.count({
       where: {
@@ -27,6 +27,13 @@ async function main(): Promise<void> {
         explanation: { not: null },
       },
     }),
+    prisma.quizAnswer.count({
+      where: {
+        run: {
+          quizId: context.quiz?.id,
+        },
+      },
+    }),
   ]);
 
   console.log({
@@ -39,6 +46,7 @@ async function main(): Promise<void> {
     lessons: Object.keys(context.lessons).length,
     enrollments: enrollmentCount,
     progressRows,
+    quizAnswers,
     quizQuestionsWithExplanations: explanationCount,
   });
 }
