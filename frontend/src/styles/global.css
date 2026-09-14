@@ -1230,6 +1230,12 @@ a {
   gap: 8px;
 }
 
+.lesson-media-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .lesson-upload-control {
   flex: 0 0 auto;
 }
@@ -1257,6 +1263,179 @@ a {
   background: var(--surface);
   box-shadow: var(--shadow-soft);
   padding: 8px 10px;
+}
+
+.media-library-sheet {
+  border-color: var(--line);
+  background: color-mix(in srgb, var(--surface) 96%, var(--bg));
+  color: var(--text);
+  padding: 0;
+}
+
+.media-library-panel {
+  display: grid;
+  min-height: 100%;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 14px;
+  padding: 16px;
+}
+
+.media-library-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding-right: 36px;
+}
+
+.media-library-header h3,
+.media-library-header p {
+  margin: 0;
+}
+
+.media-library-header h3 {
+  font-size: 18px;
+  font-weight: 760;
+  line-height: 1.2;
+}
+
+.media-library-header p {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.media-library-toolbar {
+  display: grid;
+  gap: 10px;
+}
+
+.media-search {
+  position: relative;
+  display: grid;
+}
+
+.media-search svg {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  color: var(--text-muted);
+  transform: translateY(-50%);
+}
+
+.media-search .field-control {
+  padding-left: 38px;
+}
+
+.media-filter-group {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-inset) 72%, transparent);
+  padding: 4px;
+}
+
+.media-filter-button {
+  min-height: 34px;
+  border: 0;
+  border-radius: calc(var(--radius-sm) - 2px);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+  transition:
+    background 180ms var(--ease-out),
+    color 180ms var(--ease-out),
+    transform 150ms ease;
+}
+
+.media-filter-button[aria-pressed='true'] {
+  background: color-mix(in srgb, var(--surface-strong) 82%, var(--surface));
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 18%, var(--line));
+}
+
+.media-filter-button:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.media-asset-list {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.media-asset-row {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 36px minmax(0, 1fr) max-content max-content;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid color-mix(in srgb, var(--line) 86%, transparent);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-inset) 46%, var(--surface));
+  padding: 10px;
+  transition:
+    border-color 180ms var(--ease-out),
+    background 180ms var(--ease-out);
+}
+
+.media-asset-row:hover {
+  border-color: color-mix(in srgb, var(--accent) 24%, var(--line));
+  background: color-mix(in srgb, var(--surface-strong) 54%, var(--surface));
+}
+
+.media-asset-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface-strong));
+  color: var(--accent-strong);
+}
+
+.media-asset-copy {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.media-asset-copy strong,
+.media-asset-copy span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.media-asset-copy strong {
+  font-size: 14px;
+}
+
+.media-asset-copy span {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.media-asset-state,
+.media-asset-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.media-asset-state {
+  justify-content: flex-end;
+}
+
+.media-asset-state > .badge {
+  width: fit-content;
+  white-space: nowrap;
 }
 
 .session-group {
@@ -2868,6 +3047,35 @@ a {
   .lesson-side {
     justify-content: flex-start;
     flex-wrap: wrap;
+  }
+
+  .media-library-panel {
+    padding: 14px;
+  }
+
+  .media-asset-row {
+    grid-template-columns: 34px minmax(0, 1fr) max-content;
+    grid-template-areas:
+      'icon copy actions'
+      'icon state actions';
+  }
+
+  .media-asset-icon {
+    grid-area: icon;
+  }
+
+  .media-asset-copy {
+    grid-area: copy;
+  }
+
+  .media-asset-state {
+    grid-area: state;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .media-asset-actions {
+    grid-area: actions;
   }
 
   .live-workspace {

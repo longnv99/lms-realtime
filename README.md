@@ -261,6 +261,16 @@ npm.cmd run db:seed:prod
 npm.cmd run test:e2e:prod
 ```
 
+### P8 Content & Media Management Smoke Test
+
+1. Run `docker compose -f docker-compose.infra.yml up -d`.
+2. Run `npm.cmd run dev`.
+3. Sign in as `instructor@example.com` with `Password123!`.
+4. Open `Realtime LMS Foundations`.
+5. Confirm each lesson row shows either `Video attached` or `No video`.
+6. Open the media library from a lesson row, search for `seed-demo`, and attach an unused uploaded media asset when one exists.
+7. Detach a lesson video, reattach it from the media library, then sign in as `student@example.com` and confirm `/courses/:courseId/learn` plays only enrolled course media.
+
 ## Production Verification
 
 ```bash

@@ -91,6 +91,66 @@ describe('Lessons (e2e)', () => {
       });
   });
 
+  it('attaches and detaches an uploaded media asset from an owned lesson', async () => {
+    const instructor = await registerAndLogin(app, 'INSTRUCTOR');
+    const course = await createCourse(instructor.accessToken);
+    const lesson = await createLesson(instructor.accessToken, course.id, 'Media lesson');
+    const asset = await prisma.mediaAsset.create({
+      data: {
+        contentType: 'video/mp4',
+        fileName: 'media.mp4',
+        key: 'videos/media.mp4',
+        sizeBytes: 1000,
+        status: 'UPLOADED',
+        uploadedById: instructor.userId,
+      },
+    });
+
+    await request(app.getHttpServer())
+      .patch(`/api/lessons/${lesson.id}/media`)
+      .set('Authorization', `Bearer ${instructor.accessToken}`)
+      .send({ mediaAssetId: asset.id })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.data.mediaAssetId).toBe(asset.id);
+      });
+
+    await request(app.getHttpServer())
+      .patch(`/api/lessons/${lesson.id}/media`)
+      .set('Authorization', `Bearer ${instructor.accessToken}`)
+      .send({ mediaAssetId: null })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.data.mediaAssetId).toBeNull();
+      });
+  });
+
+  it('forbids attaching another instructors media asset', async () => {
+    const owner = await registerAndLogin(app, 'INSTRUCTOR');
+    const other = await registerAndLogin(app, 'INSTRUCTOR');
+    const course = await createCourse(owner.accessToken);
+    const lesson = await createLesson(owner.accessToken, course.id, 'Owned media lesson');
+    const asset = await prisma.mediaAsset.create({
+      data: {
+        contentType: 'video/mp4',
+        fileName: 'other.mp4',
+        key: 'videos/other-owner.mp4',
+        sizeBytes: 1000,
+        status: 'UPLOADED',
+        uploadedById: other.userId,
+      },
+    });
+
+    await request(app.getHttpServer())
+      .patch(`/api/lessons/${lesson.id}/media`)
+      .set('Authorization', `Bearer ${owner.accessToken}`)
+      .send({ mediaAssetId: asset.id })
+      .expect(403)
+      .expect((res) => {
+        expect(res.body.error.code).toBe('AUTH_FORBIDDEN');
+      });
+  });
+
   async function createCourse(accessToken: string) {
     const res = await request(app.getHttpServer())
       .post('/api/courses')

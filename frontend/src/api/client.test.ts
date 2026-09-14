@@ -13,7 +13,13 @@ import {
   setAuthRefreshHandlers,
   unwrapEnvelope,
 } from './client';
-import { completeMediaUpload, createMediaUpload, getMediaPlayback } from './media';
+import {
+  completeMediaUpload,
+  createMediaUpload,
+  deleteMediaAsset,
+  getMediaPlayback,
+  listMediaAssets,
+} from './media';
 import { getCourseProgress, getMyCourseProgress } from './progress';
 
 describe('unwrapEnvelope', () => {
@@ -46,6 +52,7 @@ describe('unwrapEnvelope', () => {
   });
 
   it('calls media endpoints with envelope helpers', async () => {
+    const deleteSpy = vi.spyOn(apiClient, 'delete');
     const postSpy = vi.spyOn(apiClient, 'post');
     const getSpy = vi.spyOn(apiClient, 'get');
     postSpy.mockResolvedValueOnce({
@@ -87,6 +94,40 @@ describe('unwrapEnvelope', () => {
         meta: null,
       },
     });
+    getSpy.mockResolvedValueOnce({
+      data: {
+        success: true,
+        data: {
+          items: [
+            {
+              contentType: 'video/mp4',
+              createdAt: '2026-09-11T00:00:00.000Z',
+              fileName: 'intro.mp4',
+              id: 'asset-1',
+              key: 'videos/asset-1.mp4',
+              lesson: null,
+              sizeBytes: 123,
+              status: 'UPLOADED',
+              updatedAt: '2026-09-11T00:00:00.000Z',
+              uploadedBy: null,
+            },
+          ],
+          limit: 20,
+          page: 1,
+          total: 1,
+        },
+        error: null,
+        meta: null,
+      },
+    });
+    deleteSpy.mockResolvedValueOnce({
+      data: {
+        success: true,
+        data: { deleted: true },
+        error: null,
+        meta: null,
+      },
+    });
 
     await expect(
       createMediaUpload({ contentType: 'video/mp4', fileName: 'intro.mp4', sizeBytes: 123 }),
@@ -95,6 +136,10 @@ describe('unwrapEnvelope', () => {
     await expect(getMediaPlayback('asset-1')).resolves.toMatchObject({
       playbackUrl: 'http://localhost:9000/playback',
     });
+    await expect(listMediaAssets({ attached: false, q: 'intro' })).resolves.toMatchObject({
+      total: 1,
+    });
+    await expect(deleteMediaAsset('asset-1')).resolves.toEqual({ deleted: true });
 
     expect(postSpy).toHaveBeenNthCalledWith(1, '/media/uploads', {
       contentType: 'video/mp4',
@@ -102,7 +147,13 @@ describe('unwrapEnvelope', () => {
       sizeBytes: 123,
     });
     expect(postSpy).toHaveBeenNthCalledWith(2, '/media/uploads/asset-1/complete', undefined);
-    expect(getSpy).toHaveBeenCalledWith('/media/assets/asset-1/playback', { params: undefined });
+    expect(getSpy).toHaveBeenNthCalledWith(1, '/media/assets/asset-1/playback', {
+      params: undefined,
+    });
+    expect(getSpy).toHaveBeenNthCalledWith(2, '/media/assets', {
+      params: { attached: false, q: 'intro' },
+    });
+    expect(deleteSpy).toHaveBeenCalledWith('/media/assets/asset-1', { data: undefined });
   });
 
   it('calls progress endpoints with envelope helpers', async () => {

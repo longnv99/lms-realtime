@@ -30,6 +30,7 @@ export async function seedCoursesModule(
     },
     select: {
       id: true,
+      instructorId: true,
       slug: true,
     },
   });

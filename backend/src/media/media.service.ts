@@ -1,10 +1,18 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import type { CreateMediaUploadResponse, MediaPlaybackResponse } from '@lms/shared';
+import type {
+  CreateMediaUploadResponse,
+  ListMediaAssetsResponse,
+  MediaAssetListItemResponse,
+  MediaPlaybackResponse,
+} from '@lms/shared';
 import { randomUUID } from 'crypto';
+import { Prisma } from '../generated/prisma/client';
 import { AppError } from '../common/errors/app-error';
+import type { AuthenticatedUser } from '../common/types/authenticated-request';
 import { env } from '../config/env';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUploadDto } from './dto/create-upload.dto';
+import { ListMediaAssetsQueryDto } from './dto/list-media-assets-query.dto';
 import { S3StorageService } from './s3-storage.service';
 
 const MAX_UPLOAD_SIZE_BYTES = 2 * 1024 * 1024 * 1024;
@@ -30,7 +38,10 @@ export class MediaService {
     private readonly storage: S3StorageService,
   ) {}
 
-  async createUpload(dto: CreateUploadDto): Promise<CreateMediaUploadResponse> {
+  async createUpload(
+    actor: AuthenticatedUser,
+    dto: CreateUploadDto,
+  ): Promise<CreateMediaUploadResponse> {
     const extension = this.getAllowedExtension(dto.contentType);
     this.ensureAllowedSize(dto.sizeBytes);
 
@@ -41,6 +52,7 @@ export class MediaService {
         fileName: dto.fileName,
         contentType: dto.contentType,
         sizeBytes: dto.sizeBytes,
+        uploadedById: actor.id,
       },
       select: {
         id: true,
@@ -55,6 +67,104 @@ export class MediaService {
       uploadUrl,
       expiresInSeconds: env.MEDIA_UPLOAD_TTL_SECONDS,
     };
+  }
+
+  async listAssets(
+    actor: AuthenticatedUser,
+    query: ListMediaAssetsQueryDto,
+  ): Promise<ListMediaAssetsResponse> {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 20;
+    const skip = (page - 1) * limit;
+    const search = query.q?.trim();
+    const where: Prisma.MediaAssetWhereInput = {
+      ...(actor.role === 'INSTRUCTOR' ? { uploadedById: actor.id } : {}),
+      ...(query.status ? { status: query.status } : {}),
+      ...(query.attached === true ? { lesson: { isNot: null } } : {}),
+      ...(query.attached === false ? { lesson: { is: null } } : {}),
+      ...(search
+        ? {
+            OR: [
+              { fileName: { contains: search, mode: 'insensitive' } },
+              { key: { contains: search, mode: 'insensitive' } },
+            ],
+          }
+        : {}),
+    };
+
+    const [assets, total] = await this.prisma.$transaction([
+      this.prisma.mediaAsset.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+        include: {
+          lesson: {
+            select: {
+              id: true,
+              title: true,
+              course: {
+                select: {
+                  id: true,
+                  title: true,
+                },
+              },
+            },
+          },
+          uploadedBy: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+            },
+          },
+        },
+      }),
+      this.prisma.mediaAsset.count({ where }),
+    ]);
+
+    return {
+      items: assets.map((asset) => this.toMediaAssetListItem(asset)),
+      limit,
+      page,
+      total,
+    };
+  }
+
+  async deleteAsset(actor: AuthenticatedUser, id: string): Promise<{ deleted: true }> {
+    const asset = await this.prisma.mediaAsset.findUnique({
+      where: { id },
+      include: {
+        lesson: {
+          select: { id: true },
+        },
+      },
+    });
+
+    if (!asset) {
+      throw new AppError('NOT_FOUND', 'Media asset not found', HttpStatus.NOT_FOUND);
+    }
+
+    if (actor.role === 'INSTRUCTOR' && asset.uploadedById !== actor.id) {
+      throw new AppError(
+        'AUTH_FORBIDDEN',
+        'You cannot manage this media asset',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    if (asset.lesson) {
+      throw new AppError(
+        'MEDIA_ASSET_IN_USE',
+        'Detach this media asset before deleting it',
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    await this.storage.deleteObject(asset.key);
+    await this.prisma.mediaAsset.delete({ where: { id } });
+
+    return { deleted: true };
   }
 
   async completeUpload(id: string) {
@@ -84,8 +194,29 @@ export class MediaService {
     });
   }
 
-  async createPlayback(id: string): Promise<MediaPlaybackResponse> {
-    const asset = await this.findAssetOrThrow(id);
+  async createPlayback(actor: AuthenticatedUser, id: string): Promise<MediaPlaybackResponse> {
+    const asset = await this.prisma.mediaAsset.findUnique({
+      where: { id },
+      include: {
+        lesson: {
+          select: {
+            course: {
+              select: {
+                enrollments: {
+                  where: { userId: actor.id },
+                  select: { id: true },
+                },
+                instructorId: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!asset) {
+      throw new AppError('NOT_FOUND', 'Media asset not found', HttpStatus.NOT_FOUND);
+    }
 
     if (asset.status !== 'UPLOADED') {
       throw new AppError(
@@ -94,6 +225,8 @@ export class MediaService {
         HttpStatus.BAD_REQUEST,
       );
     }
+
+    this.ensureCanCreatePlayback(actor, asset);
 
     return {
       assetId: asset.id,
@@ -140,5 +273,76 @@ export class MediaService {
         HttpStatus.PAYLOAD_TOO_LARGE,
       );
     }
+  }
+
+  private toMediaAssetListItem(
+    asset: Prisma.MediaAssetGetPayload<{
+      include: {
+        lesson: {
+          select: { id: true; title: true; course: { select: { id: true; title: true } } };
+        };
+        uploadedBy: { select: { id: true; email: true; name: true } };
+      };
+    }>,
+  ): MediaAssetListItemResponse {
+    return {
+      id: asset.id,
+      key: asset.key,
+      fileName: asset.fileName,
+      contentType: asset.contentType,
+      sizeBytes: Number(asset.sizeBytes),
+      status: asset.status,
+      uploadedBy: asset.uploadedBy,
+      lesson: asset.lesson
+        ? {
+            id: asset.lesson.id,
+            title: asset.lesson.title,
+            courseId: asset.lesson.course.id,
+            courseTitle: asset.lesson.course.title,
+          }
+        : null,
+      createdAt: asset.createdAt.toISOString(),
+      updatedAt: asset.updatedAt.toISOString(),
+    };
+  }
+
+  private ensureCanCreatePlayback(
+    actor: AuthenticatedUser,
+    asset: Prisma.MediaAssetGetPayload<{
+      include: {
+        lesson: {
+          select: {
+            course: {
+              select: {
+                enrollments: { where: { userId: string }; select: { id: true } };
+                instructorId: true;
+              };
+            };
+          };
+        };
+      };
+    }>,
+  ): void {
+    if (actor.role === 'ADMIN') {
+      return;
+    }
+
+    if (actor.role === 'INSTRUCTOR') {
+      if (asset.uploadedById === actor.id || asset.lesson?.course.instructorId === actor.id) {
+        return;
+      }
+
+      throw new AppError(
+        'AUTH_FORBIDDEN',
+        'You cannot play this media asset',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    if (asset.lesson?.course.enrollments.length) {
+      return;
+    }
+
+    throw new AppError('AUTH_FORBIDDEN', 'You cannot play this media asset', HttpStatus.FORBIDDEN);
   }
 }

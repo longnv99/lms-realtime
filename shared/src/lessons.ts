@@ -33,3 +33,7 @@ export interface ReplaceLessonTranscriptInput {
     text: string;
   }>;
 }
+
+export interface UpdateLessonMediaInput {
+  mediaAssetId: string | null;
+}

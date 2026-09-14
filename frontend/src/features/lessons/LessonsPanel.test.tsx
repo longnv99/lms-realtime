@@ -4,25 +4,27 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { LessonResponse } from '@lms/shared';
 import { completeMediaUpload, createMediaUpload } from '../../api/media';
-import { createLesson, listLessons, updateLesson } from '../../api/lessons';
+import { createLesson, listLessons, updateLessonMedia } from '../../api/lessons';
 import { LessonsPanel } from './LessonsPanel';
 
 vi.mock('../../api/lessons', () => ({
   createLesson: vi.fn(),
   listLessons: vi.fn(),
-  updateLesson: vi.fn(),
+  updateLessonMedia: vi.fn(),
 }));
 
 vi.mock('../../api/media', () => ({
   completeMediaUpload: vi.fn(),
   createMediaUpload: vi.fn(),
+  deleteMediaAsset: vi.fn(),
+  listMediaAssets: vi.fn(),
 }));
 
 const mockedCompleteMediaUpload = vi.mocked(completeMediaUpload);
 const mockedCreateLesson = vi.mocked(createLesson);
 const mockedCreateMediaUpload = vi.mocked(createMediaUpload);
 const mockedListLessons = vi.mocked(listLessons);
-const mockedUpdateLesson = vi.mocked(updateLesson);
+const mockedUpdateLessonMedia = vi.mocked(updateLessonMedia);
 const fetchMock = vi.fn();
 
 describe('LessonsPanel', () => {
@@ -31,7 +33,7 @@ describe('LessonsPanel', () => {
     mockedCreateLesson.mockReset();
     mockedCreateMediaUpload.mockReset();
     mockedListLessons.mockReset();
-    mockedUpdateLesson.mockReset();
+    mockedUpdateLessonMedia.mockReset();
     fetchMock.mockReset();
     vi.stubGlobal('fetch', fetchMock);
     mockedListLessons.mockResolvedValue([
@@ -51,7 +53,7 @@ describe('LessonsPanel', () => {
       key: 'videos/asset-1.mp4',
       status: 'UPLOADED',
     });
-    mockedUpdateLesson.mockResolvedValue(
+    mockedUpdateLessonMedia.mockResolvedValue(
       createLessonFixture({ id: 'lesson-1', mediaAssetId: 'asset-1', title: 'Intro lesson' }),
     );
     fetchMock.mockResolvedValue({ ok: true });
@@ -63,6 +65,9 @@ describe('LessonsPanel', () => {
     expect(await screen.findByText('Intro lesson')).toBeInTheDocument();
     expect(screen.getByLabelText(/upload video for intro lesson/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/upload video for practice/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /open media library for intro lesson/i }),
+    ).toBeInTheDocument();
     expect(screen.getByText('No video')).toBeInTheDocument();
     expect(screen.getByText('Video attached')).toBeInTheDocument();
   });
@@ -92,8 +97,20 @@ describe('LessonsPanel', () => {
         method: 'PUT',
       });
       expect(mockedCompleteMediaUpload).toHaveBeenCalledWith('asset-1');
-      expect(mockedUpdateLesson).toHaveBeenCalledWith('lesson-1', { mediaAssetId: 'asset-1' });
+      expect(mockedUpdateLessonMedia).toHaveBeenCalledWith('lesson-1', {
+        mediaAssetId: 'asset-1',
+      });
     });
+  });
+
+  it('detaches lesson media from attached lessons', async () => {
+    renderLessonsPanel({ canManage: true });
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: /detach video for practice/i }),
+    );
+
+    expect(mockedUpdateLessonMedia).toHaveBeenCalledWith('lesson-2', { mediaAssetId: null });
   });
 
   it('rejects non-video files before creating an upload', async () => {

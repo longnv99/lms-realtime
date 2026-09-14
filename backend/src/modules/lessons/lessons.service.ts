@@ -6,6 +6,7 @@ import { CoursesService } from '../courses/courses.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { ReorderLessonsDto } from './dto/reorder-lessons.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
+import { UpdateLessonMediaDto } from './dto/update-lesson-media.dto';
 
 const lessonSelect = {
   id: true,
@@ -45,7 +46,7 @@ export class LessonsService {
   ): Promise<PublicLesson> {
     const course = await this.coursesService.findCourseOrThrow(courseId);
     this.coursesService.ensureCanManage(course, actor);
-    await this.ensureMediaAssetReady(dto.mediaAssetId);
+    await this.ensureMediaAssetAssignable(dto.mediaAssetId, actor);
 
     const max = await this.prisma.lesson.aggregate({
       where: { courseId },
@@ -79,7 +80,7 @@ export class LessonsService {
   async update(id: string, actor: AuthenticatedUser, dto: UpdateLessonDto): Promise<PublicLesson> {
     const lesson = await this.findLessonWithCourseOrThrow(id);
     this.coursesService.ensureCanManage(lesson.course, actor);
-    await this.ensureMediaAssetReady(dto.mediaAssetId);
+    await this.ensureMediaAssetAssignable(dto.mediaAssetId, actor, id);
 
     return this.prisma.lesson.update({
       where: { id },
@@ -88,6 +89,24 @@ export class LessonsService {
         description: dto.description,
         durationSeconds: dto.durationSeconds,
         mediaAssetId: dto.mediaAssetId,
+      },
+      select: lessonSelect,
+    });
+  }
+
+  async updateMedia(
+    id: string,
+    actor: AuthenticatedUser,
+    dto: UpdateLessonMediaDto,
+  ): Promise<PublicLesson> {
+    const lesson = await this.findLessonWithCourseOrThrow(id);
+    this.coursesService.ensureCanManage(lesson.course, actor);
+    await this.ensureMediaAssetAssignable(dto.mediaAssetId, actor, id);
+
+    return this.prisma.lesson.update({
+      where: { id },
+      data: {
+        mediaAssetId: dto.mediaAssetId === undefined ? lesson.mediaAssetId : dto.mediaAssetId,
       },
       select: lessonSelect,
     });
@@ -157,14 +176,24 @@ export class LessonsService {
     return lesson;
   }
 
-  private async ensureMediaAssetReady(mediaAssetId: string | undefined): Promise<void> {
+  private async ensureMediaAssetAssignable(
+    mediaAssetId: string | null | undefined,
+    actor: AuthenticatedUser,
+    lessonId?: string,
+  ): Promise<void> {
     if (!mediaAssetId) {
       return;
     }
 
     const asset = await this.prisma.mediaAsset.findUnique({
       where: { id: mediaAssetId },
-      select: { status: true },
+      select: {
+        status: true,
+        uploadedById: true,
+        lesson: {
+          select: { id: true },
+        },
+      },
     });
 
     if (asset?.status !== 'UPLOADED') {
@@ -172,6 +201,22 @@ export class LessonsService {
         'LESSON_MEDIA_NOT_READY',
         'Media cua lesson chua san sang',
         HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (actor.role === 'INSTRUCTOR' && asset.uploadedById !== actor.id) {
+      throw new AppError(
+        'AUTH_FORBIDDEN',
+        'You cannot manage this media asset',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    if (asset.lesson && asset.lesson.id !== lessonId) {
+      throw new AppError(
+        'CONFLICT',
+        'Media asset is already attached to another lesson',
+        HttpStatus.CONFLICT,
       );
     }
   }

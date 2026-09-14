@@ -23,12 +23,14 @@ export async function seedLessonsModule(
         contentType: lessonSeed.media.contentType,
         sizeBytes: lessonSeed.media.sizeBytes,
         status: 'UPLOADED',
+        uploadedById: course.instructorId,
       },
       update: {
         fileName: lessonSeed.media.fileName,
         contentType: lessonSeed.media.contentType,
         sizeBytes: lessonSeed.media.sizeBytes,
         status: 'UPLOADED',
+        uploadedById: course.instructorId,
       },
       select: {
         id: true,

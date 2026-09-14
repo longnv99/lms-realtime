@@ -1,5 +1,11 @@
-import type { CreateMediaUploadResponse, MediaPlaybackResponse } from '@lms/shared';
-import { getEnvelope, postEnvelope } from './client';
+import type {
+  CreateMediaUploadResponse,
+  DeletedMediaAssetResponse,
+  ListMediaAssetsQuery,
+  ListMediaAssetsResponse,
+  MediaPlaybackResponse,
+} from '@lms/shared';
+import { deleteEnvelope, getEnvelope, postEnvelope } from './client';
 
 export type CreateMediaUploadInput = {
   contentType: 'video/mp4' | 'video/webm';
@@ -29,4 +35,14 @@ export async function completeMediaUpload(assetId: string): Promise<CompletedMed
 
 export async function getMediaPlayback(assetId: string): Promise<MediaPlaybackResponse> {
   return getEnvelope<MediaPlaybackResponse>(`/media/assets/${assetId}/playback`);
+}
+
+export async function listMediaAssets(
+  query?: ListMediaAssetsQuery,
+): Promise<ListMediaAssetsResponse> {
+  return getEnvelope<ListMediaAssetsResponse>('/media/assets', query ? { ...query } : undefined);
+}
+
+export async function deleteMediaAsset(assetId: string): Promise<DeletedMediaAssetResponse> {
+  return deleteEnvelope<DeletedMediaAssetResponse>(`/media/assets/${assetId}`);
 }

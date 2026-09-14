@@ -1,11 +1,11 @@
-import type { LessonResponse } from '@lms/shared';
+import type { LessonResponse, UpdateLessonMediaInput } from '@lms/shared';
 import { deleteEnvelope, getEnvelope, patchEnvelope, postEnvelope } from './client';
 import type { DeletedResponse } from './courses';
 
 export type LessonInput = {
   description?: string;
   durationSeconds?: number;
-  mediaAssetId?: string;
+  mediaAssetId?: string | null;
   title: string;
 };
 
@@ -22,6 +22,13 @@ export async function updateLesson(
   input: Partial<LessonInput>,
 ): Promise<LessonResponse> {
   return patchEnvelope<LessonResponse>(`/lessons/${id}`, input);
+}
+
+export async function updateLessonMedia(
+  id: string,
+  input: UpdateLessonMediaInput,
+): Promise<LessonResponse> {
+  return patchEnvelope<LessonResponse>(`/lessons/${id}/media`, input);
 }
 
 export async function deleteLesson(id: string): Promise<DeletedResponse> {
