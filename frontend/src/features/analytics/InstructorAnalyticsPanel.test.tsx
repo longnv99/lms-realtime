@@ -29,8 +29,8 @@ describe('InstructorAnalyticsPanel', () => {
     expect(screen.getByText('Intro video')).toBeInTheDocument();
     expect(screen.getByText('Which tool renders React apps?')).toBeInTheDocument();
     expect(screen.getByText('Student One')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Export students CSV' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Export questions CSV' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Export student analytics' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Export question analytics' })).toBeInTheDocument();
   });
 });
 

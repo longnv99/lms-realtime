@@ -49,11 +49,11 @@ export function InstructorAnalyticsPanel({ courseId }: InstructorAnalyticsPanelP
         <TooltipProvider>
           <div className="analytics-actions" aria-label="Analytics exports">
             <ExportButton
-              label="Export students CSV"
+              label="Export student analytics"
               onClick={() => void handleExport('students')}
             />
             <ExportButton
-              label="Export questions CSV"
+              label="Export question analytics"
               onClick={() => void handleExport('questions')}
             />
           </div>

@@ -151,6 +151,33 @@ describe('Analytics (e2e)', () => {
     expect(res.text).toContain('STUDENT User');
   });
 
+  it('exports question analytics as csv for instructors', async () => {
+    const fixture = await createAnalyticsFixture();
+
+    const res = await request(app.getHttpServer())
+      .get(`/api/courses/${fixture.course.id}/analytics/export?kind=questions`)
+      .set('Authorization', `Bearer ${fixture.instructor.accessToken}`)
+      .expect(200);
+
+    expect(res.headers['content-type']).toContain('text/csv');
+    expect(res.headers['content-disposition']).toContain('course-analytics-questions.csv');
+    expect(res.text).toContain('Quiz,Question,Answers,Correct answers,Correct %,Quiz run');
+    expect(res.text).toContain('Which tool renders React apps?');
+  });
+
+  it('rejects instructor analytics for instructors who do not own the course', async () => {
+    const fixture = await createAnalyticsFixture();
+    const otherInstructor = await registerAndLogin(app, 'INSTRUCTOR');
+
+    await request(app.getHttpServer())
+      .get(`/api/courses/${fixture.course.id}/analytics`)
+      .set('Authorization', `Bearer ${otherInstructor.accessToken}`)
+      .expect(403)
+      .expect((res) => {
+        expect(res.body.error.code).toBe('AUTH_FORBIDDEN');
+      });
+  });
+
   async function createAnalyticsFixture() {
     const instructor = await registerAndLogin(app, 'INSTRUCTOR');
     const student = await registerAndLogin(app, 'STUDENT');

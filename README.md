@@ -271,6 +271,22 @@ npm.cmd run test:e2e:prod
 6. Open the media library from a lesson row, search for `seed-demo`, and attach an unused uploaded media asset when one exists.
 7. Detach a lesson video, reattach it from the media library, then sign in as `student@example.com` and confirm `/courses/:courseId/learn` plays only enrolled course media.
 
+### P9 Assessment & Analytics Smoke Test
+
+1. Run `docker compose -f docker-compose.infra.yml up -d`.
+2. Run `npm.cmd run db:seed`.
+3. Run `npm.cmd run dev`.
+4. Sign in as `instructor@example.com` with `Password123!`.
+5. Open `Realtime LMS Foundations` and confirm `Course analytics` shows student, completion, quiz, lesson, and question metrics.
+6. Use the export buttons to download student and question CSV files.
+7. Sign in as `student@example.com` with `Password123!`.
+8. Open the same course and confirm `Assessment analytics` shows completion, quiz score, rank, and recent attempts.
+9. Run the Playwright smoke when backend and frontend are available:
+
+```bash
+npm.cmd run test:e2e:ui -- tests/e2e/p9-assessment-analytics.spec.ts
+```
+
 ## Production Verification
 
 ```bash

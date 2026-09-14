@@ -1028,7 +1028,7 @@ git commit -m "feat(frontend): add course analytics panels"
   - visual audit artifacts under ignored local artifact directories
   - completed P9 checklist
 
-- [ ] **Step 1: Add Playwright E2E smoke**
+- [x] **Step 1: Add Playwright E2E smoke**
 
 Create `tests/e2e/p9-assessment-analytics.spec.ts`:
 
@@ -1041,7 +1041,7 @@ test('instructor and learner can view course analytics', async ({ browser, reque
     height: 900,
   });
 
-  await instructorPage.goto(`/courses/${instructorDemo.courseId}`, { waitUntil: 'networkidle' });
+  await instructorPage.goto(`/courses/${instructorDemo.courseId}`, { waitUntil: 'domcontentloaded' });
   await expect(instructorPage.getByRole('heading', { name: 'Course analytics' })).toBeVisible();
   await expect(
     instructorPage.getByRole('button', { name: /export student analytics/i }),
@@ -1058,8 +1058,8 @@ test('instructor and learner can view course analytics', async ({ browser, reque
     height: 844,
   });
 
-  await studentPage.goto(`/courses/${studentDemo.courseId}`, { waitUntil: 'networkidle' });
-  await expect(studentPage.getByRole('heading', { name: 'My analytics' })).toBeVisible();
+  await studentPage.goto(`/courses/${studentDemo.courseId}`, { waitUntil: 'domcontentloaded' });
+  await expect(studentPage.getByRole('heading', { name: 'Assessment analytics' })).toBeVisible();
   await studentPage.screenshot({
     fullPage: true,
     path: 'artifacts/ui-audit/p9-analytics/learner-mobile.png',
@@ -1070,7 +1070,7 @@ test('instructor and learner can view course analytics', async ({ browser, reque
 });
 ```
 
-- [ ] **Step 2: Run Playwright visual audit**
+- [x] **Step 2: Run Playwright visual audit**
 
 Run local BE/FE with existing DB:
 
@@ -1094,7 +1094,7 @@ Visual pass criteria:
 - analytics panel spacing matches the existing course/detail panels;
 - mobile view stacks rows cleanly and keeps primary actions reachable.
 
-- [ ] **Step 3: Update README**
+- [x] **Step 3: Update README**
 
 Add `### P9 Assessment & Analytics Smoke Test`:
 
@@ -1106,10 +1106,10 @@ Add `### P9 Assessment & Analytics Smoke Test`:
 5. Open `Realtime LMS Foundations` and confirm `Course analytics` shows student, completion, quiz, lesson, and question metrics.
 6. Use the export buttons to download student and question CSV files.
 7. Sign in as `student@example.com` with `Password123!`.
-8. Open the same course and confirm `My analytics` shows completion, quiz score, rank, and recent attempts.
+8. Open the same course and confirm `Assessment analytics` shows completion, quiz score, rank, and recent attempts.
 ```
 
-- [ ] **Step 4: Run final verification**
+- [x] **Step 4: Run final verification**
 
 Run:
 
@@ -1125,11 +1125,11 @@ npm run test:e2e:ui -- tests/e2e/p9-assessment-analytics.spec.ts
 
 Expected: PASS. If full lint on Windows reports only line-ending noise from existing untouched files, verify the same commands on GitHub CI before marking this task complete.
 
-- [ ] **Step 5: Mark plan complete**
+- [x] **Step 5: Mark plan complete**
 
 Check every completed box in this file and ensure no unchecked implementation task remains.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add README.md tests/e2e/p9-assessment-analytics.spec.ts docs/superpowers/plans/2026-09-14-lms-realtime-p9-assessment-analytics.md
@@ -1140,16 +1140,16 @@ git commit -m "docs(plan): complete p9 assessment analytics"
 
 ## P9 Acceptance Checklist
 
-- [ ] Learner analytics endpoint returns lesson completion, quiz attempt, score, rank, and last activity data for enrolled students.
-- [ ] Learner analytics endpoint denies non-enrolled students.
-- [ ] Instructor analytics endpoint returns total students, active students, average completion, completed students, quiz participation, lesson completions, question performance, and student summaries.
-- [ ] Instructor analytics endpoint is restricted to admin or the owning instructor.
-- [ ] CSV export supports `students` and `questions` with escaped values and `text/csv` response headers.
-- [ ] Seed data includes enough progress and quiz answer variance to make analytics meaningful.
-- [ ] Course detail UI shows learner and instructor analytics with English copy and shadcn-style dark UI.
-- [ ] UI action buttons use icons and accessible labels; tables have balanced columns and avoid desktop horizontal scroll.
-- [ ] Playwright screenshots verify desktop/mobile analytics layout quality.
-- [ ] Backend lint, frontend lint, backend tests, frontend tests, typecheck, build, and P9 E2E pass locally or on GitHub CI.
+- [x] Learner analytics endpoint returns lesson completion, quiz attempt, score, rank, and last activity data for enrolled students.
+- [x] Learner analytics endpoint denies non-enrolled students.
+- [x] Instructor analytics endpoint returns total students, active students, average completion, completed students, quiz participation, lesson completions, question performance, and student summaries.
+- [x] Instructor analytics endpoint is restricted to admin or the owning instructor.
+- [x] CSV export supports `students` and `questions` with escaped values and `text/csv` response headers.
+- [x] Seed data includes enough progress and quiz answer variance to make analytics meaningful.
+- [x] Course detail UI shows learner and instructor analytics with English copy and shadcn-style dark UI.
+- [x] UI action buttons use icons and accessible labels; tables have balanced columns and avoid desktop horizontal scroll.
+- [x] Playwright screenshots verify desktop/mobile analytics layout quality.
+- [x] Backend lint, frontend lint, backend tests, frontend tests, typecheck, build, and P9 E2E pass locally or on GitHub CI.
 
 ## Out of Scope for P9
 
